@@ -1,0 +1,28 @@
+; Engine configuration file.
+; SPDX-License-Identifier: AGPL-3.0-or-later
+
+config_version=5
+
+[application]
+
+config/name="The Fortune Teahouse"
+run/main_scene="res://scenes/placeholder.tscn"
+config/features=PackedStringArray("4.7", "GL Compatibility")
+config/icon="res://icon.svg"
+
+[display]
+
+window/size/viewport_width=390
+window/size/viewport_height=844
+window/stretch/mode="canvas_items"
+window/stretch/aspect="expand"
+window/handheld/orientation=1
+
+[editor_plugins]
+
+enabled=PackedStringArray()
+
+[rendering]
+
+renderer/rendering_method="gl_compatibility"
+renderer/rendering_method.mobile="gl_compatibility"
