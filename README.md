@@ -33,6 +33,16 @@ Headless Godot can exit 0 even when something failed to load, so also look for `
 
 To try the game itself, run `$GODOT --path game` (a window, 390x844 portrait) or serve the web export below.
 
+## Point the game at a scoreboard
+
+By default the game is offline-only: progress lives on the phone. To share progress through a scoreboard server (see [server/README.md](server/README.md); locally `uvicorn app.main:create_app --factory` in `server/` serves `http://localhost:8000`):
+
+- **Build time:** set `fortune/scoreboard_url` in `game/project.godot` (section `[fortune]`) to the server root, for example `scoreboard_url="https://scoreboard.example.org"`.
+- **Web, at run time:** open the game with `?scoreboard=` and the address, for example `https://example.github.io/fortune/?scoreboard=https://scoreboard.example.org`. It overrides the setting for that page load only (http and https only).
+- **On the phone:** Menu > Scoreboard has a "Use scoreboard" switch, the address in use, and "Sync now", which sends anything still waiting. Writes queue in `user://queue.json` while the server is down and send when it is back; the game plays on regardless.
+
+A browser blocks a plain `http://` scoreboard from an `https://` page, and the server must list the game's origin in `CORS_ORIGINS`.
+
 ## Export the web build
 
 ```sh

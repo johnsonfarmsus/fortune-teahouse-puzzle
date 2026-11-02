@@ -1,11 +1,16 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 extends ScreenBase
-## Display name, switch crew, sound, source code link and reset.
+## Display name, switch crew, sound, scoreboard, source code link and reset.
 
 var _name_label: Label
 var _keypad: LetterKeypad
 var _crew_buttons: Dictionary = {}
 var _confirm_row: HBoxContainer
+var _board_toggle: CheckButton
+var _board_url: Label
+var _board_status: Label
+var _board_queue: Label
+var _sync_button: Button
 
 
 func _screen_title() -> String:
@@ -52,6 +57,8 @@ func _build(box: VBoxContainer) -> void:
 	sound.toggled.connect(func(on: bool) -> void: GameState.set_sound_on(on))
 	list.add_child(sound)
 
+	_build_scoreboard(list)
+
 	var source := UiKit.button("Source code (AGPL)", Vector2(0, 48))
 	source.pressed.connect(func() -> void: OS.shell_open(Ids.REPO_URL))
 	list.add_child(source)
@@ -72,6 +79,59 @@ func _build(box: VBoxContainer) -> void:
 	list.add_child(warn)
 	list.add_child(_confirm_row)
 	refresh()
+	_refresh_scoreboard()
+
+
+func _build_scoreboard(list: VBoxContainer) -> void:
+	list.add_child(UiKit.label("Scoreboard", 20))
+	_board_toggle = CheckButton.new()
+	_board_toggle.text = "Use scoreboard"
+	_board_toggle.custom_minimum_size = Vector2(200, 48)
+	_board_toggle.focus_mode = Control.FOCUS_NONE
+	_board_toggle.button_pressed = Progress.scoreboard_enabled
+	_board_toggle.disabled = not Progress.scoreboard_available()
+	_board_toggle.toggled.connect(_on_board_toggled)
+	list.add_child(_board_toggle)
+	_board_url = UiKit.label("", UiKit.CLUE_SIZE)
+	list.add_child(_board_url)
+	_board_status = UiKit.label("", UiKit.CLUE_SIZE)
+	list.add_child(_board_status)
+	_sync_button = UiKit.button("Sync now", Vector2(0, 48))
+	_sync_button.pressed.connect(_on_sync)
+	list.add_child(_sync_button)
+	_board_queue = UiKit.label("", UiKit.CLUE_SIZE)
+	list.add_child(_board_queue)
+	Events.scoreboard_status_changed.connect(_refresh_scoreboard)
+
+
+func _refresh_scoreboard() -> void:
+	if _board_status == null or not is_inside_tree():
+		return
+	if Progress.scoreboard_available():
+		_board_url.text = "Address: " + Progress.scoreboard_url
+	else:
+		_board_url.text = "Address: none set"
+	if not Progress.scoreboard_available():
+		_board_status.text = "No scoreboard is set up. This phone plays on its own."
+	elif not Progress.scoreboard_enabled:
+		_board_status.text = "Off. This phone plays on its own."
+	elif Progress.store.is_online():
+		_board_status.text = "Online"
+	else:
+		_board_status.text = "Offline. Updates wait here and send when it is back."
+	var waiting := Progress.queue_size()
+	_board_queue.text = "Waiting to send: %d" % waiting
+	_sync_button.disabled = not Progress.scoreboard_active()
+
+
+func _on_board_toggled(on: bool) -> void:
+	Progress.use_scoreboard(on)
+	_refresh_scoreboard()
+
+
+func _on_sync() -> void:
+	Progress.sync_now()
+	_refresh_scoreboard()
 
 
 func refresh() -> void:

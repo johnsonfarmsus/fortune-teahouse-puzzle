@@ -20,6 +20,7 @@ CREATE TABLE IF NOT EXISTS part_solves (
   machine TEXT NOT NULL,
   part TEXT NOT NULL,
   solved_at TEXT NOT NULL,
+  credited INTEGER NOT NULL DEFAULT 1,
   PRIMARY KEY (device_id, machine, part)
 );
 CREATE INDEX IF NOT EXISTS part_solves_machine ON part_solves(machine, part);
@@ -81,6 +82,9 @@ def init_db(settings: Settings) -> None:
     try:
         conn.execute("PRAGMA journal_mode=WAL")
         conn.executescript(SCHEMA)
+        cols = {r["name"] for r in conn.execute("PRAGMA table_info(part_solves)")}
+        if "credited" not in cols:  # databases created before the credited flag
+            conn.execute("ALTER TABLE part_solves ADD COLUMN credited INTEGER NOT NULL DEFAULT 1")
         for hid, name, frm, to in HANDOFFS:
             conn.execute(
                 "INSERT INTO handoffs (id, name, from_machine, to_machine, settings_total)"

@@ -26,12 +26,25 @@ grow_horizontal = 2
 grow_vertical = 2
 theme_override_constants/separation = 6
 
-[node name="CrewLabel" type="Label" parent="Bar/Row"]
+[node name="CrewBox" type="VBoxContainer" parent="Bar/Row"]
 layout_mode = 2
 size_flags_horizontal = 3
+theme_override_constants/separation = 0
+alignment = 1
+
+[node name="CrewLabel" type="Label" parent="Bar/Row/CrewBox"]
+layout_mode = 2
 theme_override_font_sizes/font_size = 16
 text = "No crew yet"
 vertical_alignment = 1
+text_overrun_behavior = 3
+
+[node name="MaintainerBadge" type="Label" parent="Bar/Row/CrewBox"]
+visible = false
+layout_mode = 2
+theme_override_colors/font_color = Color(0.95, 0.72, 0.2, 1)
+theme_override_font_sizes/font_size = 14
+text = "Maintainer"
 text_overrun_behavior = 3
 
 [node name="CluesButton" type="Button" parent="Bar/Row"]

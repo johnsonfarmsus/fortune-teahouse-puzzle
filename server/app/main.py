@@ -34,7 +34,7 @@ class DeviceRef(BaseModel):
     @field_validator("device_id")
     @classmethod
     def _uuid(cls, v: str) -> str:
-        return service.canon_device_id(v)
+        return service.check_device_id(v)
 
 
 class DeviceIn(DeviceRef):
@@ -45,6 +45,10 @@ class DeviceIn(DeviceRef):
     @classmethod
     def _name(cls, v: str | None) -> str | None:
         return service.clean_display_name(v)
+
+
+class SolveIn(DeviceRef):
+    credited: bool = True
 
 
 class SettingIn(DeviceRef):
@@ -138,10 +142,10 @@ def get_crew(machine: str, ctx: Ctx = Depends(get_ctx)) -> dict:
 
 
 @api.post("/crews/{machine}/parts/{part}/solve")
-def solve_part(machine: str, part: str, body: DeviceRef, ctx: Ctx = Depends(get_ctx)) -> dict:
+def solve_part(machine: str, part: str, body: SolveIn, ctx: Ctx = Depends(get_ctx)) -> dict:
     service.check_machine(machine)
     service.check_part(part)
-    return service.solve_part(ctx.conn, body.device_id, machine, part, ctx.now_str)
+    return service.solve_part(ctx.conn, body.device_id, machine, part, ctx.now_str, body.credited)
 
 
 @api.get("/contributors")
