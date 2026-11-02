@@ -1,0 +1,288 @@
+{
+  "schema_version": 1,
+  "description": "The Gnu, the retired maintainer. He appears only through notes, voicemails and sticky labels. One piece per machine part (shown the first time a player opens that part, before the puzzle's own intro), six notes around town, and the last fortune.",
+  "pieces": [
+    {
+      "id": "gnu.part.fortune_machine.logic",
+      "speaker": "Gnu",
+      "kind": "sticky",
+      "lines": [
+        "Phrase banks: I always knew which bank fed which printer slot.",
+        "I kept it in my head, which is not a filing system. Sorry. - G."
+      ],
+      "where": "puzzle:fortune_machine/logic",
+      "when": "first_visit"
+    },
+    {
+      "id": "gnu.part.fortune_machine.wiring",
+      "speaker": "Gnu",
+      "kind": "note",
+      "lines": [
+        "Ink pump: I lettered every tube. I did that much, at least.",
+        "If the fortunes print pale, a tube has wandered off. They do that. - G."
+      ],
+      "where": "puzzle:fortune_machine/wiring",
+      "when": "first_visit"
+    },
+    {
+      "id": "gnu.part.fortune_machine.sequence",
+      "speaker": "Gnu",
+      "kind": "voicemail",
+      "lines": [
+        "Hi, it's me. Did the job list fall off the wall again? The tape never holds.",
+        "The machine does it the way you would by hand. Just faster. Oh, my bus. Bye!"
+      ],
+      "where": "puzzle:fortune_machine/sequence",
+      "when": "first_visit"
+    },
+    {
+      "id": "gnu.part.fortune_machine.word",
+      "speaker": "Gnu",
+      "kind": "note",
+      "lines": [
+        "I dropped the phrase drawer and a fortune came apart. It rhymed once.",
+        "Read it out loud. Your ear knows more than you think. - G."
+      ],
+      "where": "puzzle:fortune_machine/word",
+      "when": "first_visit"
+    },
+    {
+      "id": "gnu.part.fortune_machine.rhythm",
+      "speaker": "Gnu",
+      "kind": "sticky",
+      "lines": [
+        "Printer: stamps on the beat. Do not rush it.",
+        "(I always rushed it.)"
+      ],
+      "where": "puzzle:fortune_machine/rhythm",
+      "when": "first_visit"
+    },
+    {
+      "id": "gnu.part.fortune_machine.helper",
+      "speaker": "Gnu",
+      "kind": "note",
+      "lines": [
+        "Seagull has been rescuing my lost fortunes for years.",
+        "I never once said thank you. Would you say it for me? - G."
+      ],
+      "where": "puzzle:fortune_machine/helper",
+      "when": "first_visit"
+    },
+    {
+      "id": "gnu.part.cookie_machine.logic",
+      "speaker": "Gnu",
+      "kind": "note",
+      "lines": [
+        "The batter jars! I took the labels off to wash them, and then I retired.",
+        "The recipe is still out there. In bits. On the cookies, mostly. Sorry. - G."
+      ],
+      "where": "puzzle:cookie_machine/logic",
+      "when": "first_visit"
+    },
+    {
+      "id": "gnu.part.cookie_machine.wiring",
+      "speaker": "Gnu",
+      "kind": "sticky",
+      "lines": [
+        "Mixer controller: the colored bands are numbers. Old trick, still good.",
+        "Penguin, if you're reading this: you were right about the faded label."
+      ],
+      "where": "puzzle:cookie_machine/wiring",
+      "when": "first_visit"
+    },
+    {
+      "id": "gnu.part.cookie_machine.sequence",
+      "speaker": "Gnu",
+      "kind": "voicemail",
+      "lines": [
+        "Penguin, it's the gnu. I shuffled your recipe card looking for my glasses.",
+        "They were on my head the whole time. The card was not. So sorry about the card."
+      ],
+      "where": "puzzle:cookie_machine/sequence",
+      "when": "first_visit"
+    },
+    {
+      "id": "gnu.part.cookie_machine.word",
+      "speaker": "Gnu",
+      "kind": "note",
+      "lines": [
+        "I write my maintenance notes in rhyme, so I'll remember them.",
+        "I did not remember where I put them. - G."
+      ],
+      "where": "puzzle:cookie_machine/word",
+      "when": "first_visit"
+    },
+    {
+      "id": "gnu.part.cookie_machine.rhythm",
+      "speaker": "Gnu",
+      "kind": "sticky",
+      "lines": [
+        "Press: listen to the belt. Thump when it says thump.",
+        "Not before. Not after. (Mostly not after.)"
+      ],
+      "where": "puzzle:cookie_machine/rhythm",
+      "when": "first_visit"
+    },
+    {
+      "id": "gnu.part.cookie_machine.helper",
+      "speaker": "Gnu",
+      "kind": "note",
+      "lines": [
+        "Penguin knows every gear in that machine better than I ever did.",
+        "I just never asked. Don't be like me. Ask Penguin. - G."
+      ],
+      "where": "puzzle:cookie_machine/helper",
+      "when": "first_visit"
+    },
+    {
+      "id": "gnu.part.oven.logic",
+      "speaker": "Gnu",
+      "kind": "voicemail",
+      "lines": [
+        "It's me again. Every heat zone wants its own temperature. They're fussy.",
+        "I set them by feel for thirty years. Feel doesn't fit on a sticky note. Sorry."
+      ],
+      "where": "puzzle:oven/logic",
+      "when": "first_visit"
+    },
+    {
+      "id": "gnu.part.oven.wiring",
+      "speaker": "Gnu",
+      "kind": "sticky",
+      "lines": [
+        "Thermostat: every port has its own sticker. Trust the stickers.",
+        "Do not trust my handwriting on the back of them."
+      ],
+      "where": "puzzle:oven/wiring",
+      "when": "first_visit"
+    },
+    {
+      "id": "gnu.part.oven.sequence",
+      "speaker": "Gnu",
+      "kind": "note",
+      "lines": [
+        "Steam shuffles the Oven's stage list every spring. Every spring, I forget.",
+        "Follow one cookie, start to finish. That's all the Oven knows how to do. - G."
+      ],
+      "where": "puzzle:oven/sequence",
+      "when": "first_visit"
+    },
+    {
+      "id": "gnu.part.oven.word",
+      "speaker": "Gnu",
+      "kind": "note",
+      "lines": [
+        "The packaging label is a little poem. Gopher liked it. So did I.",
+        "The steam got at it. If you can make it rhyme again, it's yours. - G."
+      ],
+      "where": "puzzle:oven/word",
+      "when": "first_visit"
+    },
+    {
+      "id": "gnu.part.oven.rhythm",
+      "speaker": "Gnu",
+      "kind": "sticky",
+      "lines": [
+        "Folding arms: a warm cookie bends. A cold one cracks.",
+        "You only get a moment. Make it count."
+      ],
+      "where": "puzzle:oven/rhythm",
+      "when": "first_visit"
+    },
+    {
+      "id": "gnu.part.oven.helper",
+      "speaker": "Gnu",
+      "kind": "voicemail",
+      "lines": [
+        "Gopher, it's me. Sorry about the maps. I drew north wherever the teahouse was.",
+        "That is not how north works. I know that now. Love to everyone on the pier."
+      ],
+      "where": "puzzle:oven/helper",
+      "when": "first_visit"
+    },
+    {
+      "id": "gnu.town.shop_door",
+      "speaker": "Gnu",
+      "kind": "sign",
+      "lines": [
+        "CLOSED. Gone somewhere warm.",
+        "The machines are... well. You'll see. Please be kind to them. - G."
+      ],
+      "where": "town:shop",
+      "when": "first_visit",
+      "dev_note": "Show on the first tap of the Shop hotspot, before the Shop opens."
+    },
+    {
+      "id": "gnu.town.teahouse_board",
+      "speaker": "Gnu",
+      "kind": "note",
+      "lines": [
+        "Red Panda: my tab is paid up through spring.",
+        "Keep the kettle on for whoever comes to fix things. Somebody will. - G."
+      ],
+      "where": "town:teahouse",
+      "when": "first_visit",
+      "dev_note": "Pinned on the teahouse noticeboard; show after Red Panda's welcome."
+    },
+    {
+      "id": "gnu.town.pier_bottle",
+      "speaker": "Gnu",
+      "kind": "note",
+      "lines": [
+        "If you found this: I meant to write a manual. I wrote this note instead.",
+        "Sorry. Thirty years goes faster than you'd think. - G."
+      ],
+      "where": "town:pier",
+      "when": "first_visit",
+      "dev_note": "A note in a bottle washed up by the pier."
+    },
+    {
+      "id": "gnu.town.shop_counter",
+      "speaker": "Gnu",
+      "kind": "note",
+      "lines": [
+        "THINGS ONLY I KNOW: too many to list.",
+        "THINGS I WROTE DOWN: this list.",
+        "(The list is otherwise blank. I see the problem now.)"
+      ],
+      "where": "shop",
+      "when": "first_visit",
+      "dev_note": "Taped under the shop counter."
+    },
+    {
+      "id": "gnu.town.answering_machine",
+      "speaker": "Gnu",
+      "kind": "voicemail",
+      "lines": [
+        "You've reached the fortune shop. Nobody's here right now.",
+        "Well. If a machine is running, maybe everybody is. Leave a message!"
+      ],
+      "where": "shop",
+      "when": "machine_running:crew",
+      "dev_note": "The shop's answering machine, once the player's crew machine runs."
+    },
+    {
+      "id": "gnu.town.handoffs",
+      "speaker": "Gnu",
+      "kind": "note",
+      "lines": [
+        "Three machines that each work are not one line that works.",
+        "I did the handoffs between them by hand. Every day. Never wrote it down. - G."
+      ],
+      "where": "town",
+      "when": "finale_open",
+      "dev_note": "Found in the town when the finale opens; points players to Elephant."
+    },
+    {
+      "id": "gnu.last_fortune",
+      "speaker": "Gnu",
+      "kind": "note",
+      "lines": [
+        "You figured out what I never wrote down. It's yours now. - G."
+      ],
+      "where": "big_screen",
+      "when": "line_running",
+      "dev_note": "The gnu's last fortune, from DESIGN.md, inside the first cookie out of the full line. DESIGN.md prints the dash as an en dash; the data uses a plain hyphen for the ASCII rule."
+    }
+  ]
+}

@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "description": "Elephant, the archivist, who keeps the town records and collects the gnu's scattered notes in the finale. Generic placeholders until WP9 fixes the finale's design; triggers note_found and handoff_solved are WP9 hooks.",
+  "pieces": [
+    {
+      "id": "elephant.archive.welcome",
+      "speaker": "Elephant",
+      "kind": "dialogue",
+      "lines": [
+        "Welcome to the archive. I keep the town's records. All of them. I never forget.",
+        "But the gnu never gave me his. His notes are scattered all over town."
+      ],
+      "where": "finale_archive",
+      "when": "first_visit"
+    },
+    {
+      "id": "elephant.archive.finale_open",
+      "speaker": "Elephant",
+      "kind": "dialogue",
+      "lines": [
+        "Found one of his notes? Bring it here, and I'll file it where anyone can read it.",
+        "We don't need every note. Just enough. That's the good thing about lots of people."
+      ],
+      "where": "finale_archive",
+      "when": "finale_open"
+    },
+    {
+      "id": "elephant.archive.note_found",
+      "speaker": "Elephant",
+      "kind": "dialogue",
+      "lines": ["Another one! Filed. Now it isn't only in his head. Or yours."],
+      "where": "finale_archive",
+      "when": "note_found"
+    },
+    {
+      "id": "elephant.archive.handoff_solved",
+      "speaker": "Elephant",
+      "kind": "dialogue",
+      "lines": [
+        "A new page for the README he never wrote.",
+        "He would be so embarrassed. And so pleased."
+      ],
+      "where": "finale_archive",
+      "when": "handoff_solved"
+    },
+    {
+      "id": "elephant.archive.line_running",
+      "speaker": "Elephant",
+      "kind": "dialogue",
+      "lines": [
+        "The README is finished. Not by one author. By all of you, a page at a time.",
+        "I'll keep it safe. That's my job. Keeping it running is yours now."
+      ],
+      "where": "finale_archive",
+      "when": "line_running"
+    }
+  ]
+}

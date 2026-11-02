@@ -1,0 +1,102 @@
+{
+  "schema_version": 1,
+  "description": "Red Panda, the teahouse keeper and the game's hub. Shown in a dialogue box over the lucky-word entry screen that the Teahouse hotspot opens.",
+  "pieces": [
+    {
+      "id": "red_panda.welcome.1",
+      "speaker": "Red Panda",
+      "kind": "dialogue",
+      "lines": [
+        "Welcome to the teahouse! Sit anywhere. The cushions don't bite.",
+        "The old gnu retired, and his fortune machines are in a terrible muddle.",
+        "Nobody in town has the whole manual. Lots of us have a page or two."
+      ],
+      "where": "lucky_word_entry",
+      "when": "first_visit"
+    },
+    {
+      "id": "red_panda.welcome.2",
+      "speaker": "Red Panda",
+      "kind": "dialogue",
+      "lines": [
+        "Got a fortune cookie? Its fortune is one of his scrambled ones.",
+        "Type the lucky word from it here, and I'll pour you into the right crew."
+      ],
+      "where": "lucky_word_entry",
+      "when": "first_visit",
+      "dev_note": "Follows red_panda.welcome.1 on the next tap."
+    },
+    {
+      "id": "red_panda.no_crew.1",
+      "speaker": "Red Panda",
+      "kind": "dialogue",
+      "lines": [
+        "No cookie? That's all right. Plenty of people here have one and need a hand.",
+        "Pick a crew below, then go find them. Ask around: what did your fortune say?"
+      ],
+      "where": "lucky_word_entry",
+      "when": "no_crew",
+      "group": "red_panda.no_crew"
+    },
+    {
+      "id": "red_panda.no_crew.2",
+      "speaker": "Red Panda",
+      "kind": "dialogue",
+      "lines": [
+        "Still looking for your people? Wave your phone and ask who got a cookie.",
+        "Everyone here is missing a piece. That's how you find each other."
+      ],
+      "where": "lucky_word_entry",
+      "when": "no_crew",
+      "group": "red_panda.no_crew"
+    },
+    {
+      "id": "red_panda.has_crew.1",
+      "speaker": "Red Panda",
+      "kind": "dialogue",
+      "lines": [
+        "Your crew is scattered all over the room, I'm afraid. That part's on purpose.",
+        "Each of them holds a clue. Bring me their lucky words and we'll add them up."
+      ],
+      "where": "lucky_word_entry",
+      "when": "has_crew",
+      "group": "red_panda.has_crew"
+    },
+    {
+      "id": "red_panda.has_crew.2",
+      "speaker": "Red Panda",
+      "kind": "dialogue",
+      "lines": [
+        "Back for a refill? The tea's still hot.",
+        "Any new lucky words from your crewmates? They go right here."
+      ],
+      "where": "lucky_word_entry",
+      "when": "has_crew",
+      "group": "red_panda.has_crew"
+    },
+    {
+      "id": "red_panda.machine_running",
+      "speaker": "Red Panda",
+      "kind": "dialogue",
+      "lines": [
+        "Hear that humming? The {machine} is running! The whole street can hear it.",
+        "That makes you a maintainer. The other crews could use what you know.",
+        "Go on, send them a nudge. I'll keep your cup warm."
+      ],
+      "where": "lucky_word_entry",
+      "when": "machine_running:crew",
+      "dev_note": "{machine} is the player's crew machine title. Show once, on the first teahouse visit after it runs."
+    },
+    {
+      "id": "red_panda.finale_open",
+      "speaker": "Red Panda",
+      "kind": "dialogue",
+      "lines": [
+        "All three machines run, and still no cookies. The gnu did the handoffs by hand.",
+        "This part takes everyone at once. Elephant is collecting his notes."
+      ],
+      "where": "lucky_word_entry",
+      "when": "finale_open"
+    }
+  ]
+}

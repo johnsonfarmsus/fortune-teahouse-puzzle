@@ -1,0 +1,86 @@
+{
+  "schema_version": 1,
+  "description": "Anglerfish, the FortuneCloud salesperson (comic relief, not a villain). Six town bits shown one at a time at intervals while the player is in the town, and a farewell when the whole line runs, after which the Anglerfish never appears again.",
+  "pieces": [
+    {
+      "id": "anglerfish.town.1",
+      "speaker": "Anglerfish",
+      "kind": "dialogue",
+      "lines": ["Psst! Over here! See the light? FREE TRIAL. Lovely glow, isn't it?"],
+      "where": "town",
+      "when": "interval",
+      "group": "anglerfish.town",
+      "dev_note": "The glowing FREE TRIAL lure. Show the six bits in order, one every few minutes of town time, then repeat."
+    },
+    {
+      "id": "anglerfish.town.2",
+      "speaker": "Anglerfish",
+      "kind": "dialogue",
+      "lines": [
+        "Why fix three creaky old machines? Try FortuneCloud!",
+        "Fresh fortunes, streamed to your door every month. Roughly."
+      ],
+      "where": "town",
+      "when": "interval",
+      "group": "anglerfish.town"
+    },
+    {
+      "id": "anglerfish.town.3",
+      "speaker": "Anglerfish",
+      "kind": "dialogue",
+      "lines": [
+        "Everything you need is right here in this briefcase. *click* *click*",
+        "It's a little stuck. Give me one moment."
+      ],
+      "where": "town",
+      "when": "interval",
+      "group": "anglerfish.town"
+    },
+    {
+      "id": "anglerfish.town.4",
+      "speaker": "Anglerfish",
+      "kind": "dialogue",
+      "lines": [
+        "FortuneCloud Premium: fortunes that say exactly what you want to hear!",
+        "Terms and conditions are in the briefcase. Which is... still stuck."
+      ],
+      "where": "town",
+      "when": "interval",
+      "group": "anglerfish.town"
+    },
+    {
+      "id": "anglerfish.town.5",
+      "speaker": "Anglerfish",
+      "kind": "dialogue",
+      "lines": [
+        "The first month is free! The second month costs a fortune.",
+        "Get it? A fortune? I've been saving that one."
+      ],
+      "where": "town",
+      "when": "interval",
+      "group": "anglerfish.town"
+    },
+    {
+      "id": "anglerfish.town.6",
+      "speaker": "Anglerfish",
+      "kind": "dialogue",
+      "lines": ["Don't mind me. Just glowing in a friendly, helpful sort of way. FREE TRIAL!"],
+      "where": "town",
+      "when": "interval",
+      "group": "anglerfish.town"
+    },
+    {
+      "id": "anglerfish.farewell",
+      "speaker": "Anglerfish",
+      "kind": "dialogue",
+      "lines": [
+        "Well. You fixed it all yourselves. Together, even. Hard to sell against that.",
+        "I'll be off, then. Between us, I always liked the old machines.",
+        "Oh! The briefcase opened. It was empty all along. Huh."
+      ],
+      "where": "town",
+      "when": "line_running",
+      "dev_note": "Shown once, the first time the player is in the town after the line runs. The Anglerfish then leaves for good."
+    }
+  ]
+}

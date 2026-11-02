@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "description": "Concepts for town side puzzles that need no fortune clues, for a later package. Not shown in game. Each is self-contained on one phone screen, has no timer, and fits the existing puzzle types where it can.",
+  "concepts": [
+    {
+      "id": "side.seagull.torn_strips",
+      "character": "Seagull",
+      "place": "town:rooftop",
+      "title": "Torn fortune strips",
+      "concept": "On the seagulls' rooftop, Seagull has a pile of fortune strips that the wind tore in half. The player drags torn halves together until the ragged edges line up and each strip reads as a sensible sentence. Four strips, eight halves, with the torn edge shapes doing most of the work and the words confirming it. Solving one strip makes Seagull read the fortune aloud with great ceremony; finishing all four adds a little framed fortune to the rooftop. No clue, no hint beyond 'look at the edges'."
+    },
+    {
+      "id": "side.penguin.pegboard",
+      "character": "Penguin",
+      "place": "town:shed",
+      "title": "The tool pegboard",
+      "concept": "In the penguins' shed, the gnu borrowed every tool and hung them back anywhere. Penguin's pegboard has a painted outline for each tool. The player drags each tool to the outline that fits its shape, rotating where needed; two outlines look alike and only differ in one detail (a hook, a notch), so players learn to look closely. When the board is full, Penguin finds the little wrench from the idle line and is visibly delighted. A shape-matching cousin of the wiring puzzle."
+    },
+    {
+      "id": "side.gopher.upside_down_map",
+      "character": "Gopher",
+      "place": "town:pier",
+      "title": "The upside-down map",
+      "concept": "Gopher has a delivery to make, but the gnu's hand-drawn map is in square pieces and several are turned the wrong way. The player taps tiles to rotate them until one unbroken path runs from the shop door to the teahouse, past the pier. Lamp posts and the shop sign on the tiles give extra cues for which way is up. When the path joins, Gopher sets off along it and returns with a cup of tea for the player. A tile-rotation puzzle with a single obvious goal."
+    },
+    {
+      "id": "side.red_panda.tea_table",
+      "character": "Red Panda",
+      "place": "town:teahouse",
+      "title": "Seats at the tea table",
+      "concept": "Four regulars (Seagull, Penguin, Gopher and Crab) are coming for tea, and Red Panda wants everyone happy. Each guest says one simple thing about where they like to sit, shown in the scene itself: by the window, next to a friend, not beside the drafty door. The player places four cups around a round table until nobody grumbles. Every fact needed is on screen, so it is a gentle warm-up for the core logic puzzles without using any fortune. Solving it lets the player sit down and adds their cup to the teahouse shelf."
+    },
+    {
+      "id": "side.crab.sandcastle_diff",
+      "character": "Crab",
+      "place": "town:pier",
+      "title": "Two sandcastles",
+      "concept": "Crab built a sandcastle, and a friend suggested changes by building a second one beside it. The player compares the two, taps each difference, and for each one decides with Crab whether to keep it (a flag, a moat) or not (a seaweed tower that will fall over). This quietly shows what reviewing a change looks like: spot what is different, then say yes or no to each part. When the review is done, Crab merges the castles into one and the friend's name joins a tiny sandcastle contributors list."
+    },
+    {
+      "id": "side.anglerfish.briefcase",
+      "character": "Anglerfish",
+      "place": "town",
+      "title": "The briefcase that never opens",
+      "concept": "The Anglerfish asks the player for help opening the clamshell briefcase. Its three-dial lock has a sticker with a small rhyme and three pictures that point to the three numbers, all on the briefcase itself. The player works out and dials the combination; the clasp clicks, the shell creaks, and the briefcase still does not open, because it is glued shut. The Anglerfish thanks them warmly and keeps glowing. The joke pays off in the farewell, when the briefcase finally opens on its own and turns out to be empty."
+    }
+  ]
+}
