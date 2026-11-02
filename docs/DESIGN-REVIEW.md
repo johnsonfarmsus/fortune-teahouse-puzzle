@@ -87,7 +87,10 @@ so confirm with organizers):
   100 cookies is a reasonable fraction of in-person attendees; the online track should get a
   "no cookie" path (the design already has one) and the lucky words should not be printed
   only on cookies if remote players are meant to join crews.
-- **Vendor terms are unconfirmed.** None of the custom fortune cookie vendors found (Fancy
+- **Vendor terms.** Update 2 Nov: Trevor confirmed the vendor is Fortune Cookie Guy
+  (fortunecookieguy.com) and the product page shows a 140-character limit; the sandbox could
+  not fetch the page. The research below predates that and stands only for the remaining
+  terms. None of the custom fortune cookie vendors found (Fancy
   Fortune Cookies, Golden Gate Fortune Cookie Factory, Wonton Food) matches the document's
   terms (9 messages per 50-pack, 140 characters, $69 per pack, $30 per back message). The
   numbers may come from a quote not found online. **Blocker for the cookie order only:** get

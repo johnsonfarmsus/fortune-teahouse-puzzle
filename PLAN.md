@@ -105,8 +105,8 @@ reads, AGPL SPDX header on every new source file, and tests for anything with lo
   answer) satisfying: every 4 of 6 unique, no 3 unique, approachable four unique, and a
   report of which 4-subsets break under the "either order" misreading; 18 fortunes in
   `puzzles/*.yaml` with styled text, lucky word, style, fact, and front length; a configurable
-  character limit (140 default, 99 as an alternative profile because vendor terms are
-  unconfirmed); both back messages; CI job `puzzle-checks` covering the 4-of-6 rule per
+  character limit (140 default, confirmed by the vendor Fortune Cookie Guy; a 99 profile is
+  kept as a stricter option); both back messages; CI job `puzzle-checks` covering the 4-of-6 rule per
   machine, approachable-four rule, length limits, unique lucky words across all 18, and a
   JSON report artifact. Answers must not appear in CI logs.
 - Acceptance: `puzzle-checks` green; a human (Trevor) later confirms each styled text
@@ -184,8 +184,9 @@ reads, AGPL SPDX header on every new source file, and tests for anything with lo
 - WP12 Finale implementation in game and server (Sonnet).
 - WP13 Scoreboard deploy to Hetzner with TLS and backups (Sonnet, Trevor grants access).
 - WP14 Playtest protocol and three playtests (Haiku writes the protocol; humans play).
-- WP15 Cookie order: vendor terms, re-fit fortunes to the real character limit, allergen
-  card, order (Trevor with Haiku support).
+- WP15 Cookie order: confirm the remaining Fortune Cookie Guy terms (different backs per
+  pack, messages per pack, allergens, lead time), allergen card, order (Trevor with Haiku
+  support).
 - WP16 Venue notes (k of N), organizer approvals, event runbook (Sonnet drafts).
 - WP17 Dress rehearsal, freeze, event, retrospective.
 
@@ -227,7 +228,7 @@ worker), never pre-emptively.
 | 100 phones loading several MB at once on venue Wi-Fi | Medium | Size budget, packed assets, loading screen, announce the URL before TeaGL, QR codes on tables |
 | Sandbox cannot run Godot, so workers iterate only through CI | Medium | `get-godot.sh` in WP1; CI kept under 10 minutes; unit-testable logic kept in plain GDScript classes |
 | Session 3-sized packages overrun the credit | High if not split | Already split into WP3 and WP4; WP6 can drop to the Oven only |
-| Vendor character limit is 99, not 140 | Medium | Generator has a limit parameter and a 99-char profile; do not freeze fortunes until terms are written |
+| Vendor terms change (two-sided printing, different backs per pack, messages per pack) | Low | Vendor is Fortune Cookie Guy and 140 characters is confirmed; generator keeps a limit parameter anyway; confirm the remaining terms in writing before the order |
 | Parallel workers touch the same `game/` files | Medium | WP3 owns the shell; WP4 and WP6 create new scenes only and extend via the `PuzzleBase` contract; integrator rebases |
 | Headless Godot exits 0 on failure | High | Log grep in CI |
 | Fortune text does not mean its fact | Medium | PR checklist, human read-through, optional LLM entailment comment |
@@ -240,8 +241,8 @@ Blocking Phase 1 only if you want a non-default answer: D0 to D8 above.
 
 Not blocking Phase 1:
 
-1. Vendor name and written terms (message count per pack, character limit, two-sided cost,
-   different backs per pack, allergens, lead time).
+1. Vendor is Fortune Cookie Guy, 140 characters confirmed. Still needed in writing: message
+   count per pack, two-sided cost, different backs per pack, allergens, lead time.
 2. Hetzner server access and the domain for the scoreboard and, later, the game.
 3. Organizer contact and whether to approach them now or after a playable build exists.
 4. Whether a human artist is planned for the original character designs.
