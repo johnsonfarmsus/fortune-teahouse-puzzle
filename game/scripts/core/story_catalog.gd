@@ -17,6 +17,7 @@ const FILES: Array[String] = [
 	"res://data/story/elephant.json",
 	"res://data/story/anglerfish.json",
 	"res://data/story/interface.json",
+	"res://data/story/chains.json",
 ]
 
 var _pieces: Array[Dictionary] = []  # raw pieces in load order

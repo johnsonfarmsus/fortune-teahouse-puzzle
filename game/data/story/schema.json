@@ -30,15 +30,16 @@
         },
         "where": {
           "type": "string",
-          "description": "Screen or place: start_screen, loading, town, town:<spot>, shop, lucky_word_entry, clue_board, machine_view:<machine>, puzzle:<machine>/<part>, merge_celebration, contributors, crew_progress, settings, finale_archive, big_screen.",
-          "pattern": "^(start_screen|loading|town|town:[a-z_]+|shop|lucky_word_entry|clue_board|machine_view:[a-z_]+|puzzle:[a-z_]+/[a-z_]+|merge_celebration|contributors|crew_progress|settings|finale_archive|big_screen)$"
+          "description": "Screen or place: start_screen, loading, town, town:<spot>, shop, lucky_word_entry, clue_board, machine_view:<machine>, puzzle:<machine>/<part>, merge_celebration, contributors, crew_progress, settings, finale_archive, big_screen; and for the adventure layer room:<room id> (data/rooms.json) and inventory.",
+          "pattern": "^(start_screen|loading|town|town:[a-z_]+|room:[a-z_]+|inventory|shop|lucky_word_entry|clue_board|machine_view:[a-z_]+|puzzle:[a-z_]+/[a-z_]+|merge_celebration|contributors|crew_progress|settings|finale_archive|big_screen)$"
         },
         "when": {
           "type": "string",
-          "description": "always; first_visit (first time 'where' is shown on this device); no_crew / has_crew (player state while at 'where'); idle (no input for a while on 'where'); interval (timed, while in the town); merged (any credited merge); first_credit (the first credited solve on this device); uncredited (a revealed solve); machine_running:<machine id, or crew for the player's own crew>; part_fixed:<machine>/<part>; finale_open; note_found and handoff_solved (finale, shape set by WP9); line_running (the whole line runs end to end).",
-          "pattern": "^(always|first_visit|no_crew|has_crew|idle|interval|merged|first_credit|uncredited|finale_open|note_found|handoff_solved|line_running|machine_running:[a-z_]+|part_fixed:[a-z_]+/[a-z_]+)$"
+          "description": "always; interaction (a tap or drop in the adventure layer names this piece by id, from chain or room data); hint (Red Panda's help for a chain step); first_visit (first time 'where' is shown on this device); no_crew / has_crew (player state while at 'where'); idle (no input for a while on 'where'); interval (timed, while in the town); merged (any credited merge); first_credit (the first credited solve on this device); uncredited (a revealed solve); machine_running:<machine id, or crew for the player's own crew>; part_fixed:<machine>/<part>; finale_open; note_found and handoff_solved (finale, shape set by WP9); line_running (the whole line runs end to end).",
+          "pattern": "^(always|interaction|hint|first_visit|no_crew|has_crew|idle|interval|merged|first_credit|uncredited|finale_open|note_found|handoff_solved|line_running|machine_running:[a-z_]+|part_fixed:[a-z_]+/[a-z_]+)$"
         },
         "group": { "type": "string", "pattern": "^[a-z0-9_.]+$" },
+        "expression": { "enum": ["neutral", "happy", "worried", "surprised", "sly"], "description": "Portrait expression in the adventure layer's dialogue bar (portrait.<speaker>.<expression> in game/assets.json). Default neutral." },
         "dev_note": { "type": "string", "description": "For the implementer; never shown to players." }
       }
     },

@@ -222,7 +222,7 @@ def main():
             for field in ("where", "when"):
                 value = str(piece.get(field, ""))
                 m = re.search(r":([a-z_]+)(?:/([a-z_]+))?$", value)
-                if not m or value.startswith("town:"):
+                if not m or value.startswith("town:") or value.startswith("room:"):
                     continue
                 machine, part = m.group(1), m.group(2)
                 if machine == "crew" and value.startswith("machine_running:"):
