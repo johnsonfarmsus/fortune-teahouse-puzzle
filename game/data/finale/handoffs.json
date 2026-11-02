@@ -1,0 +1,328 @@
+{
+  "schema_version": 1,
+  "notes": [
+    {
+      "id": "cookie_machine",
+      "title": "the Cookie Machine note",
+      "handoff_word": "BATTERBOWL",
+      "free": false,
+      "text": "You got my Cookie Machine going! Thank you, and sorry about the mess. The Oven folk will need two things from you. Every round comes off my press 9 cm across. One bowl of batter makes 24 rounds, then the press runs dry. – G."
+    },
+    {
+      "id": "fortune_machine",
+      "title": "the Fortune Machine note",
+      "handoff_word": "PAPERCHUTE",
+      "free": false,
+      "text": "You fixed my Fortune Machine. I knew someone would. For the Oven: fresh ink must dry for 1 tick before a strip goes down the chute, or it smudges. The chute takes 2 ticks to reach the end of the Oven. – G."
+    },
+    {
+      "id": "oven",
+      "title": "the Oven note",
+      "handoff_word": "GOLDENROUND",
+      "free": false,
+      "text": "The Oven runs again, bless you. I never wrote this down, so here it is. The baking tunnel is 120 cm long, and a round bakes in exactly 40 seconds. Leave 6 cm of bare belt between rounds. A warm round reaches the folding arms at tick 3, then every 4 ticks, and its fortune must land right then. Cooled cookies leave by three chutes: chute 1 the extra crisp ones, chute 2 the golden ones, chute 3 the soft ones. – G."
+    },
+    {
+      "id": "gopher",
+      "title": "Gopher's packing slip",
+      "handoff_word": "",
+      "free": true,
+      "text": "Seagull wants the extra crisp ones for the rooftop basket. Red Panda wants golden ones for the teahouse tins. Crab's little claws need soft ones, packed in the pier crate. Penguin and Elephant have already had theirs. – Gopher"
+    }
+  ],
+  "handoffs": [
+    {
+      "id": "cookie_to_oven",
+      "title": "Cookie Machine to Oven",
+      "needs": [
+        "cookie_machine",
+        "oven"
+      ],
+      "type": "dials",
+      "config": {
+        "intro": "Penguin's rounds drop onto the Oven belt. Set the belt, the press and the bowl so every round comes out golden.",
+        "test_label": "Run a test batch",
+        "preview": {
+          "kind": "belt",
+          "roles": {
+            "speed": "belt_speed",
+            "spacing": "press_every",
+            "bowl": "bowl_every"
+          }
+        },
+        "hints": [
+          "Read both notes side by side. Everything you need is in them."
+        ],
+        "dials": [
+          {
+            "id": "belt_speed",
+            "setting_index": 0,
+            "label": "Belt speed",
+            "unit": "cm per second",
+            "ordered": true,
+            "values": [
+              1,
+              2,
+              3,
+              4,
+              5,
+              6
+            ],
+            "labels": [],
+            "start": 0,
+            "answer": 3,
+            "low": "Too slow: the rounds come out burnt.",
+            "high": "Too fast: the rounds come out raw.",
+            "wrong": "",
+            "hint": "120 cm in 40 seconds. How far each second?"
+          },
+          {
+            "id": "press_every",
+            "setting_index": 1,
+            "label": "Press: one round every",
+            "unit": "seconds",
+            "ordered": true,
+            "values": [
+              3,
+              4,
+              5,
+              6,
+              7,
+              8
+            ],
+            "labels": [],
+            "start": 0,
+            "answer": 5,
+            "low": "Too often: the rounds bump into each other.",
+            "high": "Too slow: big gaps on the belt.",
+            "wrong": "",
+            "hint": "A round plus its bare belt is 9 + 6 cm."
+          },
+          {
+            "id": "bowl_every",
+            "setting_index": 2,
+            "label": "New bowl every",
+            "unit": "minutes",
+            "ordered": true,
+            "values": [
+              1,
+              2,
+              3,
+              4,
+              5,
+              6
+            ],
+            "labels": [],
+            "start": 0,
+            "answer": 2,
+            "low": "Too soon: the bowl overflows.",
+            "high": "Too late: the press runs dry.",
+            "wrong": "",
+            "hint": "24 rounds, one every 5 seconds."
+          }
+        ]
+      }
+    },
+    {
+      "id": "fortune_to_oven",
+      "title": "Fortune Machine to Oven",
+      "needs": [
+        "fortune_machine",
+        "oven"
+      ],
+      "type": "dials",
+      "config": {
+        "intro": "Each printed fortune must land on a warm round just as the arms fold it. Line up the two rows.",
+        "test_label": "Run a test batch",
+        "preview": {
+          "kind": "beats",
+          "ticks": 12,
+          "targets": [
+            3,
+            7,
+            11
+          ],
+          "chute_ticks": 2,
+          "roles": {
+            "every": "print_every",
+            "dry": "dry",
+            "start": "start_tick"
+          }
+        },
+        "hints": [
+          "Read both notes side by side. Everything you need is in them."
+        ],
+        "dials": [
+          {
+            "id": "print_every",
+            "setting_index": 0,
+            "label": "Print a fortune every",
+            "unit": "ticks",
+            "ordered": true,
+            "values": [
+              2,
+              3,
+              4,
+              5,
+              6
+            ],
+            "labels": [],
+            "start": 0,
+            "answer": 4,
+            "low": "Too often: fortunes pile up.",
+            "high": "Too slow: some rounds get no fortune.",
+            "wrong": "",
+            "hint": "How often does a round reach the arms?"
+          },
+          {
+            "id": "dry",
+            "setting_index": 1,
+            "label": "Let the ink dry",
+            "unit": "ticks",
+            "ordered": true,
+            "values": [
+              0,
+              1,
+              2,
+              3
+            ],
+            "labels": [],
+            "start": 0,
+            "answer": 1,
+            "low": "Too short: the ink smudges.",
+            "high": "Too long: the strip misses its round.",
+            "wrong": "",
+            "hint": "How long does fresh ink need?"
+          },
+          {
+            "id": "start_tick",
+            "setting_index": 2,
+            "label": "Start printing at tick",
+            "unit": "",
+            "ordered": true,
+            "values": [
+              0,
+              1,
+              2,
+              3
+            ],
+            "labels": [],
+            "start": 3,
+            "answer": 0,
+            "low": "Too early: the fortune lands on a bare belt.",
+            "high": "Too late: the round has cooled and cracks.",
+            "wrong": "",
+            "hint": "Work back from tick 3: take away drying and chute time."
+          }
+        ]
+      }
+    },
+    {
+      "id": "oven_to_packaging",
+      "title": "Oven to packaging",
+      "needs": [
+        "oven",
+        "gopher"
+      ],
+      "type": "dials",
+      "config": {
+        "intro": "Gopher's paws are full. Send each chute to the package that's waiting for it.",
+        "test_label": "Send a test cookie",
+        "preview": {
+          "kind": "routes",
+          "chutes": [
+            "chute_1",
+            "chute_2",
+            "chute_3"
+          ]
+        },
+        "hints": [
+          "Read both notes side by side. Everything you need is in them."
+        ],
+        "dials": [
+          {
+            "id": "chute_1",
+            "setting_index": 0,
+            "label": "Chute 1 goes to",
+            "unit": "",
+            "ordered": false,
+            "values": [
+              "rooftop_basket",
+              "teahouse_tin",
+              "pier_crate",
+              "shed_box",
+              "archive_drawer"
+            ],
+            "labels": [
+              "Seagull's rooftop basket",
+              "Red Panda's teahouse tin",
+              "Crab's pier crate",
+              "Penguin's shed box",
+              "Elephant's archive drawer"
+            ],
+            "start": 3,
+            "answer": "rooftop_basket",
+            "low": "",
+            "high": "",
+            "wrong": "Gopher frowns: that's not who wants these.",
+            "hint": "What comes down chute 1? Then who wants those?"
+          },
+          {
+            "id": "chute_2",
+            "setting_index": 1,
+            "label": "Chute 2 goes to",
+            "unit": "",
+            "ordered": false,
+            "values": [
+              "rooftop_basket",
+              "teahouse_tin",
+              "pier_crate",
+              "shed_box",
+              "archive_drawer"
+            ],
+            "labels": [
+              "Seagull's rooftop basket",
+              "Red Panda's teahouse tin",
+              "Crab's pier crate",
+              "Penguin's shed box",
+              "Elephant's archive drawer"
+            ],
+            "start": 3,
+            "answer": "teahouse_tin",
+            "low": "",
+            "high": "",
+            "wrong": "Gopher frowns: that's not who wants these.",
+            "hint": "Chute 2 carries the golden ones."
+          },
+          {
+            "id": "chute_3",
+            "setting_index": 2,
+            "label": "Chute 3 goes to",
+            "unit": "",
+            "ordered": false,
+            "values": [
+              "rooftop_basket",
+              "teahouse_tin",
+              "pier_crate",
+              "shed_box",
+              "archive_drawer"
+            ],
+            "labels": [
+              "Seagull's rooftop basket",
+              "Red Panda's teahouse tin",
+              "Crab's pier crate",
+              "Penguin's shed box",
+              "Elephant's archive drawer"
+            ],
+            "start": 3,
+            "answer": "pier_crate",
+            "low": "",
+            "high": "",
+            "wrong": "Gopher frowns: that's not who wants these.",
+            "hint": "Soft cookies, for little claws."
+          }
+        ]
+      }
+    }
+  ]
+}

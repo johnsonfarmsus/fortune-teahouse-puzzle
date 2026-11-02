@@ -1,0 +1,150 @@
+{
+  "schema_version": 1,
+  "needed": 4,
+  "notes": [
+    {
+      "id": "note_1",
+      "code": "KETTLE 27",
+      "venue": "Registration desk sign",
+      "text": "Note to self: the registration desk always runs out of pens. Bring more. – G. Code: KETTLE 27",
+      "twin": {
+        "speaker": "Red Panda",
+        "config": {
+          "speaker": "Red Panda",
+          "lines": [
+            "Oh, the gnu and his tea. Three sugars, every single cup.",
+            "I stopped counting. The sugar bowl was always empty by noon."
+          ],
+          "question": "How many sugars did the gnu take in his tea?",
+          "choices": [
+            "One",
+            "Three",
+            "None"
+          ],
+          "correct": 1,
+          "nudge": "Listen to what Red Panda says about the tea."
+        }
+      }
+    },
+    {
+      "id": "note_2",
+      "code": "GULLWING 41",
+      "venue": "Seagull hidden in the welcome slides",
+      "text": "Note to self: the spare key is under the bait bucket. Do not tell the Anglerfish. – G. Code: GULLWING 41",
+      "twin": {
+        "speaker": "Seagull",
+        "config": {
+          "speaker": "Seagull",
+          "lines": [
+            "Squawk! The gnu hid his spare key under the bait bucket.",
+            "He thought no fish would ever look there. He was right."
+          ],
+          "question": "Where did the gnu hide his spare key?",
+          "choices": [
+            "In the Oven",
+            "In the till",
+            "Under the bait bucket"
+          ],
+          "correct": 2,
+          "nudge": "Seagull knows all about buckets."
+        }
+      }
+    },
+    {
+      "id": "note_3",
+      "code": "DRIPCOFFEE 08",
+      "venue": "Hallway-track coffee",
+      "text": "Note to self: Crab merges every fix, even the tiny ones. Say thank you. – G. Code: DRIPCOFFEE 08",
+      "twin": {
+        "speaker": "Crab",
+        "config": {
+          "speaker": "Crab",
+          "lines": [
+            "Snip snip! Every fix that comes in, I merge it.",
+            "I never hide one. I never eat one. I merge it."
+          ],
+          "question": "What does Crab do with every fix?",
+          "choices": [
+            "Merges it",
+            "Hides it",
+            "Eats it"
+          ],
+          "correct": 0,
+          "nudge": "Crab is very proud of one thing."
+        }
+      }
+    },
+    {
+      "id": "note_4",
+      "code": "CROSSWIND 63",
+      "venue": "Big-screen stand",
+      "text": "Note to self: the Cookie Machine's belt runs towards the Oven. Mind the crumbs. – G. Code: CROSSWIND 63",
+      "twin": {
+        "speaker": "Penguin",
+        "config": {
+          "speaker": "Penguin",
+          "lines": [
+            "Waddle waddle. The belt on the Cookie Machine runs towards the Oven.",
+            "Always has. The rounds go in one end and the Oven gets them."
+          ],
+          "question": "Which way does the Cookie Machine's belt run?",
+          "choices": [
+            "Towards the sea",
+            "In circles",
+            "Towards the Oven"
+          ],
+          "correct": 2,
+          "nudge": "Think about where the rounds are going."
+        }
+      }
+    },
+    {
+      "id": "note_5",
+      "code": "INKBLOT 19",
+      "venue": "Session schedule board",
+      "text": "Note to self: never pack a warm cookie. Gopher will tell you why. – G. Code: INKBLOT 19",
+      "twin": {
+        "speaker": "Gopher",
+        "config": {
+          "speaker": "Gopher",
+          "lines": [
+            "Paws off the warm ones! I never pack a warm cookie.",
+            "Cold cookies travel well. Warm ones crumble in the crate."
+          ],
+          "question": "What does Gopher never pack?",
+          "choices": [
+            "A warm cookie",
+            "A cold cookie",
+            "A map"
+          ],
+          "correct": 0,
+          "nudge": "Gopher is fussy about temperature."
+        }
+      }
+    },
+    {
+      "id": "note_6",
+      "code": "SALTWATER 52",
+      "venue": "Info and swag table",
+      "text": "Note to self: show Elephant everything. The town records are only as good as what goes in. – G. Code: SALTWATER 52",
+      "twin": {
+        "speaker": "Elephant",
+        "config": {
+          "speaker": "Elephant",
+          "lines": [
+            "I keep the town records. That is what I do.",
+            "Not the cookies. Not the keys. The records."
+          ],
+          "question": "What does Elephant keep?",
+          "choices": [
+            "The cookies",
+            "The keys",
+            "The town records"
+          ],
+          "correct": 2,
+          "nudge": "Elephant has said it more than once."
+        }
+      }
+    }
+  ]
+}
