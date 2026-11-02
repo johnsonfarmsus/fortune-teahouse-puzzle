@@ -1,0 +1,142 @@
+# SPDX-License-Identifier: AGPL-3.0-or-later
+#
+# CI for the Godot web game: headless import, gdUnit4 tests, web export with a
+# size budget, and (on main only) deploy to GitHub Pages.
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+env:
+  GODOT_VERSION: "4.7.2"
+  # Keep in sync with GDUNIT4_VERSION default in tools/dev/get-gdunit4.sh.
+  GDUNIT4_VERSION: "v6.2.3"
+
+jobs:
+  test:
+    name: gdUnit4 tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      # The action installs Godot and the GdUnit4 addon (addons/gdUnit4 is not committed).
+      - name: Run gdUnit4 tests
+        uses: godot-gdunit-labs/gdUnit4-action@v1
+        with:
+          godot-version: ${{ env.GODOT_VERSION }}
+          version: ${{ env.GDUNIT4_VERSION }}
+          paths: res://test
+          project_dir: game
+          # Report publishing needs checks/pull-requests write access, which
+          # fork PRs do not get. The report is still uploaded as an artifact.
+          publish-report: "false"
+          upload-report: "true"
+
+  build:
+    name: Import, export and size budget
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: chickensoft-games/setup-godot@v2
+        with:
+          version: ${{ env.GODOT_VERSION }}
+          use-dotnet: false
+          include-templates: true
+
+      - name: Godot version
+        run: godot --version
+
+      # Headless Godot exits 0 even when scripts or resources fail to load, so
+      # every step greps its log for errors. Import runs twice: the first run
+      # builds the .godot cache, the second proves a warm import is clean too.
+      - name: Import project (pass 1)
+        run: |
+          set -o pipefail
+          godot --headless --path game --import 2>&1 | tee "$RUNNER_TEMP/import1.log"
+          if grep -E "ERROR|SCRIPT ERROR" "$RUNNER_TEMP/import1.log"; then
+            echo "::error::Errors found in import pass 1 log"; exit 1
+          fi
+
+      - name: Import project (pass 2)
+        run: |
+          set -o pipefail
+          godot --headless --path game --import 2>&1 | tee "$RUNNER_TEMP/import2.log"
+          if grep -E "ERROR|SCRIPT ERROR" "$RUNNER_TEMP/import2.log"; then
+            echo "::error::Errors found in import pass 2 log"; exit 1
+          fi
+
+      - name: Export Web build
+        run: |
+          set -o pipefail
+          mkdir -p game/build/web
+          godot --headless --path game --export-release "Web" build/web/index.html 2>&1 | tee "$RUNNER_TEMP/export.log"
+          if grep -E "ERROR|SCRIPT ERROR" "$RUNNER_TEMP/export.log"; then
+            echo "::error::Errors found in export log"; exit 1
+          fi
+          test -s game/build/web/index.html
+          test -s game/build/web/index.wasm
+          test -s game/build/web/index.pck
+          # GitHub Pages must not run Jekyll over the export.
+          touch game/build/web/.nojekyll
+
+      # Budget is on gzip size (what phones download from Pages); uncompressed
+      # size is reported too. Writes both to the job summary.
+      - name: Size budget (12 MB gzip)
+        run: tools/dev/check-size.sh game/build/web
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: web-build
+          path: game/build/web
+          include-hidden-files: true
+          if-no-files-found: error
+
+      - name: Upload logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: godot-logs
+          path: ${{ runner.temp }}/*.log
+          if-no-files-found: ignore
+
+      - name: Package for GitHub Pages
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: game/build/web
+
+  deploy:
+    name: Deploy to GitHub Pages
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: [test, build]
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+      contents: read
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    concurrency:
+      group: pages
+      cancel-in-progress: false
+    steps:
+      - uses: actions/configure-pages@v5
+        with:
+          enablement: true
+      - name: Deploy
+        id: deployment
+        uses: actions/deploy-pages@v4
