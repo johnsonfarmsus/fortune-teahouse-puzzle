@@ -19,3 +19,6 @@ node_modules/
 
 # Server data
 server/data/*.db
+
+# Deployment secrets (copy server/deploy/.env.example to server/deploy/.env on the server only)
+server/deploy/.env

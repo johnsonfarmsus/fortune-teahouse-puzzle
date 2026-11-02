@@ -1,0 +1,15 @@
+# SPDX-License-Identifier: AGPL-3.0-or-later
+# Install: sudo cp this file and the .timer to /etc/systemd/system/, edit the two paths below if
+# the repository is not in /opt/fortune-teahouse-puzzle, then
+#   sudo systemctl daemon-reload && sudo systemctl enable --now fortune-scoreboard-backup.timer
+[Unit]
+Description=Back up the Fortune Teahouse scoreboard database
+Wants=docker.service
+After=docker.service
+
+[Service]
+Type=oneshot
+WorkingDirectory=/opt/fortune-teahouse-puzzle
+ExecStart=/opt/fortune-teahouse-puzzle/server/deploy/backup.sh
+# BACKUP_DIR, BACKUP_KEEP and BACKUP_RSYNC_TARGET are read from server/deploy/.env.
+Nice=10
