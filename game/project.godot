@@ -6,9 +6,19 @@ config_version=5
 [application]
 
 config/name="The Fortune Teahouse"
-run/main_scene="res://scenes/placeholder.tscn"
+run/main_scene="res://scenes/main/main.tscn"
 config/features=PackedStringArray("4.7", "GL Compatibility")
 config/icon="res://icon.svg"
+
+[autoload]
+
+Events="*res://autoload/events.gd"
+PuzzleData="*res://autoload/puzzle_data.gd"
+GameState="*res://autoload/game_state.gd"
+Progress="*res://autoload/progress.gd"
+Hints="*res://autoload/hints.gd"
+Audio="*res://autoload/audio.gd"
+Router="*res://autoload/router.gd"
 
 [display]
 
@@ -17,6 +27,14 @@ window/size/viewport_height=844
 window/stretch/mode="canvas_items"
 window/stretch/aspect="expand"
 window/handheld/orientation=1
+
+[gui]
+
+theme/custom="res://ui/main_theme.tres"
+
+[input_devices]
+
+pointing/emulate_mouse_from_touch=true
 
 [editor_plugins]
 

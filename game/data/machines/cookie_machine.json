@@ -1,0 +1,60 @@
+{
+  "helper": "Penguin",
+  "machine": "cookie_machine",
+  "parts": [
+    {
+      "config": {
+        "from_puzzle_data": true
+      },
+      "part": "logic",
+      "title": "Batter recipe",
+      "type": "matching"
+    },
+    {
+      "config": {},
+      "part": "wiring",
+      "title": "Mixer motor controller",
+      "type": "wiring"
+    },
+    {
+      "config": {},
+      "part": "sequence",
+      "title": "Mix, rest and press",
+      "type": "sequence"
+    },
+    {
+      "config": {},
+      "part": "word",
+      "title": "The gnu's rhyming note",
+      "type": "word"
+    },
+    {
+      "config": {},
+      "part": "rhythm",
+      "title": "Press and conveyor beat",
+      "type": "rhythm"
+    },
+    {
+      "config": {
+        "choices": [
+          "The press",
+          "The motor controller",
+          "The conveyor"
+        ],
+        "correct": 1,
+        "lines": [
+          "Squawk! Oh, hello there. I'm Penguin. I look after the Cookie Machine's moving parts, ever since the gnu retired.",
+          "First, the mixer. It stirs the batter, but it only turns when the motor controller tells it to. No controller, no stirring.",
+          "Then the press. It squashes each blob of batter into a thin, flat round. It waits for the conveyor's beat, then thump.",
+          "Last, the conveyor. It carries the flat rounds away to the Oven. Press too early and the rounds pile up. Too late and the belt runs empty."
+        ],
+        "nudge": "Listen to what Penguin said about the mixer. Which part tells it when to turn?",
+        "question": "The batter is not being stirred. Which part tells the mixer when to turn?",
+        "speaker": "Penguin"
+      },
+      "part": "helper",
+      "title": "Penguin's moving parts",
+      "type": "helper"
+    }
+  ]
+}

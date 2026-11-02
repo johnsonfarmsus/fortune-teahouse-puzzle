@@ -1,0 +1,150 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scenes/world/shop.gd" id="1"]
+[ext_resource type="PackedScene" path="res://scenes/world/hotspot.tscn" id="2"]
+[ext_resource type="PackedScene" path="res://scenes/world/part_fixture.tscn" id="3"]
+
+[node name="Shop" type="Node2D"]
+script = ExtResource("1")
+
+[node name="Floor" type="ColorRect" parent="."]
+offset_left = -400.0
+offset_top = -100.0
+offset_right = 1600.0
+offset_bottom = 2000.0
+mouse_filter = 2
+color = Color(0.3, 0.22, 0.17, 1)
+
+[node name="Machines" type="Node2D" parent="."]
+
+[node name="FortuneMachine" type="Node2D" parent="Machines"]
+position = Vector2(0, 70)
+
+[node name="Hotspot" parent="Machines/FortuneMachine" instance=ExtResource("2")]
+position = Vector2(70, 60)
+machine = "fortune_machine"
+label_text = "Fortune Machine"
+
+[node name="Fixtures" type="Node2D" parent="Machines/FortuneMachine"]
+position = Vector2(170, 20)
+
+[node name="Logic" parent="Machines/FortuneMachine/Fixtures" instance=ExtResource("3")]
+position = Vector2(0, 0)
+machine = "fortune_machine"
+part = "logic"
+
+[node name="Wiring" parent="Machines/FortuneMachine/Fixtures" instance=ExtResource("3")]
+position = Vector2(76, 0)
+machine = "fortune_machine"
+part = "wiring"
+
+[node name="Sequence" parent="Machines/FortuneMachine/Fixtures" instance=ExtResource("3")]
+position = Vector2(152, 0)
+machine = "fortune_machine"
+part = "sequence"
+
+[node name="Word" parent="Machines/FortuneMachine/Fixtures" instance=ExtResource("3")]
+position = Vector2(0, 100)
+machine = "fortune_machine"
+part = "word"
+
+[node name="Rhythm" parent="Machines/FortuneMachine/Fixtures" instance=ExtResource("3")]
+position = Vector2(76, 100)
+machine = "fortune_machine"
+part = "rhythm"
+
+[node name="Helper" parent="Machines/FortuneMachine/Fixtures" instance=ExtResource("3")]
+position = Vector2(152, 100)
+machine = "fortune_machine"
+part = "helper"
+
+[node name="CookieMachine" type="Node2D" parent="Machines"]
+position = Vector2(0, 320)
+
+[node name="Hotspot" parent="Machines/CookieMachine" instance=ExtResource("2")]
+position = Vector2(70, 60)
+machine = "cookie_machine"
+label_text = "Cookie Machine"
+
+[node name="Fixtures" type="Node2D" parent="Machines/CookieMachine"]
+position = Vector2(170, 20)
+
+[node name="Logic" parent="Machines/CookieMachine/Fixtures" instance=ExtResource("3")]
+position = Vector2(0, 0)
+machine = "cookie_machine"
+part = "logic"
+
+[node name="Wiring" parent="Machines/CookieMachine/Fixtures" instance=ExtResource("3")]
+position = Vector2(76, 0)
+machine = "cookie_machine"
+part = "wiring"
+
+[node name="Sequence" parent="Machines/CookieMachine/Fixtures" instance=ExtResource("3")]
+position = Vector2(152, 0)
+machine = "cookie_machine"
+part = "sequence"
+
+[node name="Word" parent="Machines/CookieMachine/Fixtures" instance=ExtResource("3")]
+position = Vector2(0, 100)
+machine = "cookie_machine"
+part = "word"
+
+[node name="Rhythm" parent="Machines/CookieMachine/Fixtures" instance=ExtResource("3")]
+position = Vector2(76, 100)
+machine = "cookie_machine"
+part = "rhythm"
+
+[node name="Helper" parent="Machines/CookieMachine/Fixtures" instance=ExtResource("3")]
+position = Vector2(152, 100)
+machine = "cookie_machine"
+part = "helper"
+
+[node name="Oven" type="Node2D" parent="Machines"]
+position = Vector2(0, 570)
+
+[node name="Hotspot" parent="Machines/Oven" instance=ExtResource("2")]
+position = Vector2(70, 60)
+machine = "oven"
+label_text = "Oven"
+
+[node name="Fixtures" type="Node2D" parent="Machines/Oven"]
+position = Vector2(170, 20)
+
+[node name="Logic" parent="Machines/Oven/Fixtures" instance=ExtResource("3")]
+position = Vector2(0, 0)
+machine = "oven"
+part = "logic"
+
+[node name="Wiring" parent="Machines/Oven/Fixtures" instance=ExtResource("3")]
+position = Vector2(76, 0)
+machine = "oven"
+part = "wiring"
+
+[node name="Sequence" parent="Machines/Oven/Fixtures" instance=ExtResource("3")]
+position = Vector2(152, 0)
+machine = "oven"
+part = "sequence"
+
+[node name="Word" parent="Machines/Oven/Fixtures" instance=ExtResource("3")]
+position = Vector2(0, 100)
+machine = "oven"
+part = "word"
+
+[node name="Rhythm" parent="Machines/Oven/Fixtures" instance=ExtResource("3")]
+position = Vector2(76, 100)
+machine = "oven"
+part = "rhythm"
+
+[node name="Helper" parent="Machines/Oven/Fixtures" instance=ExtResource("3")]
+position = Vector2(152, 100)
+machine = "oven"
+part = "helper"
+
+[node name="TownButton" type="Button" parent="."]
+offset_left = 15.0
+offset_top = 784.0
+offset_right = 135.0
+offset_bottom = 832.0
+custom_minimum_size = Vector2(120, 48)
+focus_mode = 0
+text = "Town"
