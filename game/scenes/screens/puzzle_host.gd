@@ -67,6 +67,10 @@ func _build(box: VBoxContainer) -> void:
 	puzzle.give_up.connect(func() -> void: Router.pop())
 	_slot.add_child(puzzle)
 	puzzle.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	# The Gnu's note for this part, once, the first time it is opened.
+	var note := Story.next_unseen("puzzle:%s/%s" % [machine, part], "first_visit", {"part": _title, "machine": Ids.machine_title(machine)})
+	if not note.is_empty():
+		Story.play(self, [note])
 
 
 func _on_back() -> void:
