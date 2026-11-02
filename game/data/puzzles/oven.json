@@ -1,0 +1,114 @@
+{
+  "answer": {
+    "c120": 5,
+    "c140": 2,
+    "c160": 1,
+    "c180": 3,
+    "c200": 4
+  },
+  "clues": [
+    {
+      "approachable": true,
+      "fact": {
+        "a": "c120",
+        "b": "c200",
+        "kind": "offset",
+        "value": 1
+      },
+      "fortune_text": "After the 200 C zone the heat settles down: the next zone along is 120 C, golden and brown.",
+      "id": "oven.poem",
+      "lucky_word": "TOASTY",
+      "nudge": "Read past the rhyme. The couplet names two temperatures and which one comes later along the belt. The belt runs from zone 1 to zone 5.",
+      "style": "poem"
+    },
+    {
+      "approachable": true,
+      "fact": {
+        "a": "c140",
+        "b": "c160",
+        "kind": "offset",
+        "value": 1
+      },
+      "fortune_text": "A newborn gnu calf trots at its mother's heels. 140 C follows 160 C just so, one zone after.",
+      "id": "oven.animal",
+      "lucky_word": "MIGRATE",
+      "nudge": "The calf is a picture of following closely. The belt runs from zone 1 to zone 5, so after means further along the belt.",
+      "style": "animal"
+    },
+    {
+      "approachable": true,
+      "fact": {
+        "a": "c120",
+        "kind": "position",
+        "value": 5
+      },
+      "fortune_text": "Count the letters in vi's old rival from the editor wars. Set the zone with that number to 120 C.",
+      "id": "oven.trivia",
+      "lucky_word": "TARBALL",
+      "nudge": "The editor wars are a decades-old friendly argument between fans of two text editors. One of them is vi: find the other and count its letters.",
+      "style": "trivia"
+    },
+    {
+      "approachable": true,
+      "fact": {
+        "a": "c160",
+        "kind": "position",
+        "value": 1
+      },
+      "fortune_text": "The gnu wrote zone 1's heat in hex: 0xA0 degrees C.",
+      "id": "oven.security",
+      "lucky_word": "HEXDUMP",
+      "nudge": "0x marks a hexadecimal number. The first digit counts sixteens and the second counts ones; A means 10, B means 11, up to F for 15.",
+      "style": "security"
+    },
+    {
+      "approachable": false,
+      "fact": {
+        "a": "c180",
+        "b": "c140",
+        "kind": "offset",
+        "value": 1
+      },
+      "fortune_text": "assert zone[180] == zone[140] + 1  # zone 1 comes first, +1 is one zone after",
+      "id": "oven.code",
+      "lucky_word": "LAMBDA",
+      "nudge": "zone[t] means the number of the zone set to t degrees. An assert must be true, so read the line as plain arithmetic about two zone numbers.",
+      "style": "code"
+    },
+    {
+      "approachable": false,
+      "fact": {
+        "a": "c200",
+        "b": "c180",
+        "kind": "offset",
+        "value": 1
+      },
+      "fortune_text": "Thermostat pins: pin n reads zone n. The 200 C probe is wired one pin after the 180 C probe.",
+      "id": "oven.hardware",
+      "lucky_word": "FUSEBOX",
+      "nudge": "Each temperature probe reads one zone and plugs into the matching pin, so pin numbers are zone numbers and neighbouring pins differ by one.",
+      "style": "hardware"
+    }
+  ],
+  "domain": {
+    "items": [
+      "c120",
+      "c140",
+      "c160",
+      "c180",
+      "c200"
+    ],
+    "position_noun": "heat zone",
+    "positions": [
+      "Zone 1",
+      "Zone 2",
+      "Zone 3",
+      "Zone 4",
+      "Zone 5"
+    ]
+  },
+  "machine": "oven",
+  "puzzle_title": "Heat zones",
+  "schema_version": 1,
+  "title": "Oven"
+}

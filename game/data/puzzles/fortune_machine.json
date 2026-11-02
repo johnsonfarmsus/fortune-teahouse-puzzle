@@ -1,0 +1,114 @@
+{
+  "answer": {
+    "love": 2,
+    "luck": 5,
+    "travel": 3,
+    "wisdom": 4,
+    "work": 1
+  },
+  "clues": [
+    {
+      "approachable": true,
+      "fact": {
+        "a": "love",
+        "b": "work",
+        "kind": "offset",
+        "value": 1
+      },
+      "fortune_text": "After a long day of Work, Love is near: one slot below Work, Love's verses appear.",
+      "id": "fortune_machine.poem",
+      "lucky_word": "INKWELL",
+      "nudge": "Read past the rhyme. The couplet names two phrase banks and says which one is lower. Slot 1 is at the top.",
+      "style": "poem"
+    },
+    {
+      "approachable": true,
+      "fact": {
+        "a": "wisdom",
+        "b": "luck",
+        "kind": "offset",
+        "value": -1
+      },
+      "fortune_text": "A seagull drops a clam from just above the rocks. Wisdom drops in the same way: one slot above Luck.",
+      "id": "fortune_machine.animal",
+      "lucky_word": "SQUAWK",
+      "nudge": "The gull is a picture of something falling from a little way up. The second sentence names two phrase banks. Slot 1 is at the top.",
+      "style": "animal"
+    },
+    {
+      "approachable": true,
+      "fact": {
+        "a": "work",
+        "kind": "position",
+        "value": 1
+      },
+      "fortune_text": "Work's slot is the FSF's number for the freedom to study how a program works (the FSF counts from 0).",
+      "id": "fortune_machine.trivia",
+      "lucky_word": "COPYLEFT",
+      "nudge": "The Free Software Foundation lists four freedoms and numbers them itself, starting at 0. Use the FSF's number, not your own count.",
+      "style": "trivia"
+    },
+    {
+      "approachable": true,
+      "fact": {
+        "a": "luck",
+        "kind": "position",
+        "value": 5
+      },
+      "fortune_text": "The gnu's Caesar note, each letter shifted 3 along: Oxfn lv lq vorw ilyh.",
+      "id": "fortune_machine.security",
+      "lucky_word": "SHIFTY",
+      "nudge": "A Caesar shift moves every letter the same number of places along the alphabet. Move each letter 3 places back to undo it: D becomes A, E becomes B.",
+      "style": "security"
+    },
+    {
+      "approachable": false,
+      "fact": {
+        "a": "travel",
+        "b": "love",
+        "kind": "offset",
+        "value": 1
+      },
+      "fortune_text": "assert(slot[TRAVEL] == slot[LOVE] + 1); /* slot 1 is the top, +1 is below */",
+      "id": "fortune_machine.code",
+      "lucky_word": "STDOUT",
+      "nudge": "slot[X] means the number of the slot that bank X feeds. An assert must be true, so read the line as plain arithmetic about two slot numbers.",
+      "style": "code"
+    },
+    {
+      "approachable": false,
+      "fact": {
+        "a": "wisdom",
+        "b": "travel",
+        "kind": "offset",
+        "value": 1
+      },
+      "fortune_text": "Ribbon cable, wire 1 at the top: the Wisdom wire is the one just below the Travel wire.",
+      "id": "fortune_machine.hardware",
+      "lucky_word": "PINOUT",
+      "nudge": "A ribbon cable is a flat row of wires numbered in order, so neighbouring wires differ by one. Each wire number is a slot number.",
+      "style": "hardware"
+    }
+  ],
+  "domain": {
+    "items": [
+      "luck",
+      "love",
+      "work",
+      "travel",
+      "wisdom"
+    ],
+    "position_noun": "printer slot",
+    "positions": [
+      "Slot 1",
+      "Slot 2",
+      "Slot 3",
+      "Slot 4",
+      "Slot 5"
+    ]
+  },
+  "machine": "fortune_machine",
+  "puzzle_title": "Phrase banks",
+  "schema_version": 1,
+  "title": "Fortune Machine"
+}
