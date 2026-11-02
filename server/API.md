@@ -30,6 +30,9 @@ Rules the server enforces (decision D1: every player solves on their own device)
 - A device **appears on a crew's contributors list** when it solves a part for that crew
   (`via: "solve"`), or when it, as a member of a running crew, sends that crew a hint
   (`via: "mentor"`). Names are the device's current display name or `"anonymous"`.
+- A crew's **inventory** (items found and installed around town) is shared by its members. An
+  item's state only moves forward, `found` then `installed`; repeating a write changes nothing;
+  `found_by` is whoever reported it first.
 
 ## Errors
 
@@ -41,7 +44,7 @@ Every error has the same shape:
 
 | HTTP | `code` | When |
 | --- | --- | --- |
-| 400 | `unknown_crew`, `unknown_nudge`, `own_crew`, `bad_setting_index`, `confirm_required`, `bad_scope` | Well-formed request with a bad value |
+| 400 | `unknown_crew`, `unknown_nudge`, `own_crew`, `bad_setting_index`, `bad_item_id`, `bad_state`, `bad_place`, `confirm_required`, `bad_scope` | Well-formed request with a bad value |
 | 401 | `bad_admin_secret` | Missing or wrong `X-Admin-Secret` |
 | 403 | `not_in_crew`, `not_a_maintainer`, `finale_closed` | Not allowed (yet) |
 | 404 | `device_not_registered`, `unknown_crew`, `unknown_part`, `unknown_handoff`, `not_found` | Unknown id or path |
@@ -122,6 +125,8 @@ Progress for one crew, including its contributors (newest first).
   "parts_solved": 2,
   "parts_total": 6,
   "members": 14,
+  "items_found": 5,
+  "items_installed": 2,
   "parts": [
     {"part": "logic",    "solved": true,  "solved_count": 3, "first_solved_at": "2027-10-29T17:20:00Z"},
     {"part": "wiring",   "solved": true,  "solved_count": 1, "first_solved_at": "2027-10-29T17:31:40Z"},
@@ -137,7 +142,9 @@ Progress for one crew, including its contributors (newest first).
 ```
 
 `parts` always lists all six parts in the order above. `solved_count` is the number of distinct
-devices that solved the part. `members` is the number of devices whose current crew this is.
+devices that solved the part. `members` is the number of devices whose current crew this is. `items_found` is the number of
+inventory items the crew has found (installed ones included) and `items_installed` the number
+installed; they are also in every crew object in the big-screen summary and in solve responses.
 Errors: `404 unknown_crew`.
 
 ### `POST /api/v1/crews/{machine}/parts/{part}/solve`
@@ -170,6 +177,84 @@ POST /api/v1/crews/cookie_machine/parts/logic/solve
 
 Errors: `404 device_not_registered` (register first), `403 not_in_crew`, `404 unknown_crew`,
 `404 unknown_part`.
+
+### `GET /api/v1/crews/{machine}/inventory`
+
+The crew's shared inventory, oldest find first. Items nobody has reported are not listed.
+
+```json
+{
+  "items": [
+    {
+      "item_id": "brass_key",
+      "state": "installed",
+      "found_by": "3f0c2a8e6d514c2e9a340b5f6f7e8d90",
+      "found_at": "2027-10-29T17:40:12Z",
+      "installed_by": "b81d0e5a9c3f4472a6d1e05c7f2a9b34",
+      "installed_at": "2027-10-29T17:52:03Z",
+      "place": "depot_locker"
+    },
+    {
+      "item_id": "fuse_16a",
+      "state": "found",
+      "found_by": "b81d0e5a9c3f4472a6d1e05c7f2a9b34",
+      "found_at": "2027-10-29T17:44:30Z",
+      "installed_by": null,
+      "installed_at": null,
+      "place": "harbour_crate"
+    }
+  ]
+}
+```
+
+`found_by` and `installed_by` are device ids of the crew's own phones; the client maps them to
+display names it already knows, or shows "a crewmate". Errors: `404 unknown_crew`.
+
+### `POST /api/v1/crews/{machine}/inventory/{item_id}`
+
+Report that this device found, or installed, an item. The device must currently be in
+`{machine}` (the same rule as part solves). `item_id` matches `^[a-z0-9_]{1,64}$`.
+
+| Field | Type | Notes |
+| --- | --- | --- |
+| `device_id` | string, required | |
+| `state` | `"found"` or `"installed"`, required | |
+| `place` | string or null, optional | Where it was found or installed (a place id from the game's data), up to 64 characters. A missing or `null` `place` keeps the stored one; a given `place` replaces it when the state advances. |
+
+Rules, so offline queues are safe to flush in any order and to retry:
+
+- Idempotent per (machine, item_id, state). A repeat write changes nothing and returns the
+  current row, even if it came from another device.
+- State only moves forward. `installed` after `found` records `installed_by` and `installed_at`.
+  `found` after `installed` is a no-op that returns the installed row.
+- `found_by` and `found_at` belong to the first writer. `installed` for an item nobody has
+  reported found creates it as installed, with that device as both finder and installer.
+
+```http
+POST /api/v1/crews/oven/inventory/brass_key
+{"device_id": "b81d0e5a9c3f4472a6d1e05c7f2a9b34", "state": "installed", "place": "depot_locker"}
+```
+
+The response is the item row (the same fields as in the list above):
+
+```json
+{
+  "item_id": "brass_key",
+  "state": "installed",
+  "found_by": "3f0c2a8e6d514c2e9a340b5f6f7e8d90",
+  "found_at": "2027-10-29T17:40:12Z",
+  "installed_by": "b81d0e5a9c3f4472a6d1e05c7f2a9b34",
+  "installed_at": "2027-10-29T17:52:03Z",
+  "place": "depot_locker"
+}
+```
+
+Errors: `404 device_not_registered`, `403 not_in_crew` (drop a queued write that gets this, as with
+solves), `404 unknown_crew`, `400 bad_item_id`, `400 bad_state`, `400 bad_place` (over 64
+characters), `422` malformed body. Subject to the normal per-IP rate limit.
+
+The inventory is a convenience: everything in the game can still be found alone without the
+scoreboard.
 
 ---
 
@@ -356,7 +441,7 @@ Everything the big screen needs in one call.
 ```json
 {
   "server_time": "2027-10-29T18:10:00Z",
-  "crews": [ { "...": "three objects like GET /crews/{machine} but without `contributors`, in the order fortune_machine, cookie_machine, oven" } ],
+  "crews": [ { "...": "three objects like GET /crews/{machine} (including `items_found` and `items_installed`) but without `contributors`, in the order fortune_machine, cookie_machine, oven" } ],
   "machines_running": 1,
   "finale": { "...": "same object as GET /finale" },
   "contributors": {
@@ -391,7 +476,7 @@ admin API answers `503 admin_disabled`. Every call that changes the finale retur
 | `POST /api/v1/admin/finale/close` | none | Hold the finale closed, even after the safety net |
 | `POST /api/v1/admin/finale/auto` | none | Remove the override (automatic rules) |
 | `POST /api/v1/admin/finale/line` | `{"started": true}` | Force the line started (or `false` to un-start), skipping `line_ready` |
-| `POST /api/v1/admin/reset` | `{"confirm": "reset", "scope": "progress"}` | Rehearsal reset. `progress` (default) clears solves, contributors, handoff settings, notes, hints, finale override and line start, and keeps devices and the safety-net time. `all` also deletes devices and the stored safety-net time. |
+| `POST /api/v1/admin/reset` | `{"confirm": "reset", "scope": "progress"}` | Rehearsal reset. `progress` (default) clears solves, contributors, handoff settings, notes, hints, crew inventories, finale override and line start, and keeps devices and the safety-net time. `all` also deletes devices and the stored safety-net time. |
 
 ```sh
 curl -X PUT https://scoreboard.example.org/api/v1/admin/finale/safety-net \

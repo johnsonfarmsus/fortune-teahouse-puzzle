@@ -51,6 +51,11 @@ class SolveIn(DeviceRef):
     credited: bool = True
 
 
+class ItemIn(DeviceRef):
+    state: str
+    place: str | None = Field(default=None, max_length=200)
+
+
 class SettingIn(DeviceRef):
     setting_index: int
 
@@ -146,6 +151,21 @@ def solve_part(machine: str, part: str, body: SolveIn, ctx: Ctx = Depends(get_ct
     service.check_machine(machine)
     service.check_part(part)
     return service.solve_part(ctx.conn, body.device_id, machine, part, ctx.now_str, body.credited)
+
+
+@api.get("/crews/{machine}/inventory")
+def get_inventory(machine: str, ctx: Ctx = Depends(get_ctx)) -> dict:
+    service.check_machine(machine)
+    return {"items": service.list_items(ctx.conn, machine)}
+
+
+@api.post("/crews/{machine}/inventory/{item_id}")
+def post_item(machine: str, item_id: str, body: ItemIn, ctx: Ctx = Depends(get_ctx)) -> dict:
+    service.check_machine(machine)
+    service.check_item_id(item_id)
+    state = service.check_item_state(body.state)
+    return service.set_item(ctx.conn, body.device_id, machine, item_id, state,
+                            service.clean_place(body.place), ctx.now_str)
 
 
 @api.get("/contributors")
