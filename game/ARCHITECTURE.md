@@ -54,15 +54,15 @@ Thin Nodes over core classes, registered in this order:
 
 | Autoload | Wraps | Responsibility |
 | --- | --- | --- |
-| `Events` | none | Signals `part_fixed(machine, part)`, `machine_running(machine)`, `clue_collected(clue_id)`, `crew_changed(machine)`, `display_name_changed(name)`, `progress_changed(machine)` |
+| `Events` | none | Signals `part_fixed(machine, part)`, `machine_running(machine)`, `clue_collected(clue_id)`, `crew_changed(machine)`, `display_name_changed(name)`, `progress_changed(machine)`, `hint_received(text)` (a mentor nudge arrived), `scoreboard_status_changed` (online state or queue size changed) |
 | `PuzzleData` | `PuzzleCatalog` | Loads existing files for `Ids.MACHINES` (no directory listing): `get_clue`, `get_clues`, `get_domain`, `get_answer`, `get_parts`, `get_part`, `matching_config(machine, collected_ids)`, `lookup_lucky_word(word) -> {machine, clue_id}` or `{}` |
 | `GameState` | `PlayerState` | Saved to `user://player.json` on change: `device_id` (`Crypto.generate_random_bytes(16).hex_encode()`), `display_name` ("" anonymous), `name_asked`, `crew` ("" none), `collected_clue_ids`, `solved_parts {machine: {part: credited}}`, `hint_levels`, `sound_on` |
-| `Progress` | `ProgressStore` | `store`: `LocalProgressStore` if setting `fortune/scoreboard_url` is empty, else `RemoteProgressStore`. After writes it diffs progress, emitting `part_fixed` (0 to 1) and `machine_running` (all six). At boot it writes the display name and crew to the store only if non-empty and changed. `Progress.reset()` calls `store.reset_local()` (new on `ProgressStore`; a remote store resets the local part it wraps and drops unsent writes) and keeps the active store |
-| `Hints` | `HintLadder` | `advance(puzzle_id, can_reveal) -> int`: 0 none, 1 nudge, 2 stronger nudge, 3 reveal; capped at 2 without `can_reveal`; stored in `GameState.hint_levels`. `receive_pushed_nudge(puzzle_id, text)` stub for WP7 |
+| `Progress` | `ProgressStore` | `store`: `LocalProgressStore` if no scoreboard URL is configured (setting `fortune/scoreboard_url`, or `?scoreboard=` on the web build, section 12) or "Use scoreboard" is off, else `RemoteProgressStore`. A 1 s `Timer` calls the remote store's `tick()`; `use_scoreboard(on)`, `sync_now()`, `queue_size()`, `is_maintainer()`, `refresh_contributors()` serve Settings, the Hud and screens. After writes it diffs progress, emitting `part_fixed` (0 to 1) and `machine_running` (all six). At boot it writes the display name and crew to the store only if non-empty and changed. `Progress.reset()` calls `store.reset_local()` (new on `ProgressStore`; a remote store resets the local part it wraps and drops unsent writes) and keeps the active store |
+| `Hints` | `HintLadder` | `advance(puzzle_id, can_reveal) -> int`: 0 none, 1 nudge, 2 stronger nudge, 3 reveal; capped at 2 without `can_reveal`; stored in `GameState.hint_levels`. `receive_pushed_nudge(puzzle_id, text)`: a mentor's nudge (Progress passes `""` for a whole-crew nudge); stores it, emits `nudge_received` and `Events.hint_received(text)` |
 | `Audio` | none | Muted until the start tap calls `unlock()`; `play(name)` no-ops on missing streams or `sound_on` false |
 | `Router` | none | Section 5 |
 
-Core classes in `scripts/core/` (one file each): `Ids`, `Paths`, `JsonFile`, `PuzzleCatalog`, `PlayerState`, `LuckyWords`, `MatchingRules`, `HintLadder`, `ProgressStore`, `LocalProgressStore`, `RemoteProgressStore`.
+Core classes in `scripts/core/` (one file each): `Ids`, `Paths`, `JsonFile`, `PuzzleCatalog`, `PlayerState`, `LuckyWords`, `MatchingRules`, `HintLadder`, `ProgressStore`, `LocalProgressStore`, `RemoteProgressStore`, and for the scoreboard `ScoreboardUrl`, `HttpTransport`, `Nudges` (section 12).
 
 `Ids`: `MACHINES`, `MACHINE_TITLES`, `PARTS = ["logic","wiring","sequence","word","rhythm","helper"]`, `PART_TITLES`, `STYLE_LABELS`, `CLUE_THRESHOLD = 4`, `REPO_URL`. `Paths`: `PLACES` (`town`, `shop`), one constant per screen (`LUCKY_WORD_ENTRY`, `MERGE_CELEBRATION`, ...), `puzzle_scene(type)`. `JsonFile.read(path)` returns `{}` on a missing or bad file.
 
@@ -79,7 +79,7 @@ func is_online() -> bool
 func refresh() -> void
 ```
 
-A machine's progress counts solves from devices in that crew; the scoreboard enforces this (a solve from a device not in the crew is rejected). The local store counts this device's solves. Mentors help other crews through hints, not solves. A revealed solve counts for progress but adds no contributor. Names are unique; anonymous shows once as "Anonymous". `LocalProgressStore.new(path := "user://progress.json")` saves `{version, names, crews, solves: [{machine, part, device_id, credited}]}`, ignoring repeats. `RemoteProgressStore.new(base_url, local)` delegates to `local` and appends writes to `queue`; `flush()` returns `queue.size()`.
+A machine's progress counts solves from devices in that crew; the scoreboard enforces this (a solve from a device not in the crew is rejected). The local store counts this device's solves. Mentors help other crews through hints, not solves. A revealed solve counts for progress but adds no contributor. Names are unique; anonymous shows once as "Anonymous". `LocalProgressStore.new(path := "user://progress.json")` saves `{version, names, crews, solves: [{machine, part, device_id, credited}]}`, ignoring repeats. `RemoteProgressStore.new(base_url, local, transport := Callable(), queue_path := "user://queue.json")` delegates to `local`, queues writes, sends them to the scoreboard and merges its answers into getters; `flush()` returns `queue.size()`. Section 12 has the details.
 
 ## 4. Scenes
 
@@ -94,7 +94,7 @@ Router > Screens (CanvasLayer 10)
 
 **Shop** (Node2D): `Machines/FortuneMachine`, `Machines/CookieMachine`, `Machines/Oven` and a Town button. Each machine has a hotspot opening MachineView and `Fixtures` with six `part_fixture.tscn`. `PartFixture` (`@export machine`, `@export part`) toggles `Broken` and `Fixed` children that differ in shape and label ("Mixer: off"/"Mixer: on"); it reads `Progress.store` in `_ready` and listens to `Events.part_fixed`. The Shop script has no machine-specific code.
 
-**Hud:** a 56 px top bar with crew label, "Clues N" (ClueBoard) and "Menu" (Settings).
+**Hud:** a 56 px top bar with crew label (and a "Maintainer" badge once the scoreboard says the crew's machine runs), "Clues N" (ClueBoard) and "Menu" (Settings). It also hosts a `HintBanner` on its own CanvasLayer 30, above every screen.
 
 ## 5. Router
 
@@ -106,10 +106,11 @@ Router > Screens (CanvasLayer 10)
 | --- | --- | --- |
 | LuckyWordEntry | none | Keypad, result line, "No cookie? Choose a crew" (three buttons) |
 | ClueBoard | none | Clues by machine, crew first, "N of 6, 4 needed"; ClueCard "Help me read this" shows `nudge` |
-| MachineView | `machine` | Six part rows opening PuzzleHost |
+| MachineView | `machine` | Six part rows opening PuzzleHost, and "See crew progress" |
 | PuzzleHost, MergeCelebration | `machine`, `part` (+ `credited`, `now_running`) | Section 7 |
-| Contributors | `machine` (optional) | Names per machine |
-| Settings | none | Display name, switch crew, sound, "Source code (AGPL)" (`REPO_URL`), "Reset this device" (confirm) |
+| Contributors | `machine` (optional) | Names per machine (from the scoreboard when it is on) |
+| CrewProgress | `machine` (optional, default the player's crew) | Section 12 |
+| Settings | none | Display name, switch crew, sound, scoreboard section (section 12), "Source code (AGPL)" (`REPO_URL`), "Reset this device" (confirm) |
 
 **No LineEdit** (Godot's web virtual keyboard is experimental on iOS). `LetterKeypad` has in-game keys A to Z, 0 to 9, Space, Delete and Enter (48x48 or larger), also takes physical keys, and emits `submitted(text)`. It serves lucky words and display names (max 20 characters).
 
@@ -200,3 +201,21 @@ Unit tests use the core classes with data from `test/fixtures/fixtures.gd`, neve
 | WP7 | crew progress and mentor screens, tests | `remote_progress_store.gd`, `progress.gd` (store choice, refresh), a Settings scoreboard section, `fortune/scoreboard_url` in `project.godot`, new `events.gd` signals, `receive_pushed_nudge` | PuzzleBase, ProgressStore signatures |
 
 Contract changes (PuzzleBase, ProgressStore, data formats) go through the integrator.
+
+## 12. Scoreboard client (WP7)
+
+The contract is `server/API.md`; this section is the client's side of it. The game plays unchanged with no scoreboard.
+
+**Switching it on.** `ScoreboardUrl.configured()` gives the base URL: the project setting `fortune/scoreboard_url` (committed empty, so the game is offline-only by default), overridden on the web build by `?scoreboard=https://host` in the page address (read once through `JavaScriptBridge`, a no-op off web; the query accepts `https` only, or `http` for localhost; the project setting may be any `http(s)` URL). Settings shows a "Use scoreboard" toggle (saved in `user://scoreboard.json`, on by default; disabled when no URL is set) and the configured URL read-only. Typing a URL on the in-game keypad is deliberately not offered.
+
+**RemoteProgressStore.** Extends `ProgressStore`, wraps the local store and never blocks. The network is an injected `transport(method, url, body, done)` that ends with `done(status, data, retry_after)` (status 0 means no answer); `HttpTransport` (a Node with one `HTTPRequest` per request) is the real one and tests inject `FakeScoreboard`. With no transport it only queues, as in WP3.
+
+- *Writes* (`set_display_name`, `join_crew`, `record_part_solved`) apply to the local store at once and append to `queue`, saved to `user://queue.json` with the id of the last hint seen per crew, whether this device is registered, and the machines known to run. They map to `POST /devices` (name or crew) and `POST /crews/{m}/parts/{p}/solve` with body `{device_id, credited}` (an uncredited, revealed solve counts for progress but adds no contributor). The queue is sent in order, one request at a time, which also meets the "flush before switching crews" rule. A network error, 5xx or 429 keeps the head and retries after a backoff of 2, 4, 8, ... up to 60 s (or `Retry-After`); `tick()` (a 1 s Timer in `Progress`) does the retry, and `flush()` ("Sync now") ignores the backoff. `403 not_in_crew` drops the solve (it stays in the local store, so this phone still shows it); `404 device_not_registered` inserts one registration first; any other 4xx is kept for retry but dropped after five refusals so a malformed write cannot block the queue. A first-time device with a name or crew queues one `POST /devices` (`set_identity`). Solves made before the scoreboard was on are queued once per device (`backfill_solves`, from `GameState.player.solved_parts`). `retire()` stops a store for good (no transport, no queue writes, late answers ignored); `Progress` retires the old store when the scoreboard is switched off or the address changes, and keeps the existing one when the toggle is set again for the same address. `reset_local()` also forgets the device id, crew and `runs` cache.
+- *Reads.* Getters return at once: `get_crew_progress` is the per-part maximum of the local count and the last server `solved_count`; `get_contributors` lists the server's names (reversed to first-merged order, "anonymous" shown as "Anonymous") then any local name the server lacks; `get_contributor_entries` adds `via` (`solve` or `mentor`). `is_online()` is the outcome of the last request. A crew answer with `runs: false` clears the remembered flag (an admin reset). A 429 on a poll pushes the next poll out to `max(Retry-After, 10 s)`. Every cache change that differs emits `progress_changed`, and `Progress` turns that into `part_fixed` and `machine_running` as for local solves. The solve response's crew object also updates the cache.
+- *Polling budget.* `refresh()` looks once at the player's crew, every watched machine, and (if hint polling is on) new hints. Nothing polls on its own: `Progress` calls `set_watching(machines, hints)` when the Router stack changes. A MachineView or CrewProgress on top watches that machine and hints; a PuzzleHost on top watches hints only; anything else watches nothing. `tick()` repeats `refresh()` every 10 s while something is watched. Also one look at boot, on `crew_changed`, and one `GET /contributors` when the Contributors screen opens.
+- *Maintainer.* `server_runs(machine)` is true once a crew response said `runs`, remembered in the queue file. `Progress.is_maintainer()` is that for the player's crew; the Hud badge and the nudge section use it.
+- *Hints.* `GET /hints?crew=&after_id=` for the player's crew; each new hint is emitted as `hint_arrived`, and `Progress` passes `Nudges.describe(hint)` to `Hints.receive_pushed_nudge("", text)`, which emits `Events.hint_received(text)` for the `HintBanner` (dismissible; later hints queue behind it). On the first look for a crew only the newest hint is shown, then `after_id` pages forward 50 at a time. `fetch_nudge_ids(done)` and `send_nudge(to_crew, nudge_id, done)` wrap `GET /hints/nudges` and `POST /hints`; the words for each nudge id live in `Nudges`.
+
+**CrewProgress screen** (`scenes/screens/crew_progress.tscn`, reached from MachineView): "Machine runs!" or "N of 6 parts working", one row per part (light plus text: "Broken" or "fixed by N crewmates", "fixed on this phone" offline), contributors (mentors marked), and the line "Online, showing your whole crew" or "Offline, showing this phone only". Maintainers also get "Send a nudge": pick one of the other two crews, then a nudge from the server's list.
+
+**Tests.** `test/fixtures/fake_scoreboard.gd` is the fake transport; `test_remote_progress_store.gd`, `test_scoreboard_url.gd` and `test/scene/test_scoreboard_screens.gd` cover queue persistence, order, drops and retries, cache and offline getters, polling cadence, hints, URL parsing and the screens. No test opens a socket.
