@@ -54,13 +54,27 @@ func definition(id: String) -> Dictionary:
 	return {}
 
 
+func is_built(id: String) -> bool:
+	return _cache.has(id)
+
+
+## Samples one sound needs (tests keep these within a budget).
+func sample_count(id: String) -> int:
+	var def := definition(id)
+	if def.is_empty():
+		return 0
+	var notes: Array = def.get("notes", [])
+	var seconds := float(def.get("note_len", 0.06)) * notes.size() if not notes.is_empty() else float(def.get("duration", 0.1))
+	return int(clampf(seconds, 0.005, SfxSynth.MAX_SECONDS) * int(def.get("rate", rate)))
+
+
 func stream(id: String) -> AudioStreamWAV:
 	if _cache.has(id):
 		return _cache[id]
 	var def := definition(id)
 	if def.is_empty():
 		return null
-	var built := SfxSynth.build(def, rate)
+	var built := SfxSynth.build(def, int(def.get("rate", rate)))
 	_cache[id] = built
 	return built
 

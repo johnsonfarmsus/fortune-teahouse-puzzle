@@ -13,6 +13,7 @@ signal thing_activated(thing: Dictionary)
 signal item_used(thing: Dictionary, item: String)
 signal exit_reached(exit: Dictionary)
 signal walk_finished
+signal use_cleared  ## a tap on the ground dropped the picked item
 
 const TILE := 16
 const WALK_SPEED := 96.0  # pixels per second (6 tiles)
@@ -41,6 +42,16 @@ class TileLayer:
 				draw_texture(room.assets.texture(asset, (frame + x + y) % frames if animated else 0), Vector2(cell * TILE))
 
 
+## The outline a tap draws on a hotspot that has no sprite.
+class HotspotFlash:
+	extends Node2D
+	var rect: Rect2
+
+	func _draw() -> void:
+		draw_rect(rect, Color(1, 0.95, 0.6, 0.25))
+		draw_rect(rect.grow(-0.5), Color(1, 0.95, 0.6), false, 1.0)
+
+
 var room_id: String = ""
 var graph: RoomGraph
 var assets: AssetLoader
@@ -66,6 +77,8 @@ var _steps := 0
 var _water: TileLayer
 var _water_clock := 0.0
 var _shake_tween: Tween
+## The canvas item the last tap lit up (tests check every tap shows something).
+var last_flash: CanvasItem
 
 
 func setup(p_room_id: String, p_graph: RoomGraph, p_assets: AssetLoader, p_spawn: Vector2i) -> void:
@@ -154,7 +167,9 @@ func tap_world(point: Vector2) -> Dictionary:
 				thing_activated.emit(t))
 		return t
 	Audio.play("tap")
-	use_item = ""
+	if use_item != "":
+		use_item = ""
+		use_cleared.emit()
 	var cell := cell_of(point)
 	if not graph.exit_at(room_id, cell).is_empty():
 		walk_to(cell)
@@ -180,14 +195,28 @@ func thing_node(id: String) -> CanvasItem:
 	return _nodes.get(id)
 
 
-## A quick bright blink on a thing, so a tap visibly lands.
-func flash(id: String) -> void:
+## A quick bright blink on a thing, so a tap visibly lands. A hotspot with
+## no sprite of its own (the Cookie Machine's parts) gets a glowing outline.
+func flash(id: String) -> CanvasItem:
 	var node := thing_node(id)
 	if node == null:
-		return
+		var t := graph.thing(room_id, id)
+		if t.is_empty():
+			return null
+		var outline := HotspotFlash.new()
+		outline.rect = RoomGraph.rect_px(t)
+		outline.z_index = 45
+		add_child(outline)
+		var fade := outline.create_tween()
+		fade.tween_property(outline, "modulate:a", 0.0, 0.3).from(1.0)
+		fade.tween_callback(outline.queue_free)
+		last_flash = outline
+		return outline
 	var tween := create_tween()
 	tween.tween_property(node, "modulate", Color(1.6, 1.6, 1.3), 0.05)
 	tween.tween_property(node, "modulate", Color.WHITE, 0.12)
+	last_flash = node
+	return node
 
 
 func shake(strength: float = 2.0, seconds: float = 0.3) -> void:

@@ -124,6 +124,13 @@ func say_text(speaker: String, text: String, expression: String = "neutral", don
 	say([{"speaker": speaker, "kind": "dialogue", "expression": expression, "lines": [text]}], done)
 
 
+## The portrait is drawn at the room's pixel scale.
+func set_pixel_scale(value: float) -> void:
+	pixel_scale = value
+	if _portrait != null:
+		_portrait.custom_minimum_size = Vector2(PORTRAIT_PX, PORTRAIT_PX) * pixel_scale
+
+
 func is_open() -> bool:
 	return _index >= 0 and _index < _pages.size()
 

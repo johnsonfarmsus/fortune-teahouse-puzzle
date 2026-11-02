@@ -28,11 +28,15 @@ var pixel_scale: float = 2.0
 var closeup: Control
 var frame_rect: Rect2
 
-var _frame: SubViewportContainer
+var _frame: SubViewportContainer  # the active room view
 var _viewport: SubViewport
 var _world: Node2D
+var _frames: Array[SubViewportContainer] = []
+var _viewports: Array[SubViewport] = []
+var _worlds: Array[Node2D] = []
+var _active := 0
+var _clip: Control
 var _fade: ColorRect
-var _slide: Control
 var _bar: InventoryBar
 var _dialogue: PortraitDialogue
 var _catcher: Control
@@ -59,32 +63,39 @@ func _ready() -> void:
 	bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	bg.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	add_child(bg)
-	_frame = SubViewportContainer.new()
-	_frame.name = "RoomFrame"
-	_frame.stretch = false
-	_frame.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
-	_frame.mouse_filter = Control.MOUSE_FILTER_STOP
-	add_child(_frame)
-	_viewport = SubViewport.new()
-	_viewport.name = "RoomViewport"
-	_viewport.size = VIEW
-	_viewport.canvas_item_default_texture_filter = Viewport.DEFAULT_CANVAS_ITEM_TEXTURE_FILTER_NEAREST
-	_viewport.snap_2d_transforms_to_pixel = true
-	_viewport.snap_2d_vertices_to_pixel = true
-	_viewport.handle_input_locally = true
-	_viewport.physics_object_picking = false
-	_frame.add_child(_viewport)
-	_frame.size = Vector2(VIEW)
-	_world = Node2D.new()
-	_world.name = "World"
-	_viewport.add_child(_world)
+	# Two live room views in a clipping box: an edge crossing slides the old
+	# one out as the new one slides in, with no viewport readback.
+	_clip = Control.new()
+	_clip.name = "RoomClip"
+	_clip.clip_contents = true
+	_clip.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(_clip)
+	for i in 2:
+		var frame := SubViewportContainer.new()
+		frame.name = "RoomFrame" if i == 0 else "RoomFrame2"
+		frame.stretch = false
+		frame.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+		frame.mouse_filter = Control.MOUSE_FILTER_STOP if i == 0 else Control.MOUSE_FILTER_IGNORE
+		frame.visible = i == 0
+		_clip.add_child(frame)
+		var vp := SubViewport.new()
+		vp.name = "RoomViewport" if i == 0 else "RoomViewport2"
+		vp.size = VIEW
+		vp.canvas_item_default_texture_filter = Viewport.DEFAULT_CANVAS_ITEM_TEXTURE_FILTER_NEAREST
+		vp.snap_2d_transforms_to_pixel = true
+		vp.snap_2d_vertices_to_pixel = true
+		vp.handle_input_locally = true
+		vp.physics_object_picking = false
+		frame.add_child(vp)
+		frame.size = Vector2(VIEW)
+		var world := Node2D.new()
+		world.name = "World"
+		vp.add_child(world)
+		_frames.append(frame)
+		_viewports.append(vp)
+		_worlds.append(world)
+	_use_view(0)
 	_fade = _overlay_rect("Fade", Color(0, 0, 0, 0))
-	_slide = Control.new()
-	_slide.name = "Slide"
-	_slide.clip_contents = true
-	_slide.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_slide.visible = false
-	add_child(_slide)
 	_catcher = Control.new()
 	_catcher.name = "DialogueCatcher"
 	_catcher.mouse_filter = Control.MOUSE_FILTER_STOP
@@ -100,6 +111,7 @@ func _ready() -> void:
 	_bar.drag_started.connect(_on_drag_started)
 	_bar.clues_pressed.connect(func() -> void: Router.push(Paths.CLUE_BOARD))
 	_bar.menu_pressed.connect(func() -> void: Router.push(Paths.SETTINGS))
+	_bar.hint_pressed.connect(ask_for_hint)
 	_dialogue = PortraitDialogue.new()
 	_dialogue.name = "Dialogue"
 	_dialogue.assets = Adventure.assets
@@ -163,9 +175,13 @@ func _layout() -> void:
 	if overlay:
 		top = _snap(spare / 2.0, device)
 	frame_rect = Rect2(Vector2(left, top), frame_size)
-	_frame.position = frame_rect.position
-	_frame.scale = Vector2(pixel_scale, pixel_scale)
-	for c: Control in [_fade, _slide, _catcher, _closeup_layer]:
+	_clip.position = frame_rect.position
+	_clip.size = frame_rect.size
+	for frame in _frames:
+		frame.scale = Vector2(pixel_scale, pixel_scale)
+		if not _transitioning:
+			frame.position = Vector2.ZERO
+	for c: Control in [_fade, _catcher, _closeup_layer]:
 		c.position = frame_rect.position
 		c.size = frame_rect.size
 	var bar_h := maxf(TOP_MIN, frame_rect.position.y) if not overlay else TOP_MIN
@@ -176,7 +192,7 @@ func _layout() -> void:
 	_dialogue.custom_minimum_size = Vector2(vis.x, bottom_h)
 	_dialogue.position = Vector2(0, vis.y - bottom_h)
 	_dialogue.size = Vector2(vis.x, bottom_h)
-	_dialogue.pixel_scale = pixel_scale
+	_dialogue.set_pixel_scale(pixel_scale)
 	_dialogue.grow_vertical = Control.GROW_DIRECTION_BEGIN
 
 
@@ -231,9 +247,20 @@ func go_through(e: Dictionary) -> void:
 		_fade_to(to, cell)
 
 
-func _enter(to: String, cell: Vector2i) -> void:
-	if room != null:
-		_world.remove_child(room)
+func _use_view(index: int) -> void:
+	_active = index
+	_frame = _frames[index]
+	_viewport = _viewports[index]
+	_world = _worlds[index]
+	for i in _frames.size():
+		_frames[i].mouse_filter = Control.MOUSE_FILTER_STOP if i == index else Control.MOUSE_FILTER_IGNORE
+
+
+## Builds room `to` in the active view. The old room is freed unless
+## `keep_old` (an edge slide frees it once it has slid out).
+func _enter(to: String, cell: Vector2i, keep_old: bool = false) -> void:
+	if room != null and not keep_old:
+		room.get_parent().remove_child(room)
 		room.queue_free()
 	room_id = to
 	room = load(ROOM_SCENE).instantiate()
@@ -242,6 +269,7 @@ func _enter(to: String, cell: Vector2i) -> void:
 	room.item_used.connect(_on_item_used)
 	room.exit_reached.connect(go_through)
 	room.walk_finished.connect(func() -> void: Adventure.set_place(room_id, room.player_cell()))
+	room.use_cleared.connect(_deselect)
 	_world.add_child(room)
 	if room.rig != null:
 		room.rig.part_celebrated.connect(_on_part_celebrated)
@@ -272,42 +300,26 @@ func _fade_to(to: String, cell: Vector2i) -> void:
 	tween.tween_callback(func() -> void: _transitioning = false)
 
 
-## The old room slides out as the new one slides in (snapshots of the view).
+## Flip-screen at an edge: the new room is built in the other view, then
+## both views slide together, the old one out and the new one in.
 func _slide_to(to: String, cell: Vector2i, dir: Vector2) -> void:
-	var old_image := _viewport.get_texture().get_image()
-	if old_image == null or old_image.is_empty():
-		_fade_to(to, cell)
-		return
 	_transitioning = true
-	var old_rect := _snapshot_rect(old_image)
-	_slide.visible = true
-	_slide.add_child(old_rect)
-	_enter(to, cell)
-	await RenderingServer.frame_post_draw
-	await RenderingServer.frame_post_draw
-	var new_image := _viewport.get_texture().get_image()
-	var new_rect := _snapshot_rect(new_image if new_image != null else old_image)
-	new_rect.position = dir * frame_rect.size
-	_slide.add_child(new_rect)
+	var old_room := room
+	var old_frame := _frame
+	_use_view(1 - _active)
+	_frame.position = dir * frame_rect.size
+	_frame.visible = true
+	_enter(to, cell, true)
 	var tween := create_tween().set_parallel(true)
-	tween.tween_property(old_rect, "position", -dir * frame_rect.size, SLIDE_SECONDS).set_trans(Tween.TRANS_SINE)
-	tween.tween_property(new_rect, "position", Vector2.ZERO, SLIDE_SECONDS).set_trans(Tween.TRANS_SINE)
+	tween.tween_property(old_frame, "position", -dir * frame_rect.size, SLIDE_SECONDS).set_trans(Tween.TRANS_SINE)
+	tween.tween_property(_frame, "position", Vector2.ZERO, SLIDE_SECONDS).set_trans(Tween.TRANS_SINE)
 	tween.chain().tween_callback(func() -> void:
-		old_rect.queue_free()
-		new_rect.queue_free()
-		_slide.visible = false
+		if is_instance_valid(old_room):
+			old_room.get_parent().remove_child(old_room)
+			old_room.queue_free()
+		old_frame.visible = false
+		old_frame.position = Vector2.ZERO
 		_transitioning = false)
-
-
-func _snapshot_rect(image: Image) -> TextureRect:
-	var r := TextureRect.new()
-	r.texture = ImageTexture.create_from_image(image)
-	r.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
-	r.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	r.stretch_mode = TextureRect.STRETCH_SCALE
-	r.size = frame_rect.size
-	r.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	return r
 
 
 # --- Things -------------------------------------------------------------------------
@@ -378,6 +390,16 @@ func present(r: Dictionary, then: Callable = Callable()) -> void:
 			_celebrate_merge(str(r["machine"]), solved, true, bool(r.get("now_running", false)))
 		if then.is_valid():
 			then.call())
+
+
+## Red Panda's help from anywhere (the "?" in the bar): the next rung of the
+## hint ladder for the current chain step, in her voice.
+func ask_for_hint() -> void:
+	var id := Adventure.next_hint()
+	if id == "":
+		return
+	_dialogue.skip_all()
+	_dialogue.say([Story.get_piece(id)])
 
 
 func _celebrate_merge(machine: String, part: String, credited: bool, now_running: bool) -> void:

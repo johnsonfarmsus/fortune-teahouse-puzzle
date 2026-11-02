@@ -61,3 +61,30 @@ func test_alias_and_unknown() -> void:
 	assert_bool(bank.has("b")).is_true()
 	assert_bool(bank.has("loop1")).is_false()
 	assert_object(bank.stream("zzz")).is_null()
+
+
+## Building every sound must stay cheap: they are made in GDScript on a phone.
+func test_synth_work_stays_within_budget() -> void:
+	var bank := SfxBank.new()
+	var total := 0
+	for id in bank.ids():
+		var n := bank.sample_count(id)
+		assert_int(n).override_failure_message("%s needs %d samples" % [id, n]).is_less_equal(24000)
+		total += n
+	assert_int(total).is_less_equal(250000)
+	# The count matches what is built, and the ambient loops use the low rate.
+	var loop := bank.stream("ambient.sea")
+	assert_int(loop.mix_rate).is_equal(11025)
+	assert_int(loop.data.size() / 2).is_equal(bank.sample_count("ambient.sea"))
+	assert_int(bank.stream("tap").data.size() / 2).is_equal(bank.sample_count("tap"))
+
+
+func test_prewarm_builds_a_few_per_frame_not_at_unlock() -> void:
+	Audio.bank = SfxBank.new()
+	Audio.prewarm()
+	var queued := Audio.prewarm_left()
+	assert_int(queued).is_greater(10)
+	await get_tree().process_frame
+	await get_tree().process_frame
+	assert_int(Audio.prewarm_left()).is_less(queued)
+	assert_int(Audio.prewarm_left()).is_greater_equal(queued - 2 * Audio.BUILDS_PER_FRAME - 2)

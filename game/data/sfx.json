@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "description": "Sound effects built at run time by SfxSynth (no audio files). Ids are interaction ids: the scenes' own (SfxBank.CORE_IDS), babble.<speaker> for dialogue beeps, ambient.<name> for each room's quiet loop, and any id the chain or room data names. wave: square, triangle, saw, sine or noise; freq and freq_end in Hz (a slide); notes plays a tune, note_len seconds each; attack and decay in seconds; volume 0 to 1; duty for square waves; loop and lfo for ambience. An entry {\"alias\": id} reuses another sound.",
+  "description": "Sound effects built at run time by SfxSynth (no audio files). Ids are interaction ids: the scenes' own (SfxBank.CORE_IDS), babble.<speaker> for dialogue beeps, ambient.<name> for each room's quiet loop, and any id the chain or room data names. wave: square, triangle, saw, sine or noise; freq and freq_end in Hz (a slide); notes plays a tune, note_len seconds each; attack and decay in seconds; volume 0 to 1; duty for square waves; loop and lfo for ambience; rate (Hz) overrides mix_rate for one sound (the ambient loops use 11025 to stay small and quick to build). An entry {\"alias\": id} reuses another sound.",
   "mix_rate": 22050,
   "sounds": {
     "tap": {"wave": "square", "freq": 1200, "freq_end": 900, "duration": 0.035, "decay": 0.03, "volume": 0.18, "duty": 0.25},
@@ -43,10 +43,10 @@
     "babble.anglerfish": {"wave": "sine", "freq": 260, "freq_end": 520, "duration": 0.07, "decay": 0.06, "volume": 0.3, "vibrato": 8},
     "babble.elephant": {"wave": "triangle", "freq": 150, "duration": 0.07, "decay": 0.065, "volume": 0.35},
     "babble.narrator": {"alias": "advance"},
-    "ambient.indoor": {"wave": "triangle", "freq": 55, "duration": 4.0, "volume": 0.05, "loop": true, "lfo": 0.25},
-    "ambient.machines": {"wave": "saw", "freq": 48, "duration": 4.0, "volume": 0.035, "loop": true, "lfo": 1.0},
-    "ambient.town": {"wave": "noise", "freq": 260, "duration": 4.0, "volume": 0.03, "loop": true, "lfo": 0.5, "seed": 3},
-    "ambient.sea": {"wave": "noise", "freq": 180, "duration": 4.0, "volume": 0.07, "loop": true, "lfo": 0.25, "seed": 11},
-    "ambient.wind": {"wave": "noise", "freq": 420, "duration": 4.0, "volume": 0.05, "loop": true, "lfo": 0.5, "seed": 5}
+    "ambient.indoor": {"wave": "triangle", "freq": 55, "duration": 2.0, "rate": 11025, "volume": 0.05, "loop": true, "lfo": 0.5},
+    "ambient.machines": {"wave": "saw", "freq": 48, "duration": 2.0, "rate": 11025, "volume": 0.035, "loop": true, "lfo": 1.0},
+    "ambient.town": {"wave": "noise", "freq": 260, "duration": 2.0, "rate": 11025, "volume": 0.03, "loop": true, "lfo": 0.5, "seed": 3},
+    "ambient.sea": {"wave": "noise", "freq": 180, "duration": 2.0, "rate": 11025, "volume": 0.07, "loop": true, "lfo": 0.5, "seed": 11},
+    "ambient.wind": {"wave": "noise", "freq": 420, "duration": 2.0, "rate": 11025, "volume": 0.05, "loop": true, "lfo": 0.5, "seed": 5}
   }
 }

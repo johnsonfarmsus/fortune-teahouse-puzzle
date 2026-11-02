@@ -172,10 +172,17 @@ func _on_crew(machine: String) -> void:
 	refresh()
 
 
+## Forgets this device. The old screens go back to their town; the adventure
+## restarts in the Teahouse, where a new player meets the lucky-word entry.
 func _on_reset() -> void:
 	GameState.reset_device()
 	Router.clear()
-	Router.go_to_place("town")
+	if DebugSettings.legacy_screens():
+		Router.go_to_place("town")
+		return
+	var scene := get_tree().current_scene if is_inside_tree() else null
+	if scene != null and scene.scene_file_path == Paths.MAIN:
+		get_tree().reload_current_scene()
 
 
 ## Switches between the adventure layer and the old screens, then restarts the

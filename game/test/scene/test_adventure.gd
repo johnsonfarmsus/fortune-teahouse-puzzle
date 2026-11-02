@@ -138,9 +138,9 @@ func test_room_view_is_integer_scaled_with_bars_above_and_below() -> void:
 
 func test_every_tap_answers_at_once_with_a_sound_and_a_ring() -> void:
 	await _view()
-	var count := Audio.played.size()
+	Audio.played.clear()
 	view.room.tap_world(Vector2(40, 200))
-	assert_int(Audio.played.size()).is_greater(count)
+	assert_bool(Audio.played.is_empty()).is_false()
 	assert_str(Audio.last_played()).is_equal("tap")
 	var rings := view.room.get_children().filter(func(n: Node) -> bool: return n is AnimatedSprite2D and n.z_index == 40)
 	assert_int(rings.size()).is_greater_equal(1)
@@ -463,3 +463,99 @@ func test_room_query_for_playtesting() -> void:
 	assert_str(Adventure.room_from_query("?a=1&room=harbour", Adventure.rooms)).is_equal("harbour")
 	assert_str(Adventure.room_from_query("?room=nowhere", Adventure.rooms)).is_equal("")
 	assert_str(Adventure.room_from_query("", Adventure.rooms)).is_equal("")
+
+
+# --- Review follow-ups ----------------------------------------------------------------
+
+
+func test_every_thing_in_every_room_answers_a_tap_with_a_sound_and_a_visual() -> void:
+	await _view()
+	for id in Adventure.rooms.rooms():
+		_go(id)
+		for t in Adventure.rooms.things(id):
+			view.room.input_enabled = true
+			view.room.last_flash = null
+			Audio.played.clear()
+			view.room.tap_world(RoomGraph.rect_px(t).get_center())
+			var label := "%s/%s" % [id, str(t["id"])]
+			assert_bool(Audio.played.is_empty()).override_failure_message(label + ": no sound").is_false()
+			assert_str(Audio.last_played()).override_failure_message(label).is_equal("select")
+			assert_object(view.room.last_flash).override_failure_message(label + ": nothing lit up").is_not_null()
+			assert_bool(is_instance_valid(view.room.last_flash) and view.room.last_flash.is_inside_tree()).override_failure_message(label).is_true()
+
+
+func _wait_transition() -> void:
+	for i in 600:
+		if not view._transitioning:
+			return
+		await get_tree().process_frame
+
+
+func test_edge_slides_use_two_live_views_without_readback() -> void:
+	await _view()
+	view.instant_transitions = false
+	_go("square")
+	view.room.walk_to(Vector2i(10, 12))
+	view.room.finish_walk()
+	var first := view.find_child("RoomFrame", true, false) as SubViewportContainer
+	var second := view.find_child("RoomFrame2", true, false) as SubViewportContainer
+	assert_bool(first.visible and second.visible).is_true()  # both slide together
+	assert_str(view.room_id).is_equal("pier")
+	await _wait_transition()
+	assert_bool(view._transitioning).is_false()
+	assert_int(int(first.visible) + int(second.visible)).is_equal(1)
+	assert_str(view.room.get_parent().get_parent().name).is_equal("RoomViewport2")
+	# Back the other way reuses the first view; only the active view takes taps.
+	view.room.walk_to(Vector2i(0, 12))
+	view.room.finish_walk()
+	await _wait_transition()
+	assert_str(view.room_id).is_equal("square")
+	assert_int(first.mouse_filter).is_equal(Control.MOUSE_FILTER_STOP)
+	assert_int(second.mouse_filter).is_equal(Control.MOUSE_FILTER_IGNORE)
+
+
+func test_hint_button_walks_the_ladder_and_says_done_at_the_end() -> void:
+	await _view()
+	var button := view.inventory_bar().find_child("HintButton", true, false) as Button
+	assert_object(button).is_not_null()
+	assert_float(button.custom_minimum_size.x).is_greater_equal(44.0)
+	button.pressed.emit()
+	assert_str(view.dialogue().current_speaker()).is_equal("Red Panda")
+	assert_str(view.dialogue().current_text()).is_equal(str(Story.get_piece("red_panda.hint.cutter.find.1")["lines"][0]))
+	view.dialogue().skip_all()
+	button.pressed.emit()
+	assert_str(view.dialogue().current_text()).is_equal(str(Story.get_piece("red_panda.hint.cutter.find.2")["lines"][0]))
+	view.dialogue().skip_all()
+	Adventure.inventory.mark(MACHINE, "cutter_die", "installed", "shop:cutter", GameState.device_id)
+	assert_str(Adventure.next_hint()).is_equal(Adventure.HINT_DONE)
+
+
+func test_a_tap_on_the_ground_drops_the_picked_item() -> void:
+	await _view()
+	_go("scrapyard")
+	_tap_thing("scrap_pile")
+	_close_dialogue()
+	view.inventory_bar().item_tapped.emit(Adventure.visible_items()[0])
+	_close_dialogue()
+	assert_str(view.inventory_bar().selected_item).is_equal("scrap_die")
+	view.room.input_enabled = true
+	view.room.tap_world(Vector2(9 * 16 + 8, 18 * 16 + 8))
+	assert_str(view.room.use_item).is_equal("")
+	assert_str(view.inventory_bar().selected_item).is_equal("")
+
+
+func test_portrait_follows_the_pixel_scale() -> void:
+	await _view()
+	var d := view.dialogue()
+	d.set_pixel_scale(3.0)
+	var portrait := d.find_child("Portrait", true, false) as TextureRect
+	assert_object(portrait.custom_minimum_size).is_equal(Vector2(96, 96))
+
+
+func test_reset_in_the_adventure_does_not_build_the_old_town() -> void:
+	var screen := Router.push(Paths.SETTINGS)
+	await get_tree().process_frame
+	screen.call("_on_reset")
+	assert_object(Router.current_place()).is_null()
+	assert_int(Router.depth()).is_equal(0)
+	assert_str(Adventure.room_id).is_equal("")

@@ -284,7 +284,7 @@
         {"tiles": [[4, 29], [5, 29], [6, 29]], "to": "harbour", "arrive": "north_edge", "kind": "edge", "dir": "south"}
       ],
       "npcs": [
-        {"id": "seagull", "asset": "char.seagull", "speaker": "Seagull", "at": [6, 3], "stand": [5, 4], "facing": "left", "wander": [[6, 3], [6, 5]], "say": ["seagull.room.1"]},
+        {"id": "seagull", "asset": "char.seagull", "speaker": "Seagull", "at": [6, 3], "stand": [5, 4], "facing": "left", "say": ["seagull.room.1"]},
         {"id": "crab", "asset": "char.crab", "speaker": "Crab", "at": [4, 19], "stand": [5, 19], "facing": "right", "say": ["crab.room.1", "crab.room.2"]}
       ],
       "props": [

@@ -249,9 +249,12 @@ func _on_tick() -> void:
 # --- Hints --------------------------------------------------------------------------
 
 
+const HINT_DONE := "red_panda.hint.done"
+
+
 ## Red Panda's help: the next hint piece id for the first unfinished chain
 ## step (a nudge, then a stronger nudge; asking again repeats the stronger
-## one), or "" when every chain is done.
+## one), or HINT_DONE once every chain is done.
 func next_hint() -> String:
 	for machine: String in chains:
 		var data: Dictionary = chains[machine]
@@ -266,7 +269,7 @@ func next_hint() -> String:
 			var level := int(_hint_levels.get(key, 0))
 			_hint_levels[key] = level + 1
 			return str(hints[mini(level, hints.size() - 1)])
-	return ""
+	return HINT_DONE if not chains.is_empty() else ""
 
 
 # --- Persistence --------------------------------------------------------------------

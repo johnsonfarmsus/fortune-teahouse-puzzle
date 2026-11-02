@@ -6,9 +6,13 @@ extends Node
 ## overlap instead of cutting each other off, and one more plays the room's
 ## quiet ambient loop. `played` records the last ids asked for, even while
 ## muted, so tests can check that every interaction makes a sound.
+## Building sounds costs time, so prewarm() builds them a few per frame while
+## the start screen is up; nothing is built inside unlock(). An ambient loop
+## that is not built yet starts once the prewarm reaches it.
 
 const VOICES := 6
 const HISTORY := 64
+const BUILDS_PER_FRAME := 2
 
 var unlocked: bool = false
 var streams: Dictionary = {}  # name -> AudioStream, overrides the bank
@@ -18,6 +22,7 @@ var _players: Array[AudioStreamPlayer] = []
 var _next := 0
 var _ambient: AudioStreamPlayer
 var _ambient_id := ""
+var _prewarm: Array[String] = []
 
 
 func _ready() -> void:
@@ -34,6 +39,29 @@ func _ready() -> void:
 func unlock() -> void:
 	unlocked = true
 	_refresh_ambient()
+
+
+## Queues every sound to be built in the background, a few per frame.
+func prewarm(ids: Array[String] = []) -> void:
+	var list := ids if not ids.is_empty() else bank.ids()
+	for id in list:
+		if not bank.is_built(id) and not _prewarm.has(id):
+			_prewarm.append(id)
+
+
+func prewarm_left() -> int:
+	return _prewarm.size()
+
+
+func _process(_delta: float) -> void:
+	if _prewarm.is_empty():
+		return
+	for i in BUILDS_PER_FRAME:
+		if _prewarm.is_empty():
+			break
+		bank.stream(_prewarm.pop_front())
+	if _ambient_id != "" and not _ambient.playing:
+		_refresh_ambient()
 
 
 func last_played() -> String:
@@ -80,6 +108,11 @@ func _refresh_ambient() -> void:
 		return
 	if not unlocked or not GameState.sound_on or _ambient_id == "" or bank == null:
 		_ambient.stop()
+		return
+	if not bank.is_built(_ambient_id):
+		# Not built yet: build it next, never in the middle of a tap.
+		_prewarm.erase(_ambient_id)
+		_prewarm.push_front(_ambient_id)
 		return
 	var stream := bank.stream(_ambient_id)
 	if stream == null:

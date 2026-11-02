@@ -10,6 +10,7 @@ signal item_tapped(entry: Dictionary)
 signal drag_started(entry: Dictionary, at: Vector2)
 signal clues_pressed
 signal menu_pressed
+signal hint_pressed
 
 const SLOT := 44.0
 const DRAG_START_PX := 8.0
@@ -107,6 +108,13 @@ func _ready() -> void:
 	_empty.custom_minimum_size = Vector2(150, SLOT)
 	_empty.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	_slots_box.add_child(_empty)
+	var hint := UiKit.button("?", Vector2(SLOT, SLOT))
+	hint.name = "HintButton"
+	hint.add_theme_font_size_override("font_size", 18)
+	hint.pressed.connect(func() -> void:
+		Audio.play("menu")
+		hint_pressed.emit())
+	_row.add_child(hint)
 	_clues = UiKit.button("Clues", Vector2(58, SLOT))
 	_clues.add_theme_font_size_override("font_size", 15)
 	_clues.pressed.connect(func() -> void:

@@ -21,6 +21,8 @@ var load_msec: int = -1
 
 
 func _ready() -> void:
+	# Build the sound effects in the background while the player reads this.
+	Audio.prewarm()
 	_button.pressed.connect(func() -> void: started.emit())
 	_tagline.text = str(Story.pick("start_screen", "always").get("text", ""))
 	var tip := Story.pick("loading", "always")
