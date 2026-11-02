@@ -57,8 +57,8 @@ func _build(box: VBoxContainer) -> void:
 	var merged_line := Story.pick("merge_celebration", "merged", _context) if credited else {}
 	_merged = UiKit.label(str(merged_line.get("text", "")), UiKit.CLUE_SIZE)
 	_merged.position = Vector2(150, 10)
-	_merged.custom_minimum_size = Vector2(220, 0)
-	_merged.size = Vector2(220, 140)
+	_merged.custom_minimum_size = Vector2(210, 0)  # 150 + 210 stays inside the 366 px stage
+	_merged.size = Vector2(210, 140)
 	_merged.modulate.a = 0.0
 	stage.add_child(_merged)
 	_result = VBoxContainer.new()

@@ -82,10 +82,19 @@ func test_pieces_by_speaker_covers_the_gnu_notes_in_town_and_shop() -> void:
 	var catalog := StoryCatalog.load_all()
 	var town := catalog.pieces_by_speaker("Gnu", "town")
 	var shop := catalog.pieces_by_speaker("Gnu", "shop")
-	assert_int(town.size() + shop.size()).is_equal(6)
+	var expected := 0
+	for raw: Dictionary in _raw_pieces("gnu.json"):
+		if str(raw["id"]).begins_with("gnu.town."):
+			expected += 1
+	assert_int(expected).is_greater(0)
+	assert_int(town.size() + shop.size()).is_equal(expected)
 	for piece: Dictionary in town:
 		assert_str(piece["id"]).starts_with("gnu.town.")
-	assert_int(catalog.pieces_by_speaker("Gnu", "shop").size()).is_equal(2)
+	var shop_ids := 0
+	for raw: Dictionary in _raw_pieces("gnu.json"):
+		if raw["where"] == "shop" or str(raw["where"]).begins_with("shop:"):
+			shop_ids += 1
+	assert_int(shop.size()).is_equal(shop_ids)
 
 
 func test_duplicate_and_idless_pieces_are_ignored() -> void:

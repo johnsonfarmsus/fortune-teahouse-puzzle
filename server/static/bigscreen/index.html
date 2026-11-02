@@ -11,20 +11,21 @@
     --gold: #ffc94a; --ok: #6fe39b; --warn: #ff9f6b; --off: #4a4036;
   }
   * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
   html, body { margin: 0; background: var(--bg); color: var(--text); }
-  body { font-family: system-ui, "Segoe UI", Roboto, sans-serif; font-size: 2vw; line-height: 1.25;
-         min-height: 100vh; display: flex; flex-direction: column; padding: 1.5vw 2.5vw; gap: 1.6vw; }
-  h1 { font-size: 4vw; margin: 0; color: var(--gold); letter-spacing: .02em; }
+  body { font-family: system-ui, "Segoe UI", Roboto, sans-serif; font-size: 1.7vw; line-height: 1.25;
+         min-height: 100vh; display: flex; flex-direction: column; padding: .9vw 2.5vw; gap: .8vw; }
+  h1 { font-size: 3.4vw; margin: 0; color: var(--gold); letter-spacing: .02em; }
   h2 { font-size: 2.6vw; margin: 0 0 .6vw; }
   header { display: flex; justify-content: space-between; align-items: baseline; gap: 2vw; flex-wrap: wrap; }
-  #banner { font-size: 2.6vw; font-weight: 700; padding: .3em .8em; border-radius: 999px;
+  #banner { font-size: 2.2vw; font-weight: 700; padding: .3em .8em; border-radius: 999px;
             border: .25vw solid var(--line); color: var(--dim); }
   #banner.open { color: var(--bg); background: var(--ok); border-color: var(--ok); }
   #banner.started { color: var(--bg); background: var(--gold); border-color: var(--gold); }
-  .machines { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.6vw; }
-  .card { background: var(--panel); border: .2vw solid var(--line); border-radius: 1.2vw; padding: 1.4vw; }
+  .machines { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1.6vw; }
+  .card { background: var(--panel); border: .2vw solid var(--line); border-radius: 1.2vw; padding: 1vw 1.3vw; }
   .card.runs { border-color: var(--ok); }
-  .card h2 { display: flex; justify-content: space-between; align-items: baseline; gap: 1vw; }
+  .card h2 { margin-bottom: .4vw; display: flex; justify-content: space-between; align-items: baseline; gap: 1vw; }
   .status { font-size: 1.9vw; color: var(--dim); }
   .card.runs .status { color: var(--ok); font-weight: 700; }
   .parts { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: 1fr 1fr; gap: .7vw 1.2vw; }
@@ -35,9 +36,11 @@
   .part.on .light { background: var(--ok); border-color: var(--ok); color: var(--bg); box-shadow: 0 0 1.2vw var(--ok); }
   .part .n { margin-left: auto; font-variant-numeric: tabular-nums; color: var(--dim); }
   .finale { display: grid; grid-template-columns: 2fr 1fr; gap: 1.6vw; }
-  .handoff { margin-bottom: 1vw; }
+  .handoff { margin-bottom: .5vw; }
+  .finale h2 { font-size: 1.6vw; margin-bottom: .3vw; }
+  #notes { line-height: 1.15; }
   .handoff .row { display: flex; justify-content: space-between; gap: 1vw; }
-  .bar { height: 2.2vw; background: var(--off); border-radius: 1.1vw; overflow: hidden; margin-top: .3vw; }
+  .bar { height: 1vw; background: var(--off); border-radius: .7vw; overflow: hidden; margin-top: .3vw; }
   .bar > div { height: 100%; background: var(--gold); width: 0; transition: width .6s; }
   .handoff.connected .bar > div { background: var(--ok); }
   .handoff .st { color: var(--dim); }
@@ -45,10 +48,10 @@
   .handoff.waiting .st, .handoff.locked .st { color: var(--warn); }
   .big { font-size: 7vw; font-weight: 800; color: var(--gold); font-variant-numeric: tabular-nums; }
   .pips { display: flex; flex-wrap: wrap; gap: .5vw; margin-top: .8vw; }
-  .pip { width: 1.8vw; height: 1.8vw; border-radius: 50%; border: .2vw solid var(--off); }
+  .pip { width: 1.5vw; height: 1.5vw; border-radius: 50%; border: .2vw solid var(--off); }
   .pip.on { background: var(--gold); border-color: var(--gold); }
   .ticker { overflow: hidden; white-space: nowrap; border-top: .2vw solid var(--line);
-            border-bottom: .2vw solid var(--line); padding: .7vw 0; }
+            border-bottom: .2vw solid var(--line); padding: .4vw 0; }
   .ticker .track { display: inline-block; padding-left: 100%; animation: scroll var(--dur, 60s) linear infinite; }
   .ticker span.who { margin-right: 3vw; }
   .ticker b { color: var(--gold); }
@@ -57,13 +60,60 @@
     .ticker { white-space: normal; }
     .ticker .track { animation: none; padding-left: 0; }
   }
+
+  #message { font-size: 2.1vw; font-weight: 700; margin: 0; line-height: 1.2; text-wrap: balance; }
+  .machines.compact .parts { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .machines.compact h2 { font-size: 1.7vw; margin-bottom: .3vw; }
+  .machines.compact .card { padding: .8vw 1.2vw; }
+  .machines.compact .card.runs h2 { margin-bottom: 0; }
+  .machines.compact .light { width: 1.6vw; height: 1.6vw; border-width: .2vw; }
+  .machines.compact .part { font-size: 1.3vw; gap: .5vw; }
+  .machines.compact .status { font-size: 1.6vw; }
+  .handoff .row .name { font-weight: 600; }
+  .machines.compact .card.runs .parts { display: none; }
+  .finale .handoff { display: grid; grid-template-columns: 1.3fr 1fr; align-items: center; gap: 1.5vw; }
+  .finale .handoff .bar { margin-top: 0; }
+  .readme { display: grid; grid-template-columns: repeat(3, 1fr); gap: .7vw 2vw; }
+  .readme .sec h3 { margin: 0 0 .2vw; font-size: 1.5vw; color: var(--gold); }
+  .readme .sec p { margin: 0; font-size: 1.2vw; color: var(--text); }
+  .readme-sub, .readme-empty { color: var(--dim); font-size: 1.5vw; margin: 0 0 .8vw; }
+  #readme-title { font-size: 1.5vw; }
+  [data-state="S4"] .readme .sec h3 { font-size: 2.1vw; }
+  [data-state="S4"] .readme .sec p { font-size: 1.65vw; }
+  [data-state="S4"] .maint p { font-size: 1.9vw; }
+  .readme-head { margin: 0 0 .2vw; font-size: 2.6vw; color: var(--gold); }
+  .maint { margin-top: 1.4vw; }
+  .maint h3 { margin: 0; font-size: 2vw; color: var(--gold); }
+  .maint p { margin: .2vw 0 0; font-size: 1.6vw; }
+  .maint .names { color: var(--text); }
+  #reveal { position: fixed; inset: 0; background: var(--bg); z-index: 10; overflow: hidden;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            text-align: center; padding: 4vw; gap: 2vw; }
+  #reveal[hidden] { display: none; }
+  #reveal .r-big { font-size: 5.5vw; font-weight: 800; color: var(--gold); max-width: 90vw; line-height: 1.2; }
+  #reveal .r-code { font-size: 9vw; font-weight: 800; font-variant-numeric: tabular-nums; letter-spacing: .05em; }
+  #reveal .r-fortune { font-size: 4.2vw; font-style: italic; color: var(--text); max-width: 80vw; line-height: 1.3; }
+  #reveal .r-lines { list-style: none; margin: 0; padding: 0; display: grid; gap: 1.4vw; }
+  #reveal .r-lines li { font-size: 5vw; font-weight: 700; color: var(--off); transition: color .4s, text-shadow .4s; }
+  #reveal .r-lines li.lit { color: var(--ok); text-shadow: 0 0 1.5vw var(--ok); }
+  #reveal .r-skip { position: absolute; bottom: 1.5vw; right: 2.5vw; font-size: 1.3vw; color: var(--dim); }
+  #reveal .r-scroll { position: absolute; left: 10vw; right: 10vw; top: 0; text-align: left; will-change: transform; }
+  #reveal .r-scroll .readme { grid-template-columns: 1fr; gap: 1.6vw; }
+  #reveal .r-scroll .sec h3 { font-size: 3vw; }
+  #reveal .r-scroll .sec p { font-size: 2.4vw; }
+  #reveal .r-scroll .readme-head { font-size: 4.4vw; }
+  #reveal .r-scroll .readme-sub { font-size: 2.4vw; }
+  #reveal .r-scroll .maint h3 { font-size: 3.4vw; }
+  #reveal .r-scroll .maint p { font-size: 2.4vw; }
   footer { margin-top: auto; font-size: 1.4vw; color: var(--dim); display: flex; justify-content: space-between;
            gap: 2vw; flex-wrap: wrap; }
   footer a { color: var(--gold); }
   #conn { color: var(--warn); font-weight: 700; }
   @media (max-width: 800px) {
     body { font-size: 16px; } h1 { font-size: 28px; } h2 { font-size: 22px; } #banner { font-size: 18px; }
-    .machines, .finale { grid-template-columns: 1fr; } .status { font-size: 16px; }
+    .machines, .finale, .readme { grid-template-columns: 1fr; }
+    #message { font-size: 22px; }
+    .readme .sec h3 { font-size: 20px; } .readme .sec p, .readme-sub, .readme-empty { font-size: 16px; } .status { font-size: 16px; }
     .light { width: 22px; height: 22px; } .bar { height: 16px; } .big { font-size: 48px; }
     .pip { width: 14px; height: 14px; } footer { font-size: 14px; }
   }
@@ -75,19 +125,24 @@
   <div id="banner">Connecting&hellip;</div>
 </header>
 
+<p id="message" aria-live="polite"></p>
+
 <section class="machines" id="machines" aria-label="Machines"></section>
 
-<section class="finale" aria-label="Finale">
+<section class="finale" id="finale" aria-label="Finale" hidden>
   <div class="card">
     <h2>The line: handoffs</h2>
     <div id="handoffs"></div>
   </div>
   <div class="card">
-    <h2>The gnu's notes</h2>
-    <div class="big" id="notes">-</div>
-    <div id="notes-sub" class="status"></div>
+    <h2 id="notes">-</h2>
     <div class="pips" id="pips"></div>
   </div>
+</section>
+
+<section class="card" id="readme-card" aria-label="README" hidden>
+  <h2 id="readme-title">README so far</h2>
+  <div id="readme"></div>
 </section>
 
 <section class="ticker" aria-label="Contributors"><div class="track" id="ticker"></div></section>
@@ -97,6 +152,8 @@
     <a id="repo" href="{{REPO_URL}}">Source code</a></span>
   <span><span id="conn"></span> <span id="updated"></span></span>
 </footer>
+
+<div id="reveal" hidden aria-live="polite"></div>
 
 <script src="bigscreen.js"></script>
 </body>

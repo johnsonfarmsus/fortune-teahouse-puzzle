@@ -7,6 +7,11 @@ shared progress pauses.
 
 - API reference: [API.md](API.md)
 - Big screen: `/bigscreen/` (large type, dark, polls `/api/v1/summary` every 5 seconds)
+  - States follow the finale (locked, open, line ready, running). When the line starts the screen
+    plays the closing reveal, then shows the full README and the contributors. Replay it with
+    `/bigscreen/?replay=1` or by pressing **R**; any key skips it. Polling pauses during the reveal.
+  - `static/bigscreen/readme.json` is the README text; keep it equal to `game/data/finale/readme.json`
+    (a pytest checks that once the game file exists).
 - Licence: GNU AGPL-3.0-or-later. Because this runs as a network service, the big-screen footer
   links to the source repository (`REPO_URL`). Keep that link pointing at the code you run.
 
@@ -75,7 +80,7 @@ app/db.py         SQLite schema
 app/service.py    all game rules and queries
 app/main.py       FastAPI routes, CORS, rate limit, big-screen route
 app/ratelimit.py  in-memory token bucket
-static/bigscreen/ the big-screen page (plain HTML and JS, no build step)
+static/bigscreen/ the big-screen page and readme.json (plain HTML and JS, no build step)
 tests/            pytest suite (httpx TestClient)
 ```
 
