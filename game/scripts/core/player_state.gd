@@ -13,6 +13,8 @@ var collected_clue_ids: Array[String] = []
 var solved_parts: Dictionary = {}  # {machine: {part: credited}}
 var hint_levels: Dictionary = {}  # {puzzle_id: level}
 var sound_on: bool = true
+var seen_story: Array[String] = []  # story piece ids already shown, plus "visit:<key>" marks
+var story_state: Dictionary = {}  # {key: last state shown}, so a line shows again only when the state changes
 
 
 func ensure_device_id() -> void:
@@ -66,6 +68,15 @@ func is_part_credited(machine: String, part: String) -> bool:
 	return bool(solved_parts.get(machine, {}).get(part, false))
 
 
+func has_seen_story(id: String) -> bool:
+	return seen_story.has(id)
+
+
+func mark_story_seen(id: String) -> void:
+	if id != "" and not seen_story.has(id):
+		seen_story.append(id)
+
+
 func to_dict() -> Dictionary:
 	return {
 		"device_id": device_id,
@@ -76,6 +87,8 @@ func to_dict() -> Dictionary:
 		"solved_parts": solved_parts.duplicate(true),
 		"hint_levels": hint_levels.duplicate(),
 		"sound_on": sound_on,
+		"seen_story": seen_story.duplicate(),
+		"story_state": story_state.duplicate(),
 	}
 
 
@@ -97,4 +110,9 @@ static func from_dict(data: Dictionary) -> PlayerState:
 	for puzzle_id in raw_levels:
 		state.hint_levels[str(puzzle_id)] = int(raw_levels[puzzle_id])
 	state.sound_on = bool(data.get("sound_on", true))
+	for story_id in data.get("seen_story", []):
+		state.mark_story_seen(str(story_id))
+	var raw_state: Dictionary = data.get("story_state", {})
+	for key in raw_state:
+		state.story_state[str(key)] = str(raw_state[key])
 	return state

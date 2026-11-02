@@ -2,7 +2,13 @@
 extends Node
 ## Thin Node over PuzzleCatalog. Loads the data files once.
 
+var load_msec: int = 0  # how long the load below took; StartScreen reads it
+var _started_msec: int = Time.get_ticks_msec()
 var catalog: PuzzleCatalog = PuzzleCatalog.load_all()
+
+
+func _init() -> void:
+	load_msec = Time.get_ticks_msec() - _started_msec
 
 
 func get_clue(clue_id: String) -> Dictionary:

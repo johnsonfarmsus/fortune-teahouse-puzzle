@@ -28,6 +28,27 @@ func _build(box: VBoxContainer) -> void:
 		b.pressed.connect(_on_crew_chosen.bind(machine))
 		row.add_child(b)
 	box.add_child(row)
+	_red_panda_speaks()
+
+
+## Red Panda greets a first visit with the welcome. After that she speaks only
+## when the player's situation changes: no crew, then a crew, then a machine that runs.
+func _red_panda_speaks() -> void:
+	var extra := {}
+	var state := "has_crew"
+	if GameState.crew == "":
+		state = "no_crew"
+	elif Progress.is_running(GameState.crew):
+		state = "machine_running:crew"
+		extra["machine"] = Ids.machine_title(GameState.crew)
+	var changed := Story.state_changed("lucky_word_entry", state)
+	var welcome := Story.unseen("lucky_word_entry", "first_visit", extra)
+	if not welcome.is_empty():
+		Story.play(self, welcome)
+	elif changed:
+		var line := Story.pick("lucky_word_entry", state, extra)
+		if not line.is_empty():
+			Story.play(self, [line])
 
 
 func _on_submitted(word: String) -> void:

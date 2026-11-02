@@ -59,6 +59,10 @@ func _build(box: VBoxContainer) -> void:
 
 	_build_scoreboard(list)
 
+	var about := Story.pick("settings", "always")
+	if not about.is_empty():
+		list.add_child(UiKit.label("About", 20))
+		list.add_child(UiKit.label(str(about["text"]), UiKit.CLUE_SIZE))
 	var source := UiKit.button("Source code (AGPL)", Vector2(0, 48))
 	source.pressed.connect(func() -> void: OS.shell_open(Ids.REPO_URL))
 	list.add_child(source)
