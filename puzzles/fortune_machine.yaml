@@ -69,8 +69,8 @@ clues:
     style: trivia
     approachable: true
     lucky_word: COPYLEFT
-    fortune_text: "Work's slot is the number of the free software freedom to study how a program works. Lucky word: COPYLEFT"
-    char_count: 105
+    fortune_text: "Work's slot is the FSF's number for the freedom to study how a program works (the FSF counts from 0). Lucky word: COPYLEFT"
+    char_count: 122
     fact:
       kind: position
       item: work

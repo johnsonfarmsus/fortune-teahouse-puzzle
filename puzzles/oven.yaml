@@ -46,8 +46,8 @@ clues:
     style: poem
     approachable: true
     lucky_word: TOASTY
-    fortune_text: "Once past 200 the heat settles down: the zone just after is 120, golden and brown. Lucky word: TOASTY"
-    char_count: 101
+    fortune_text: "After the 200 C zone the heat settles down: the next zone along is 120 C, golden and brown. Lucky word: TOASTY"
+    char_count: 110
     fact:
       kind: offset
       item: c120
@@ -70,7 +70,7 @@ clues:
     style: trivia
     approachable: true
     lucky_word: TARBALL
-    fortune_text: "Count the letters in vi's old rival from the editor wars. Run the zone with that number at 120 C. Lucky word: TARBALL"
+    fortune_text: "Count the letters in vi's old rival from the editor wars. Set the zone with that number to 120 C. Lucky word: TARBALL"
     char_count: 117
     fact:
       kind: position

@@ -77,7 +77,7 @@ spells the start code.
 
 **Character limit.** The vendor (Fortune Cookie Guy) prints 140 characters per side, the
 default `vendor-140` profile. The limit stays a parameter: `--profile alt-99` checks the
-99-character alternative. All fronts are 119 characters or fewer; twelve need trimming to
+99-character alternative. All fronts are 122 characters or fewer; twelve need trimming to
 fit 99, which the report lists.
 
 **Misreading report (informational).** The checker re-reads each offset clue as plain
