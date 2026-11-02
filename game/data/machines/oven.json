@@ -86,7 +86,7 @@
     {
       "config": {
         "hints": [
-          "Follow one cookie: it rides in raw, gets baked, is given its fortune and folded while still warm, then cools, and only then is packaged.",
+          "Each stage works on what the one before it made. Follow one cookie from the moment it rides in raw to the moment it is packaged.",
           "The fortune drops onto the round just after baking, while it is still warm, and just before the arms fold it."
         ],
         "intro": "The Oven's stage list got shuffled by the steam. Put the stages back in the order one cookie goes through them.",
@@ -189,9 +189,9 @@
     {
       "config": {
         "choices": [
-          "The boxes are too small",
-          "Gopher is out delivering",
-          "A warm cookie steams up the wrapper and smudges the label"
+          "The boxes are the wrong size",
+          "Gopher is busy on a delivery",
+          "Warm steam smudges the label"
         ],
         "correct": 2,
         "lines": [
@@ -202,7 +202,8 @@
         ],
         "nudge": "Think about what Gopher said happens when a warm cookie goes into its wrapper.",
         "question": "Why does Gopher wait for the cookies to cool before packing them?",
-        "speaker": "Gopher"
+        "speaker": "Gopher",
+        "success_line": "Right you are! That is the one."
       },
       "part": "helper",
       "title": "Gopher's deliveries",

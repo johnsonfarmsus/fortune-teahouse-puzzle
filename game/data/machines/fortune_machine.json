@@ -23,7 +23,7 @@
           "Each tube has a letter in brackets. The tube goes to the nozzle with that same letter.",
           "Start with the cyan tube. Its letter is C."
         ],
-        "intro": "The ink pump has five tubes, and the gnu marked each one with the first letter of its ink. Wire every tube to the nozzle with the same letter.",
+        "intro": "The ink pump has five tubes, and the gnu marked each one with a letter for its ink. Wire every tube to the nozzle with the same letter.",
         "sockets": [
           {
             "color": "dimgray",
@@ -86,7 +86,7 @@
     {
       "config": {
         "hints": [
-          "Each step uses what the step before it made: phrases are picked, then joined, then checked, then printed, then left to dry, then sent.",
+          "Each step uses what the step before it made. Follow one fortune from its first phrase to the moment it leaves for the Oven.",
           "The strip only travels to the Oven at the very end, once the ink is dry."
         ],
         "intro": "The Fortune Machine's job list fell off the wall. Put the steps back in the order the machine does them.",
@@ -201,7 +201,8 @@
         ],
         "nudge": "Listen to what Seagull said about smudged fortunes. Where do they get swept to?",
         "question": "Where do the smudged fortunes swept off the printer's paper strip end up?",
-        "speaker": "Seagull"
+        "speaker": "Seagull",
+        "success_line": "Squawk! Yes, that is it."
       },
       "part": "helper",
       "title": "Seagull's lost fortunes",

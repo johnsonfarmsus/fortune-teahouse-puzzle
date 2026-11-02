@@ -241,6 +241,28 @@ func test_a_wrong_helper_choice_does_not_solve() -> void:
 		assert_array(results).is_empty()
 
 
+func test_helpers_speak_their_own_success_line() -> void:
+	var lines: Dictionary = {}
+	for machine in Ids.MACHINES:
+		var config := _config(machine, "helper")
+		assert_str(str(config.get("success_line", ""))).is_not_empty()
+		lines[config["success_line"]] = true
+		var puzzle := _make(machine, "helper")
+		puzzle.answer_choice(int(config["correct"]))
+		var labels := puzzle.find_children("*", "Label", true, false).map(func(n: Node) -> String: return (n as Label).text)
+		assert_bool(labels.has(config["success_line"])).override_failure_message("%s success line not shown" % machine).is_true()
+	assert_int(lines.size()).is_equal(3)
+
+
+func test_helper_success_line_defaults_to_neutral() -> void:
+	var puzzle: PuzzleBase = load(Paths.puzzle_scene("helper")).instantiate()
+	puzzle.configure({"speaker": "Test", "lines": ["Hi"], "question": "Q", "choices": ["a", "b"], "correct": 0, "nudge": "n"})
+	add_child(auto_free(puzzle))
+	puzzle.answer_choice(0)
+	var labels := puzzle.find_children("*", "Label", true, false).map(func(n: Node) -> String: return (n as Label).text)
+	assert_bool(labels.has("Yes, that is it.")).is_true()
+
+
 func test_three_hints_reveal_without_credit_on_the_new_machines() -> void:
 	for machine in ["fortune_machine", "oven"]:
 		for part in ["wiring", "sequence", "word", "rhythm", "helper"]:
