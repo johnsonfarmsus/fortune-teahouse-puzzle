@@ -1,0 +1,111 @@
+# SPDX-License-Identifier: AGPL-3.0-or-later
+# The sample Cookie Machine set from DESIGN.md ("The fortune cookies"), used
+# as a test fixture. Not a real puzzle: its answer is published in DESIGN.md.
+# The code clue is stored without the Markdown backticks (71 characters).
+schema_version: 1
+machine:
+  id: sample_cookie_machine
+  name: Cookie Machine (DESIGN.md sample)
+domain:
+  item_noun: ingredient
+  position_noun: jar
+  order: "jars 1 to 5, left to right"
+  items:
+    - id: sugar
+      name: Sugar
+    - id: flour
+      name: Flour
+    - id: butter
+      name: Butter
+    - id: vanilla
+      name: Vanilla
+    - id: egg
+      name: Egg
+  positions:
+    - index: 1
+      label: Jar 1
+    - index: 2
+      label: Jar 2
+    - index: 3
+      label: Jar 3
+    - index: 4
+      label: Jar 4
+    - index: 5
+      label: Jar 5
+answer:
+  sugar: 1
+  flour: 2
+  butter: 4
+  vanilla: 3
+  egg: 5
+clues:
+  - id: sample_security
+    style: security
+    approachable: true
+    lucky_word: CIPHER
+    fortune_text: "ROT13 says: Fhtne vf va wne bar. Lucky word: CIPHER"
+    char_count: 51
+    fact:
+      kind: position
+      item: sugar
+      position: 1
+    nudge: "ROT13 swaps every letter with the one 13 places along the alphabet."
+  - id: sample_poem
+    style: poem
+    approachable: true
+    lucky_word: SPRINKLE
+    fortune_text: "Vanilla came first, then butter so near: one jar to the right, and the butter is here. Lucky word: SPRINKLE"
+    char_count: 107
+    fact:
+      kind: offset
+      item: butter
+      relative_to: vanilla
+      offset: 1
+    nudge: "Read past the rhyme for the two ingredients and the direction."
+  - id: sample_animal
+    style: animal
+    approachable: true
+    lucky_word: HUDDLE
+    fortune_text: "Like a penguin and her chick, sugar and flour stand close: sugar on the left, flour just beside. Lucky word: HUDDLE"
+    char_count: 115
+    fact:
+      kind: offset
+      item: flour
+      relative_to: sugar
+      offset: 1
+    nudge: "The penguin is a picture; the second half is the instruction."
+  - id: sample_trivia
+    style: trivia
+    approachable: true
+    lucky_word: TUX
+    fortune_text: "Count the letters in the kernel Linus Torvalds wrote. That number is the egg's jar. Lucky word: TUX"
+    char_count: 99
+    fact:
+      kind: position
+      item: egg
+      position: 5
+    nudge: "Name the kernel, then count its letters."
+  - id: sample_code
+    style: code
+    approachable: false
+    lucky_word: PATCH
+    fortune_text: 'assert jar.index("vanilla") == jar.index("flour") + 1 Lucky word: PATCH'
+    char_count: 71
+    fact:
+      kind: offset
+      item: vanilla
+      relative_to: flour
+      offset: 1
+    nudge: "jar.index(x) is the position of x; the assert must be true."
+  - id: sample_hardware
+    style: hardware
+    approachable: false
+    lucky_word: SOLDER
+    fortune_text: "Read the jars like resistor bands, left to right: butter's band comes just before egg's. Lucky word: SOLDER"
+    char_count: 107
+    fact:
+      kind: offset
+      item: butter
+      relative_to: egg
+      offset: -1
+    nudge: "Resistor bands are read in order, one after another."
