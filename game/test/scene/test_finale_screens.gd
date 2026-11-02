@@ -755,3 +755,61 @@ func test_the_shop_has_a_the_line_button() -> void:
 	assert_float(button.custom_minimum_size.y).is_greater_equal(44.0)
 	button.pressed.emit()
 	assert_str(Router.top().scene_file_path).is_equal(Paths.FINALE_VIEW)
+
+
+# --- Review follow-ups ----------------------------------------------------------------------
+
+
+func test_a_revealed_twin_files_nothing() -> void:
+	_online()
+	_open()
+	var host := Router.push(Paths.HANDOFF_HOST, {"twin": "note_2"})
+	await get_tree().process_frame
+	var helper: PuzzleBase = host.puzzle
+	assert_object(helper).is_not_null()
+	Hints.reset(helper.puzzle_id)
+	helper.request_hint()
+	helper.request_hint()
+	helper.request_hint()  # level 3: the answer is shown, solved(false)
+	assert_bool(Finale.state.has_gnu_note("note_2")).is_false()
+	assert_int(Finale.state.queue.size()).is_equal(0)
+	assert_int(fake.count("POST", "/finale/notes")).is_equal(0)
+	assert_bool(_has_text(host, "Elephant smiles. Find the real note, or solve it yourself.")).is_true()
+	assert_bool(_has_text(host, "Elephant files it. Thank you!")).is_false()
+	assert_int(Finale.notes_found()).is_equal(0)
+
+
+func test_reset_device_clears_the_finale_state() -> void:
+	Finale.state.grant_note("oven")
+	Finale.add_setting("cookie_to_oven", 1)
+	Finale.collect_gnu_note("note_4")
+	Finale.state.set_cache(FinaleFixtures.finale(true))
+	assert_bool(Finale.state.queue.is_empty()).is_false()
+	GameState.reset_device()
+	assert_bool(Finale.state.notes_held.is_empty()).is_true()
+	assert_bool(Finale.state.settings.is_empty()).is_true()
+	assert_bool(Finale.state.gnu_notes.is_empty()).is_true()
+	assert_bool(Finale.state.queue.is_empty()).is_true()
+	assert_bool(Finale.state.cache.is_empty()).is_true()
+	assert_bool(Finale.is_open()).is_false()
+	assert_bool(Story.flag("finale_open")).is_false()
+
+
+func test_finale_screens_make_progress_watch_all_three_machines() -> void:
+	var queue := "user://test_finale_watch_queue.json"
+	var remote := RemoteProgressStore.new(FakeScoreboard.BASE, LocalProgressStore.new(PROGRESS_PATH), fake.transport(), queue)
+	Progress.set_store(remote)
+	Router.push(Paths.SETTINGS)
+	assert_array(remote.watched_machines()).is_empty()
+	for path in [Paths.FINALE_VIEW, Paths.ARCHIVE]:
+		Router.push(path)
+		assert_array(remote.watched_machines()).contains_exactly(Ids.MACHINES)
+		Router.pop()
+		assert_array(remote.watched_machines()).is_empty()
+	Router.push(Paths.HANDOFF_HOST, {"handoff": "oven_to_packaging"})
+	assert_array(remote.watched_machines()).contains_exactly(Ids.MACHINES)
+	assert_int(fake.count("GET", "/crews/")).is_greater_equal(3)
+	Router.clear()
+	assert_array(remote.watched_machines()).is_empty()
+	if FileAccess.file_exists(queue):
+		DirAccess.remove_absolute(ProjectSettings.globalize_path(queue))

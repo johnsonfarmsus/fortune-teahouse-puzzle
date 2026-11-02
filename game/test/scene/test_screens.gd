@@ -10,6 +10,8 @@ const MACHINE := "cookie_machine"
 func before_test() -> void:
 	_cleanup()
 	GameState.persist = false
+	Finale.set_client(null)
+	Finale.set_state(FinaleState.new(""))  # never touch user://finale.json
 	GameState.player = PlayerState.new()
 	GameState.player.ensure_device_id()
 	Progress.set_store(LocalProgressStore.new(PROGRESS_PATH))

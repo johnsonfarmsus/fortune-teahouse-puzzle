@@ -146,14 +146,18 @@ func _on_setting_set(setting_index: int) -> void:
 	refresh()
 
 
-func _on_solved(_credited: bool) -> void:
-	if twin_id != "":
+func _on_solved(credited: bool) -> void:
+	# A revealed twin files nothing: otherwise k of N could be reached without
+	# finding a single note. Only a solve of your own counts.
+	if twin_id != "" and credited:
 		Finale.collect_gnu_note(twin_id)
-	_show_done()
+	_show_done(credited)
 
 
-func _show_done() -> void:
-	if twin_id != "":
+func _show_done(credited: bool = true) -> void:
+	if twin_id != "" and not credited:
+		_done_label.text = "Elephant smiles. Find the real note, or solve it yourself."
+	elif twin_id != "":
 		_done_label.text = "Elephant files it. Thank you!"
 	else:
 		_done_label.text = "%s: connected on this phone. Elephant adds a page to the README." % _title
@@ -161,6 +165,8 @@ func _show_done() -> void:
 	_hint_button.disabled = true
 	_hide_confirm()
 	_hint_label.visible = false
+	if twin_id != "" and not credited:
+		return
 	var line := Story.pick("finale_archive", "handoff_solved" if twin_id == "" else "note_found")
 	if not line.is_empty():
 		Story.play(self, [line], false)

@@ -45,6 +45,7 @@ var _display_name := ""
 var _watching := false
 var _in_flight := false
 var _fetching := false
+var _starting := false
 var _online := false
 var _failed := false
 var _retired := false
@@ -317,10 +318,19 @@ func submit_start(typed: String, done: Callable) -> void:
 	for ch in typed:
 		if ch >= "0" and ch <= "9":
 			digits += ch
+	if _starting:
+		return  # a second tap while one is pending is ignored
 	if not transport.is_valid() or _retired or _device_id == "":
-		done.call(START_OFFLINE)
+		_finish_start(done, START_OFFLINE)
 		return
+	_starting = true
 	_start_request(digits, done, false)
+
+
+func _finish_start(done: Callable, result: String) -> void:
+	_starting = false
+	if done.is_valid():
+		done.call(result)
 
 
 func _start_request(digits: String, done: Callable, registered: bool) -> void:
@@ -332,29 +342,29 @@ func _on_start(status: int, data: Dictionary, _retry_after: int, digits: String,
 		return
 	if status == 0 or status >= 500:
 		_set_online(false)
-		done.call(START_OFFLINE)
+		_finish_start(done, START_OFFLINE)
 		return
 	_set_online(true)
 	if status == 404 and _error_code(data) == "device_not_registered" and not registered:
 		_call("POST", "/devices", _registration_body(), func(_s: int, _d: Dictionary, _r: int) -> void: _start_request(digits, done, true))
 		return
 	if status == 429:
-		done.call(START_BUSY)
+		_finish_start(done, START_BUSY)
 	elif status == 403:
-		done.call(START_CLOSED)
+		_finish_start(done, START_CLOSED)
 	elif status == 409:
-		done.call(START_NOT_READY)
+		_finish_start(done, START_NOT_READY)
 	elif status >= 200 and status < 300 and bool(data.get("valid", false)) and bool(data.get("started", false)):
 		var cache := state.cache.duplicate(true)
 		cache["started"] = true
 		cache["started_at"] = data.get("started_at")
 		_set_cache(cache)
-		done.call(START_STARTED)
+		_finish_start(done, START_STARTED)
 		refresh()
 	elif status >= 200 and status < 300:
-		done.call(START_WRONG)
+		_finish_start(done, START_WRONG)
 	else:
-		done.call(START_OFFLINE)
+		_finish_start(done, START_OFFLINE)
 
 
 # --- Plumbing --------------------------------------------------------------------------

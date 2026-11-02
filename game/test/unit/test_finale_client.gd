@@ -195,3 +195,28 @@ func test_a_retired_client_sends_nothing() -> void:
 	state.add_setting("cookie_to_oven", 0)
 	client.set_watching(true)
 	assert_int(fake.requests.size()).is_equal(0)
+
+
+func test_a_second_start_tap_while_one_is_pending_is_ignored() -> void:
+	fake.hold = true
+	fake.answer("POST", "/finale/start", 200, {"valid": false, "started": false, "started_at": null})
+	var got: Array[String] = []
+	client.submit_start("3141592650", func(r: String) -> void: got.append(r))
+	client.submit_start("3141592650", func(r: String) -> void: got.append(r))
+	assert_int(fake.count("POST", "/finale/start")).is_equal(1)
+	fake.release()
+	assert_array(got).contains_exactly([FinaleClient.START_WRONG])
+	# Once answered, the next tap goes out.
+	fake.hold = false
+	client.submit_start("3141592650", func(r: String) -> void: got.append(r))
+	assert_int(fake.count("POST", "/finale/start")).is_equal(2)
+
+
+func test_start_does_not_call_an_invalid_callback() -> void:
+	fake.answer("POST", "/finale/start", 200, {"valid": false, "started": false, "started_at": null})
+	client.submit_start("3141592650", Callable())  # no callback at all: must not raise
+	assert_int(fake.count("POST", "/finale/start")).is_equal(1)
+	# The guard was released, so a later tap still works.
+	var got: Array[String] = []
+	client.submit_start("3141592650", func(r: String) -> void: got.append(r))
+	assert_array(got).contains_exactly([FinaleClient.START_WRONG])

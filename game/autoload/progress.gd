@@ -176,8 +176,8 @@ func _on_tick() -> void:
 		(store as RemoteProgressStore).tick()
 
 
-## Poll only while a progress screen is open (machine view or crew progress);
-## a puzzle screen polls hints alone.
+## Poll only while a progress screen is open (machine view or crew progress, or a
+## finale screen, which watches all three machines); a puzzle screen polls hints alone.
 func _on_stack_changed(_depth: int) -> void:
 	if not store is RemoteProgressStore:
 		return
@@ -189,6 +189,10 @@ func _on_stack_changed(_depth: int) -> void:
 			var machine := str(top.args.get("machine", GameState.crew))
 			if Ids.MACHINES.has(machine):
 				machines.append(machine)
+		elif Finale.WATCHED_SCREENS.has(top.scene_file_path):
+			# The finale screens show every machine's progress (the pre-open
+			# "N of 6 parts working" rows, note grants, README triggers).
+			machines.append_array(Ids.MACHINES)
 		elif top.scene_file_path == Paths.PUZZLE_HOST:
 			hints = true
 	(store as RemoteProgressStore).set_watching(machines, hints)

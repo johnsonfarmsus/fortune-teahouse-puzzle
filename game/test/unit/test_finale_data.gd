@@ -132,3 +132,18 @@ func test_row_status_and_clock_helpers() -> void:
 	assert_str(FinaleData.format_clock("2027-10-30T00:05:00Z", 0)).is_equal("12:05 am")
 	assert_str(FinaleData.format_clock("2027-10-30T12:30:00Z", 0)).is_equal("12:30 pm")
 	assert_str(FinaleData.format_clock("soon", 0)).is_equal("")
+
+
+func test_no_gnu_note_code_equals_a_lucky_word_or_handoff_word() -> void:
+	var words: Array[String] = []
+	for machine in Ids.MACHINES:
+		for clue: Dictionary in PuzzleData.get_clues(machine):
+			words.append(LuckyWords.normalise(str(clue["lucky_word"])))
+	for word in data.handoff_words():
+		words.append(LuckyWords.normalise(word))
+	for entry in data.gnu_notes:
+		var code := FinaleData.normalise_code(str(entry["code"]))
+		assert_bool(words.has(code)).override_failure_message("code %s collides with a word" % code).is_false()
+		# Typed on the Lucky word keypad it must not be a lucky word or a handoff word either.
+		assert_bool(PuzzleData.lookup_lucky_word(code).is_empty()).is_true()
+		assert_bool(data.note_for_word(code).is_empty()).is_true()
