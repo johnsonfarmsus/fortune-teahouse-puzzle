@@ -13,6 +13,7 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
+from starlette.exceptions import HTTPException as StarletteHTTPException
 from pydantic import BaseModel, Field, field_validator
 
 from . import service
@@ -183,7 +184,7 @@ def post_hint(body: HintIn, ctx: Ctx = Depends(get_ctx)) -> dict:
 
 
 @api.get("/hints")
-def get_hints(crew: str, after_id: int = Query(default=0, ge=0), ctx: Ctx = Depends(get_ctx)) -> dict:
+def get_hints(crew: str, after_id: int | None = Query(default=None, ge=0), ctx: Ctx = Depends(get_ctx)) -> dict:
     service.check_machine(crew)
     return {"crew": crew, "hints": service.list_hints(ctx.conn, crew, after_id)}
 
@@ -252,7 +253,9 @@ def _client_ip(request: Request, trust_proxy: bool) -> str:
     if trust_proxy:
         fwd = request.headers.get("x-forwarded-for")
         if fwd:
-            return fwd.split(",")[0].strip()
+            # Rightmost entry: the hop our own reverse proxy appended. Earlier
+            # entries are client-controlled and can be spoofed.
+            return fwd.split(",")[-1].strip()
     return request.client.host if request.client else "unknown"
 
 
@@ -271,7 +274,7 @@ def create_app(settings: Settings | None = None,
     init_db(settings)
 
     default_bucket = TokenBuckets(settings.rate_limit_rps, settings.rate_limit_burst)
-    guess_bucket = TokenBuckets(2.0 if settings.rate_limit_rps > 0 else 0, 20)
+    guess_bucket = TokenBuckets(10.0 if settings.rate_limit_rps > 0 else 0, 30)
 
     @app.exception_handler(ApiError)
     async def _api_error(_: Request, exc: ApiError) -> JSONResponse:
@@ -283,9 +286,13 @@ def create_app(settings: Settings | None = None,
         body = {"error": {"code": "validation_error", "message": "Invalid request.", "details": details}}
         return JSONResponse(body, status_code=422)
 
-    @app.exception_handler(404)
-    async def _not_found(_: Request, __: Exception) -> JSONResponse:
-        return _error(404, "not_found", "No such endpoint.")
+    @app.exception_handler(StarletteHTTPException)
+    async def _http_error(_: Request, exc: StarletteHTTPException) -> JSONResponse:
+        codes = {404: "not_found", 405: "method_not_allowed"}
+        messages = {404: "No such endpoint.", 405: "Method not allowed."}
+        code = codes.get(exc.status_code, "http_error")
+        message = messages.get(exc.status_code) or (exc.detail if isinstance(exc.detail, str) else "Error.")
+        return _error(exc.status_code, code, message, dict(exc.headers or {}))
 
     @app.middleware("http")
     async def rate_limit(request: Request, call_next):

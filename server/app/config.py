@@ -67,8 +67,8 @@ class Settings:
     start_code: str = "3141592653"
     repo_url: str = DEFAULT_REPO_URL
     handoff_settings_total: int = 3
-    rate_limit_rps: float = 50.0
-    rate_limit_burst: int = 200
+    rate_limit_rps: float = 200.0
+    rate_limit_burst: int = 1000
     trust_proxy: bool = False
 
     @classmethod
@@ -78,7 +78,7 @@ class Settings:
         s.database_path = e.get("DATABASE_PATH", s.database_path)
         s.admin_secret = e.get("ADMIN_SECRET", "")
         if e.get("CORS_ORIGINS", "").strip():
-            s.cors_origins = _csv(e["CORS_ORIGINS"])
+            s.cors_origins = [o.rstrip("/") for o in _csv(e["CORS_ORIGINS"])]
         if e.get("FINALE_SAFETY_NET_AT", "").strip():
             s.finale_safety_net_at = parse_time(e["FINALE_SAFETY_NET_AT"])
         s.gnu_note_codes = _csv(e.get("GNU_NOTE_CODES", ""))

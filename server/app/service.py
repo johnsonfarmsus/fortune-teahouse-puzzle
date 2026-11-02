@@ -262,7 +262,7 @@ def notes_view(conn: sqlite3.Connection, settings: Settings) -> dict[str, Any]:
         "found": found,
         "total": settings.notes_total,
         "needed": settings.notes_needed,
-        "complete": settings.notes_total > 0 and found >= settings.notes_needed,
+        "complete": found >= settings.notes_needed,
     }
 
 
@@ -434,12 +434,19 @@ def hint_view(row: sqlite3.Row, from_crew: str | None) -> dict[str, Any]:
     }
 
 
-def list_hints(conn: sqlite3.Connection, crew: str, after_id: int, limit: int = 50) -> list[dict]:
-    rows = conn.execute(
-        "SELECT h.*, d.display_name, d.crew AS from_crew FROM hints h"
-        " JOIN devices d ON d.id=h.from_device WHERE h.to_crew=? AND h.id>?"
-        " ORDER BY h.id DESC LIMIT ?", (crew, after_id, limit)).fetchall()
-    return [hint_view(r, r["from_crew"]) for r in reversed(rows)]
+def list_hints(conn: sqlite3.Connection, crew: str, after_id: int | None = None,
+               limit: int = 50) -> list[dict]:
+    """Oldest-first. With after_id: the oldest `limit` unseen hints (so a client that
+    pages forward never skips any). Without it: the newest `limit` hints."""
+    base = ("SELECT h.*, d.display_name, d.crew AS from_crew FROM hints h"
+            " JOIN devices d ON d.id=h.from_device WHERE h.to_crew=?")
+    if after_id is not None:
+        rows = conn.execute(base + " AND h.id>? ORDER BY h.id ASC LIMIT ?",
+                            (crew, after_id, limit)).fetchall()
+    else:
+        rows = list(reversed(conn.execute(base + " ORDER BY h.id DESC LIMIT ?",
+                                          (crew, limit)).fetchall()))
+    return [hint_view(r, r["from_crew"]) for r in rows]
 
 
 # ------------------------------------------------------------------- summary

@@ -4,6 +4,7 @@
   "use strict";
 
   var POLL_MS = 5000;
+  var FETCH_TIMEOUT_MS = 4000;
   var PART_LABELS = {
     logic: "Logic", wiring: "Wiring", sequence: "Sequence",
     word: "Word", rhythm: "Rhythm", helper: "Helper"
@@ -131,13 +132,16 @@
   }
 
   function poll() {
-    fetch(SUMMARY_URL, { cache: "no-store" })
+    // Abort after FETCH_TIMEOUT_MS so a stalled request cannot pause polling.
+    var ctl = new AbortController();
+    var timer = setTimeout(function () { ctl.abort(); }, FETCH_TIMEOUT_MS);
+    fetch(SUMMARY_URL, { cache: "no-store", signal: ctl.signal })
       .then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
       .then(render)
       .catch(function () {
         document.getElementById("conn").textContent = "Connection lost, retrying…";
       })
-      .then(function () { setTimeout(poll, POLL_MS); });
+      .then(function () { clearTimeout(timer); setTimeout(poll, POLL_MS); });
   }
 
   poll();

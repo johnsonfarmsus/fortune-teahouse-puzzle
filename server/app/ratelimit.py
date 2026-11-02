@@ -6,6 +6,8 @@ import threading
 import time
 from typing import Callable
 
+CLEANUP_EVERY = 30.0  # seconds between sweeps of idle buckets
+
 
 class TokenBuckets:
     def __init__(self, rate: float, burst: int, clock: Callable[[], float] = time.monotonic):
@@ -14,6 +16,7 @@ class TokenBuckets:
         self.clock = clock
         self._buckets: dict[str, tuple[float, float]] = {}
         self._lock = threading.Lock()
+        self._last_cleanup = clock()
 
     def allow(self, key: str) -> bool:
         if self.rate <= 0:  # disabled
@@ -26,7 +29,8 @@ class TokenBuckets:
             if ok:
                 tokens -= 1.0
             self._buckets[key] = (tokens, now)
-            if len(self._buckets) > 10000:  # drop idle, fully refilled buckets
+            if now - self._last_cleanup >= CLEANUP_EVERY:  # drop idle, fully refilled buckets
+                self._last_cleanup = now
                 full = [k for k, (t, ts) in self._buckets.items()
                         if t + (now - ts) * self.rate >= self.burst]
                 for k in full:

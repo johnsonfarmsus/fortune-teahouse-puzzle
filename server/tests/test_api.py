@@ -394,3 +394,83 @@ def test_config_from_env():
     assert s.notes_total == 3 and s.notes_needed == 3
     assert s.finale_safety_net_at.isoformat() == "2027-10-30T08:00:00+00:00"
     assert s.start_code == "3141592653" and s.cors_origins == ["*"]
+
+
+# ------------------------------------------------------- review follow-ups
+
+def test_start_works_with_no_notes_configured(settings, clock):
+    settings.gnu_note_codes = []
+    with TestClient(create_app(settings, clock)) as c:
+        c.post(f"{API}/admin/finale/open", headers=ADMIN)
+        assert c.get(f"{API}/finale").json()["notes"] == {
+            "found": 0, "total": 0, "needed": 0, "complete": True}
+        did = str(uuid.uuid4())
+        c.post(f"{API}/devices", json={"device_id": did, "crew": "oven"})
+        for m in MACHINES:
+            for p in PARTS:
+                d = str(uuid.uuid4())
+                c.post(f"{API}/devices", json={"device_id": d, "crew": m})
+                c.post(f"{API}/crews/{m}/parts/{p}/solve", json={"device_id": d})
+        for hid in ("cookie_to_oven", "fortune_to_oven", "oven_to_packaging"):
+            for i in range(3):
+                c.post(f"{API}/finale/handoffs/{hid}/settings", json={"device_id": did, "setting_index": i})
+        r = c.post(f"{API}/finale/start", json={"device_id": did, "code": "3141592653"})
+        assert r.status_code == 200 and r.json()["started"] is True
+
+
+def test_hints_after_id_pages_oldest_first(client, h):
+    h.run_machine("oven")
+    mentors = [h.device("oven") for _ in range(6)]
+    # 6 mentors x 10 nudges = 60 distinct hints to the cookie machine
+    for m in mentors:
+        for n in NUDGES:
+            r = client.post(f"{API}/hints", json={"device_id": m, "to_crew": "cookie_machine", "nudge_id": n})
+            assert r.status_code == 200
+    newest = client.get(f"{API}/hints?crew=cookie_machine").json()["hints"]
+    assert len(newest) == 50 and newest[-1]["id"] == 60
+    seen, after = [], 0
+    while True:
+        page = client.get(f"{API}/hints?crew=cookie_machine&after_id={after}").json()["hints"]
+        if not page:
+            break
+        seen += [x["id"] for x in page]
+        after = page[-1]["id"]
+    assert seen == list(range(1, 61))
+
+
+def test_trust_proxy_uses_rightmost_forwarded_address(settings, clock):
+    settings.trust_proxy = True
+    settings.rate_limit_rps = 0.001
+    settings.rate_limit_burst = 2
+    with TestClient(create_app(settings, clock)) as c:
+        # A client rotating its own leftmost entries still shares one bucket (same proxy hop).
+        codes = [c.get(f"{API}/health", headers={"X-Forwarded-For": f"10.0.0.{i}, 203.0.113.7"}).status_code
+                 for i in range(4)]
+        assert codes == [200, 200, 429, 429]
+        # A different real client address gets its own bucket.
+        assert c.get(f"{API}/health", headers={"X-Forwarded-For": "1.1.1.1, 203.0.113.8"}).status_code == 200
+
+
+def test_http_errors_use_documented_shape(client):
+    r = client.get(f"{API}/nope")
+    assert r.status_code == 404 and r.json()["error"]["code"] == "not_found"
+    r = client.get(f"{API}/devices")
+    assert r.status_code == 405 and r.json()["error"]["code"] == "method_not_allowed"
+
+
+def test_cors_origins_trailing_slash_stripped():
+    s = Settings.from_env({"CORS_ORIGINS": "https://a.example/, https://b.example"})
+    assert s.cors_origins == ["https://a.example", "https://b.example"]
+
+
+def test_bucket_cleanup_is_periodic_not_per_request():
+    t = [0.0]
+    b = TokenBuckets(1.0, 2, clock=lambda: t[0])
+    for i in range(50):
+        b.allow(f"ip{i}")
+    t[0] += 10.0  # buckets are full again, but the sweep is not due yet
+    b.allow("x")
+    assert len(b._buckets) == 51
+    t[0] += 30.0
+    b.allow("y")
+    assert list(b._buckets) == ["y"]  # idle, fully refilled buckets swept; y is in use

@@ -21,7 +21,9 @@ curl localhost:8000/api/v1/summary
 
 The compose file stores the SQLite database in the named volume `scoreboard-data` (mounted at
 `/data`) and runs as the non-root user `10001`. If you bind-mount a host directory instead,
-`chown 10001 <dir>` first. Set real values for the event, for example:
+`chown 10001 <dir>` first. The compose file has no default admin secret or note codes: with
+`ADMIN_SECRET` unset the admin API is disabled, and with `GNU_NOTE_CODES` unset there are no notes
+(N = 0, so the notes requirement is trivially met). Set real values for the event, for example:
 
 ```sh
 ADMIN_SECRET=$(openssl rand -hex 16) \
@@ -53,17 +55,17 @@ pytest
 | `CORS_ORIGINS` | `*` | Comma-separated allowed origins, for example `https://johnsonfarmsus.github.io` |
 | `FINALE_SAFETY_NET_AT` | unset | ISO 8601 time **with offset** after which the finale opens regardless. Admins can override it at runtime. |
 | `GNU_NOTE_CODES` | empty | Comma-separated valid note codes; their count is N. Matched ignoring case and punctuation. |
-| `GNU_NOTES_K` | `3` | How many notes the finale needs (capped at N) |
+| `GNU_NOTES_K` | `3` | How many notes the finale needs (capped at N; with N = 0 nothing is needed) |
 | `START_CODE` | `3141592653` | The line's start code (matched ignoring punctuation) |
 | `REPO_URL` | the GitHub repository | Source link in the big-screen footer (AGPL source offer) |
 | `HANDOFF_SETTINGS_TOTAL` | `3` | Settings per handoff (applied to all three at startup) |
-| `RATE_LIMIT_RPS` | `50` | Per-IP token refill rate; `0` disables limiting |
-| `RATE_LIMIT_BURST` | `200` | Per-IP burst size |
-| `TRUST_PROXY` | `false` | Use the first `X-Forwarded-For` address as the client IP. Set to `true` only behind your reverse proxy. |
+| `RATE_LIMIT_RPS` | `200` | Per-IP token refill rate; `0` disables limiting |
+| `RATE_LIMIT_BURST` | `1000` | Per-IP burst size |
+| `TRUST_PROXY` | `false` | Use the rightmost `X-Forwarded-For` address (the hop your reverse proxy appended) as the client IP. Set to `true` only behind a proxy that appends it. |
 
 The rate limit is deliberately light and per IP. A whole conference may share one Wi-Fi address,
 so the defaults are generous; the note and start-code endpoints get a tighter extra limit
-(2 requests per second, burst 20, per IP).
+(10 requests per second, burst 30, per IP).
 
 ## Layout
 

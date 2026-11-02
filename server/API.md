@@ -45,10 +45,28 @@ Every error has the same shape:
 | 401 | `bad_admin_secret` | Missing or wrong `X-Admin-Secret` |
 | 403 | `not_in_crew`, `not_a_maintainer`, `finale_closed` | Not allowed (yet) |
 | 404 | `device_not_registered`, `unknown_crew`, `unknown_part`, `unknown_handoff`, `not_found` | Unknown id or path |
+| 405 | `method_not_allowed` | Wrong HTTP method for the path |
 | 409 | `handoff_waiting`, `line_not_ready` | Valid request, wrong state |
 | 422 | `validation_error` | Malformed body (bad UUID, missing field, name over 24 characters). Has a `details` array of `{loc, msg}`. |
 | 429 | `rate_limited` | Per-IP limit hit; retry after the `Retry-After` header (seconds) |
 | 503 | `admin_disabled` | Admin call while `ADMIN_SECRET` is unset |
+
+### Crew switching
+
+Switching crew (`POST /devices` with a different `crew`) is allowed, but a solve for a crew the
+device is no longer in is rejected with `403 not_in_crew`. A client that queues writes while the
+scoreboard is unreachable must **flush its offline queue before switching crews**, and drop (not
+retry forever) any queued solve that returns `403 not_in_crew`. Solves already recorded stay
+counted for the old crew.
+
+### Polling budget
+
+A whole venue may share one public IP. Per IP the server allows about 200 requests per second
+(burst 1000), and 10 per second (burst 30) on `POST /finale/notes` and `POST /finale/start`.
+Please stay well inside that: poll `GET /crews/{machine}` (or `/summary`) no more often than every
+10 seconds, `GET /finale` and `GET /hints` every 10 to 15 seconds, and only while the relevant
+screen is open. Only the big-screen page polls `/summary` every 5 seconds. On `429` wait for
+`Retry-After` and back off.
 
 Wrong guesses are not errors: `POST /finale/notes` and `POST /finale/start` answer `200` with
 `"valid": false`.
@@ -213,7 +231,7 @@ All contributors, newest first, optionally for one crew. No device ids are expos
   (finale open but a machine it touches is not running), `in_progress`, `not_started`.
   `available` is true when settings can be submitted now.
 - `notes`: gnu's notes found out of `total` (N); `needed` is k (never more than N); `complete` when
-  `found >= needed`. The codes themselves are never returned.
+  `found >= needed` (so always true when N is 0). The codes themselves are never returned.
 - `line_ready`: every handoff is complete and the notes are complete. `started` becomes true after
   a correct `POST /finale/start`.
 
@@ -307,8 +325,9 @@ Errors: `403 not_a_maintainer` (no crew, or crew's machine not running), `400 ow
 
 ### `GET /api/v1/hints?crew={machine}[&after_id={n}]`
 
-Hints sent to a crew, oldest first (at most the latest 50). Poll with `after_id` set to the
-highest `id` you have seen to receive only new ones.
+Hints sent to a crew, oldest first, at most 50 per call. Without `after_id` you get the newest 50.
+With `after_id` you get the oldest 50 hints with a larger `id`, so page forward by passing the
+highest `id` you have seen and repeat while 50 come back; none are skipped.
 
 ```json
 {"crew": "cookie_machine", "hints": [ {"id": 7, "to_crew": "cookie_machine", "from_crew": "oven",
