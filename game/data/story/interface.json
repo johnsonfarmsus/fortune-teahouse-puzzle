@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "description": "Narrator text on the start screen, the loading screen and Settings.",
+  "pieces": [
+    {
+      "id": "ui.start.tagline",
+      "speaker": "Narrator",
+      "kind": "sign",
+      "lines": ["The gnu retired. His machines didn't. Nobody can fix them alone."],
+      "where": "start_screen",
+      "when": "always",
+      "dev_note": "Under the title, above 'Tap to start'."
+    },
+    {
+      "id": "ui.loading.tip.1",
+      "speaker": "Narrator",
+      "kind": "sign",
+      "lines": ["Tip: no cookie? You can still play. Pick a crew at the Teahouse."],
+      "where": "loading",
+      "when": "always",
+      "group": "ui.loading.tip"
+    },
+    {
+      "id": "ui.loading.tip.2",
+      "speaker": "Narrator",
+      "kind": "sign",
+      "lines": ["Tip: every lucky word adds a clue. Ask the people around you what theirs says."],
+      "where": "loading",
+      "when": "always",
+      "group": "ui.loading.tip"
+    },
+    {
+      "id": "ui.loading.tip.3",
+      "speaker": "Narrator",
+      "kind": "sign",
+      "lines": ["Tip: stuck? Tap Hint. You get a nudge first, then a stronger one."],
+      "where": "loading",
+      "when": "always",
+      "group": "ui.loading.tip"
+    },
+    {
+      "id": "ui.settings.about",
+      "speaker": "Narrator",
+      "kind": "sign",
+      "lines": [
+        "The Fortune Teahouse is free software under the GNU AGPL, version 3 or later.",
+        "Its characters are original designs inspired by the animals, not official mascots.",
+        "Source code: {repo_url}"
+      ],
+      "where": "settings",
+      "when": "always",
+      "dev_note": "An 'About' block above the existing 'Source code (AGPL)' button; {repo_url} is Ids.REPO_URL."
+    }
+  ]
+}

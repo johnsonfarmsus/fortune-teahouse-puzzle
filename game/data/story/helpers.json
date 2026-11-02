@@ -1,0 +1,87 @@
+{
+  "schema_version": 1,
+  "description": "Idle lines for the three machine helpers, shown in MachineView when the player has not tapped for a while. One per idle spell, picked from the group.",
+  "pieces": [
+    {
+      "id": "seagull.idle.1",
+      "speaker": "Seagull",
+      "kind": "dialogue",
+      "lines": ["Squawk! Found another fortune behind the bins. Half of one, anyway."],
+      "where": "machine_view:fortune_machine",
+      "when": "idle",
+      "group": "seagull.idle"
+    },
+    {
+      "id": "seagull.idle.2",
+      "speaker": "Seagull",
+      "kind": "dialogue",
+      "lines": ["Some fortunes I know word for word.", "The rest? Not a feather of a clue."],
+      "where": "machine_view:fortune_machine",
+      "when": "idle",
+      "group": "seagull.idle"
+    },
+    {
+      "id": "seagull.idle.3",
+      "speaker": "Seagull",
+      "kind": "dialogue",
+      "lines": ["See a paper strip blowing down the pier? Shout! I'll swoop."],
+      "where": "machine_view:fortune_machine",
+      "when": "idle",
+      "group": "seagull.idle"
+    },
+    {
+      "id": "penguin.idle.1",
+      "speaker": "Penguin",
+      "kind": "dialogue",
+      "lines": ["Pass me that wrench? No, the other one. The little one. Thanks."],
+      "where": "machine_view:cookie_machine",
+      "when": "idle",
+      "group": "penguin.idle"
+    },
+    {
+      "id": "penguin.idle.2",
+      "speaker": "Penguin",
+      "kind": "dialogue",
+      "lines": ["I know what every gear does. Just not how the gnu set them.", "That's the tricky bit."],
+      "where": "machine_view:cookie_machine",
+      "when": "idle",
+      "group": "penguin.idle"
+    },
+    {
+      "id": "penguin.idle.3",
+      "speaker": "Penguin",
+      "kind": "dialogue",
+      "lines": ["The press should go thump. If it goes thunk, something's wrong. Flap flap."],
+      "where": "machine_view:cookie_machine",
+      "when": "idle",
+      "group": "penguin.idle"
+    },
+    {
+      "id": "gopher.idle.1",
+      "speaker": "Gopher",
+      "kind": "dialogue",
+      "lines": ["Every cookie gets a wrapper and a ride. That's my promise."],
+      "where": "machine_view:oven",
+      "when": "idle",
+      "group": "gopher.idle"
+    },
+    {
+      "id": "gopher.idle.2",
+      "speaker": "Gopher",
+      "kind": "dialogue",
+      "lines": ["Got a parcel for the teahouse. Or the pier.", "The gnu's map is upside down again."],
+      "where": "machine_view:oven",
+      "when": "idle",
+      "group": "gopher.idle"
+    },
+    {
+      "id": "gopher.idle.3",
+      "speaker": "Gopher",
+      "kind": "dialogue",
+      "lines": ["No rush, friend. The Oven bakes at its own pace, and so do I."],
+      "where": "machine_view:oven",
+      "when": "idle",
+      "group": "gopher.idle"
+    }
+  ]
+}

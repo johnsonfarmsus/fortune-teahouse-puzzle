@@ -1,0 +1,126 @@
+{
+  "schema_version": 1,
+  "description": "Crab, the young apprentice from the pier who merges every fix and keeps the contributors list. Shown on MergeCelebration and the Contributors screen (the Pier).",
+  "pieces": [
+    {
+      "id": "crab.merged.1",
+      "speaker": "Crab",
+      "kind": "dialogue",
+      "lines": ["Merged! Your fix is in. Clack clack!"],
+      "where": "merge_celebration",
+      "when": "merged",
+      "group": "crab.merged",
+      "dev_note": "Replaces the plain 'Merged!' label; pick one of the crab.merged group each time."
+    },
+    {
+      "id": "crab.merged.2",
+      "speaker": "Crab",
+      "kind": "dialogue",
+      "lines": ["Looks good to me! Merged.", "The {part} works again."],
+      "where": "merge_celebration",
+      "when": "merged",
+      "group": "crab.merged"
+    },
+    {
+      "id": "crab.merged.3",
+      "speaker": "Crab",
+      "kind": "dialogue",
+      "lines": ["In it goes! Listen. The machine already sounds happier."],
+      "where": "merge_celebration",
+      "when": "merged",
+      "group": "crab.merged"
+    },
+    {
+      "id": "crab.merged.4",
+      "speaker": "Crab",
+      "kind": "dialogue",
+      "lines": ["Merged! I'm writing you down in my good pencil."],
+      "where": "merge_celebration",
+      "when": "merged",
+      "group": "crab.merged"
+    },
+    {
+      "id": "crab.merged.5",
+      "speaker": "Crab",
+      "kind": "dialogue",
+      "lines": ["Every fix counts, big or small. This one's merged!"],
+      "where": "merge_celebration",
+      "when": "merged",
+      "group": "crab.merged"
+    },
+    {
+      "id": "crab.merged.6",
+      "speaker": "Crab",
+      "kind": "dialogue",
+      "lines": ["Merged! The gnu would have done a little dance.", "I'm doing it for him. Sideways, of course."],
+      "where": "merge_celebration",
+      "when": "merged",
+      "group": "crab.merged"
+    },
+    {
+      "id": "crab.merged.7",
+      "speaker": "Crab",
+      "kind": "dialogue",
+      "lines": ["Snip, snip, merged. Thank you for fixing that!"],
+      "where": "merge_celebration",
+      "when": "merged",
+      "group": "crab.merged"
+    },
+    {
+      "id": "crab.merged.8",
+      "speaker": "Crab",
+      "kind": "dialogue",
+      "lines": ["Merged! That's one more thing that isn't only in one head anymore."],
+      "where": "merge_celebration",
+      "when": "merged",
+      "group": "crab.merged"
+    },
+    {
+      "id": "crab.first_contribution",
+      "speaker": "Crab",
+      "kind": "dialogue",
+      "lines": [
+        "Your first fix! You offered a change, I checked it, and I added it in.",
+        "That's all a pull request is: asking to add your fix, and someone saying yes."
+      ],
+      "where": "merge_celebration",
+      "when": "first_credit",
+      "dev_note": "Show once, on the first credited solve, before the name prompt."
+    },
+    {
+      "id": "crab.name_prompt",
+      "speaker": "Crab",
+      "kind": "dialogue",
+      "lines": [
+        "Want your name on the contributors list? It goes up on the big screen.",
+        "Up to 20 letters. Or stay anonymous. Both count just the same."
+      ],
+      "where": "merge_celebration",
+      "when": "first_credit",
+      "dev_note": "Replaces 'Put your name on the contributors list?'. Buttons stay 'Add my name' / 'Stay anonymous'."
+    },
+    {
+      "id": "crab.uncredited",
+      "speaker": "Crab",
+      "kind": "dialogue",
+      "lines": [
+        "I merged the fix. The machine doesn't mind how it got solved.",
+        "Solve one yourself next time, and I'll add your name to the list."
+      ],
+      "where": "merge_celebration",
+      "when": "uncredited",
+      "dev_note": "Replaces 'Crab merged the fix. Solve one yourself to get on the list.'"
+    },
+    {
+      "id": "crab.pier",
+      "speaker": "Crab",
+      "kind": "dialogue",
+      "lines": [
+        "This is my list of everyone who fixed something. It used to be one name.",
+        "Now look at it! Every name here means the machines need one gnu less."
+      ],
+      "where": "contributors",
+      "when": "first_visit"
+    }
+  ]
+}

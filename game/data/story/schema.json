@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "fortune-teahouse/story.schema.json",
+  "title": "Story text file",
+  "description": "Every story file in game/data/story/ (except this one) is an object with schema_version 1 and either 'pieces' (in-game text for a dialogue box) or 'concepts' (design notes for later packages, never shown in game). Placeholders allowed in lines: {name} (display name, max 20), {machine} (machine title), {part} (part title), {repo_url} (Ids.REPO_URL). Pieces that share a 'group' are alternatives: show one, picked at random or in turn. tools/dev/check-story.py validates every file against this schema and also checks: ASCII only, max 3 lines per piece, max 90 characters per line with placeholders at their longest, unique ids across files, real machine and part ids, and no puzzle answers.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version"],
+  "anyOf": [{ "required": ["pieces"] }, { "required": ["concepts"] }],
+  "properties": {
+    "schema_version": { "enum": [1] },
+    "description": { "type": "string" },
+    "pieces": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/piece" } },
+    "concepts": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/concept" } }
+  },
+  "$defs": {
+    "piece": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "speaker", "kind", "lines", "where", "when"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^[a-z0-9_]+(\\.[a-z0-9_]+)+$" },
+        "speaker": { "enum": ["Gnu", "Seagull", "Penguin", "Gopher", "Crab", "Elephant", "Red Panda", "Anglerfish", "Narrator"] },
+        "kind": { "enum": ["note", "voicemail", "sticky", "dialogue", "sign"] },
+        "lines": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 3,
+          "items": { "type": "string", "minLength": 1, "maxLength": 90 }
+        },
+        "where": {
+          "type": "string",
+          "description": "Screen or place: start_screen, loading, town, town:<spot>, shop, lucky_word_entry, clue_board, machine_view:<machine>, puzzle:<machine>/<part>, merge_celebration, contributors, crew_progress, settings, finale_archive, big_screen.",
+          "pattern": "^(start_screen|loading|town|town:[a-z_]+|shop|lucky_word_entry|clue_board|machine_view:[a-z_]+|puzzle:[a-z_]+/[a-z_]+|merge_celebration|contributors|crew_progress|settings|finale_archive|big_screen)$"
+        },
+        "when": {
+          "type": "string",
+          "description": "always; first_visit (first time 'where' is shown on this device); no_crew / has_crew (player state while at 'where'); idle (no input for a while on 'where'); interval (timed, while in the town); merged (any credited merge); first_credit (the first credited solve on this device); uncredited (a revealed solve); machine_running:<machine id, or crew for the player's own crew>; part_fixed:<machine>/<part>; finale_open; note_found and handoff_solved (finale, shape set by WP9); line_running (the whole line runs end to end).",
+          "pattern": "^(always|first_visit|no_crew|has_crew|idle|interval|merged|first_credit|uncredited|finale_open|note_found|handoff_solved|line_running|machine_running:[a-z_]+|part_fixed:[a-z_]+/[a-z_]+)$"
+        },
+        "group": { "type": "string", "pattern": "^[a-z0-9_.]+$" },
+        "dev_note": { "type": "string", "description": "For the implementer; never shown to players." }
+      }
+    },
+    "concept": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "character", "place", "title", "concept"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^[a-z0-9_]+(\\.[a-z0-9_]+)+$" },
+        "character": { "enum": ["Gnu", "Seagull", "Penguin", "Gopher", "Crab", "Elephant", "Red Panda", "Anglerfish"] },
+        "place": { "type": "string", "pattern": "^(town|town:[a-z_]+|shop)$" },
+        "title": { "type": "string", "minLength": 1, "maxLength": 40 },
+        "concept": { "type": "string", "minLength": 40 }
+      }
+    }
+  }
+}
