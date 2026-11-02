@@ -73,7 +73,7 @@ func test_flush_sends_in_order_with_the_api_bodies() -> void:
 	)
 	assert_dict(fake.requests[0]["body"]).is_equal({"device_id": "dev1", "display_name": "Ada"})
 	assert_dict(fake.requests[1]["body"]).is_equal({"device_id": "dev1", "crew": COOKIE})
-	assert_dict(fake.requests[2]["body"]).is_equal({"device_id": "dev1"})
+	assert_dict(fake.requests[2]["body"]).is_equal({"device_id": "dev1", "credited": true})
 	assert_bool(store.is_online()).is_true()
 	# The emptied queue is what a restart sees too.
 	assert_int(_store().queue_size()).is_equal(0)
@@ -427,3 +427,9 @@ func test_nudge_ids_come_from_the_server() -> void:
 	fake.offline = true
 	store.fetch_nudge_ids(func(ok: bool, ids: Array[String]) -> void: results.append([ok, ids]))
 	assert_bool(results[1][0]).is_false()
+
+
+func test_a_revealed_solve_is_sent_as_uncredited() -> void:
+	var store := _store()
+	store.record_part_solved(COOKIE, "logic", "dev1", false)
+	assert_dict(fake.last_post_body()).is_equal({"device_id": "dev1", "credited": false})

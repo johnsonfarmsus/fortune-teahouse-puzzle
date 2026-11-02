@@ -298,7 +298,7 @@ func _request_for(item: Dictionary) -> Dictionary:
 			return _post("/devices", body)
 		"record_part_solved":
 			var path := "/crews/%s/parts/%s/solve" % [str(item.get("machine", "")), str(item.get("part", ""))]
-			return _post(path, {"device_id": device_id})
+			return _post(path, {"device_id": device_id, "credited": bool(item.get("credited", true))})
 	return {}
 
 
