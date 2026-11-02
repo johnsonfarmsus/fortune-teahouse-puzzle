@@ -17,6 +17,7 @@ game/
 - snake_case files; `class_name` is the PascalCase file name (`matching_rules.gd` is `MatchingRules`); autoload scripts have no `class_name`. One script per scene, beside it, same basename.
 - Text only; the sole binaries allowed are placeholder PNGs in `game/art/`. `ext_resource` uses `path="res://..."` without `uid=`; never write `uid://` or hand-made `.uid` files.
 - Scenes are reached only via `Paths` string constants passed to `load()` (`preload` would cycle).
+- WP3 helpers beyond this spec: `PlaceBase` (shared tap handling for Town and Shop), `UiKit` (button and label builders that enforce the 44 px rule), `Progress.reset()`, `GameState.persist` (tests turn it off). Godot writes `*.uid` files beside scripts; they are git-ignored.
 - Every new `.gd` starts with `# SPDX-License-Identifier: AGPL-3.0-or-later`. Typed GDScript. JSON numbers arrive as floats: loaders apply `int()`.
 - WP3 deletes the placeholder scene, script and test, and sets `run/main_scene="res://scenes/main/main.tscn"`, `gui/theme/custom="res://ui/main_theme.tres"` (font size 20) and the export preset's `include_filter="data/*"`.
 
@@ -35,7 +36,7 @@ Godot cannot read YAML or, on the web, anything outside `res://`. **Decision:** 
                "nudge": "ROT13 swaps each letter with the one 13 places along." } ] }
 ```
 
-Positions are 1 to 5; `position` means pos(a) = value, `offset` means pos(a) = pos(b) + value; `fortune_text` excludes the lucky word. `puzzles/` is empty on main, so WP3 hand-writes `cookie_machine.json` from the six DESIGN.md samples with `"seed": true`; the exporter overwrites it.
+Positions are 1 to 5; `position` means pos(a) = value, `offset` means pos(a) = pos(b) + value; `fortune_text` excludes the lucky word. The exporter has landed: `puzzles/*.yaml` is the source and `game/data/puzzles/*.json` is its committed output. The JSON carries no item display names or item noun, so `PuzzleCatalog._normalise_machine()` derives names ("sugar" becomes "Sugar", "c120" becomes "120 C") and also accepts optional `domain.item_names` and `domain.item_noun` if the exporter ever adds them.
 
 `data/machines/<machine>.json` holds exactly six parts in `Ids.PARTS` order:
 
@@ -78,7 +79,7 @@ func is_online() -> bool
 func refresh() -> void
 ```
 
-Progress counts solves by anyone, whatever their crew (helpers and mentors count). A revealed solve counts for progress but adds no contributor. Names are unique; anonymous shows once as "Anonymous". `LocalProgressStore.new(path := "user://progress.json")` saves `{version, names, crews, solves: [{machine, part, device_id, credited}]}`, ignoring repeats. `RemoteProgressStore.new(base_url, local)` delegates to `local` and appends writes to `queue`; `flush()` returns `queue.size()`.
+A machine's progress counts solves from devices in that crew; the scoreboard enforces this (a solve from a device not in the crew is rejected). The local store counts this device's solves. Mentors help other crews through hints, not solves. A revealed solve counts for progress but adds no contributor. Names are unique; anonymous shows once as "Anonymous". `LocalProgressStore.new(path := "user://progress.json")` saves `{version, names, crews, solves: [{machine, part, device_id, credited}]}`, ignoring repeats. `RemoteProgressStore.new(base_url, local)` delegates to `local` and appends writes to `queue`; `flush()` returns `queue.size()`.
 
 ## 4. Scenes
 

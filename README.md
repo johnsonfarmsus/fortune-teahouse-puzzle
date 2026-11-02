@@ -27,7 +27,9 @@ $GODOT --headless --path game --import
 $GODOT --headless --path game -s -d res://addons/gdUnit4/bin/GdUnitCmdTool.gd -a res://test --ignoreHeadlessMode
 ```
 
-Headless Godot can exit 0 even when something failed to load, so also look for `ERROR` in the output (CI greps for it).
+Headless Godot can exit 0 even when something failed to load, so also look for `ERROR` in the output (CI greps for it). Unit tests live in `game/test/unit`, scene tests in `game/test/scene`, shared fixtures in `game/test/fixtures`.
+
+To try the game itself, run `$GODOT --path game` (a window, 390x844 portrait) or serve the web export below.
 
 ## Export the web build
 
@@ -56,8 +58,8 @@ CI fails if the exported build exceeds 12 MB **gzipped**, which is what a phone 
 
 | Path | What lives there |
 | --- | --- |
-| `game/` | The Godot project: scenes, scripts, tests, export preset |
-| `puzzles/` | Every clue as data (schema and fortunes arrive with the solver work) |
+| `game/` | The Godot project. `autoload/` singletons, `scripts/core/` plain classes, `scenes/` (`main`, `world`, `hud`, `ui`, `screens`, `puzzles`), `data/` (puzzle JSON and per-machine parts), `test/`. Start with [game/ARCHITECTURE.md](game/ARCHITECTURE.md) |
+| `puzzles/` | Every clue as YAML; `tools/solver/export_json.py` turns it into `game/data/puzzles/*.json` |
 | `tools/dev/` | Developer scripts: `get-godot.sh`, `get-gdunit4.sh`, `check-size.sh` |
 | `tools/solver/` | Python solver and clue generator |
 | `server/` | Scoreboard service and big-screen page |
