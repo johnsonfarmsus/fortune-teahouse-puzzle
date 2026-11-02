@@ -8,3 +8,6 @@ build/
 # gdUnit4 addon is installed by tools/dev/get-gdunit4.sh (CI uses gdUnit4-action)
 addons/gdUnit4/
 reports/
+
+# Godot writes a .uid next to every script on import; they are not committed
+*.uid
