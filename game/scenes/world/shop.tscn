@@ -165,11 +165,11 @@ broken_label = "Gopher: stuck"
 fixed_label = "Gopher: delivering"
 
 [node name="TownButton" type="Button" parent="."]
-offset_left = 15.0
+offset_left = 12.0
 offset_top = 784.0
-offset_right = 135.0
+offset_right = 118.0
 offset_bottom = 832.0
-custom_minimum_size = Vector2(120, 48)
+custom_minimum_size = Vector2(106, 48)
 focus_mode = 0
 text = "Town"
 

@@ -105,8 +105,9 @@
   #reveal .r-scroll .readme-sub { font-size: 2.4vw; }
   #reveal .r-scroll .maint h3 { font-size: 3.4vw; }
   #reveal .r-scroll .maint p { font-size: 2.4vw; }
+  /* Sticky, so the AGPL source link stays on screen even when the README is taller than the display. */
   footer { margin-top: auto; font-size: 1.4vw; color: var(--dim); display: flex; justify-content: space-between;
-           gap: 2vw; flex-wrap: wrap; }
+           gap: 2vw; flex-wrap: wrap; position: sticky; bottom: 0; background: var(--bg); padding: .5vw 0; z-index: 5; }
   footer a { color: var(--gold); }
   #conn { color: var(--warn); font-weight: 700; }
   @media (max-width: 800px) {
