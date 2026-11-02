@@ -1,0 +1,16 @@
+# SPDX-License-Identifier: AGPL-3.0-or-later
+# Back messages: one per pack of 50 cookies. Text is exact from DESIGN.md
+# (two spaces before "Lucky numbers"); fortune.ataary.com is a placeholder.
+# Pack A then Pack B lucky numbers spell the finale start code 3.141592653
+# (decision D7).
+schema_version: 1
+packs:
+  - id: A
+    text: "Fix the gnu's fortune machine! Play at fortune.ataary.com  Lucky numbers: 3 1 4 1 5"
+    lucky_numbers: "3 1 4 1 5"
+    char_count: 83
+  - id: B
+    text: "Fix the gnu's fortune machine! Play at fortune.ataary.com  Lucky numbers: 9 2 6 5 3"
+    lucky_numbers: "9 2 6 5 3"
+    char_count: 83
+start_code: "3141592653"

@@ -1,0 +1,113 @@
+# SPDX-License-Identifier: AGPL-3.0-or-later
+# Fortune Machine core puzzle: which phrase bank feeds which printer slot.
+# Spoiler warning: this file contains the answer. See puzzles/README.md.
+schema_version: 1
+machine:
+  id: fortune_machine
+  name: Fortune Machine
+domain:
+  item_noun: phrase bank
+  position_noun: printer slot
+  order: "slots 1 to 5, top to bottom"
+  items:
+    - id: luck
+      name: Luck
+    - id: love
+      name: Love
+    - id: work
+      name: Work
+    - id: travel
+      name: Travel
+    - id: wisdom
+      name: Wisdom
+  positions:
+    - index: 1
+      label: Slot 1
+    - index: 2
+      label: Slot 2
+    - index: 3
+      label: Slot 3
+    - index: 4
+      label: Slot 4
+    - index: 5
+      label: Slot 5
+generator:
+  seed: 2
+  structure: two_anchors_four_link_chain
+answer:
+  luck: 5
+  love: 2
+  work: 1
+  travel: 3
+  wisdom: 4
+clues:
+  - id: fortune_poem
+    style: poem
+    approachable: true
+    lucky_word: INKWELL
+    fortune_text: "After a long day of Work, Love is near: one slot below Work, Love's verses appear. Lucky word: INKWELL"
+    char_count: 102
+    fact:
+      kind: offset
+      item: love
+      relative_to: work
+      offset: 1
+    nudge: "Read past the rhyme. The couplet names two phrase banks and says which one is lower. Slot 1 is at the top."
+  - id: fortune_animal
+    style: animal
+    approachable: true
+    lucky_word: SQUAWK
+    fortune_text: "A seagull drops a clam from just above the rocks. Wisdom drops in the same way: one slot above Luck. Lucky word: SQUAWK"
+    char_count: 119
+    fact:
+      kind: offset
+      item: wisdom
+      relative_to: luck
+      offset: -1
+    nudge: "The gull is a picture of something falling from a little way up. The second sentence names two phrase banks. Slot 1 is at the top."
+  - id: fortune_trivia
+    style: trivia
+    approachable: true
+    lucky_word: COPYLEFT
+    fortune_text: "Work's slot is the FSF's number for the freedom to study how a program works (the FSF counts from 0). Lucky word: COPYLEFT"
+    char_count: 122
+    fact:
+      kind: position
+      item: work
+      position: 1
+    nudge: "The Free Software Foundation lists four freedoms and numbers them itself, starting at 0. Use the FSF's number, not your own count."
+  - id: fortune_security
+    style: security
+    approachable: true
+    lucky_word: SHIFTY
+    fortune_text: "The gnu's Caesar note, each letter shifted 3 along: Oxfn lv lq vorw ilyh. Lucky word: SHIFTY"
+    char_count: 92
+    fact:
+      kind: position
+      item: luck
+      position: 5
+    nudge: "A Caesar shift moves every letter the same number of places along the alphabet. Move each letter 3 places back to undo it: D becomes A, E becomes B."
+  - id: fortune_code
+    style: code
+    approachable: false
+    lucky_word: STDOUT
+    fortune_text: "assert(slot[TRAVEL] == slot[LOVE] + 1); /* slot 1 is the top, +1 is below */ Lucky word: STDOUT"
+    char_count: 95
+    fact:
+      kind: offset
+      item: travel
+      relative_to: love
+      offset: 1
+    nudge: "slot[X] means the number of the slot that bank X feeds. An assert must be true, so read the line as plain arithmetic about two slot numbers."
+  - id: fortune_hardware
+    style: hardware
+    approachable: false
+    lucky_word: PINOUT
+    fortune_text: "Ribbon cable, wire 1 at the top: the Wisdom wire is the one just below the Travel wire. Lucky word: PINOUT"
+    char_count: 106
+    fact:
+      kind: offset
+      item: wisdom
+      relative_to: travel
+      offset: 1
+    nudge: "A ribbon cable is a flat row of wires numbered in order, so neighbouring wires differ by one. Each wire number is a slot number."
