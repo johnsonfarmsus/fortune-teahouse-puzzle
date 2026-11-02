@@ -2,16 +2,31 @@
 extends ScreenBase
 ## Names that fixed each machine. With a `machine` arg only that machine shows.
 
+var _box: VBoxContainer
+
 
 func _screen_title() -> String:
 	return "Contributors"
 
 
 func _build(box: VBoxContainer) -> void:
+	_box = box
+	Progress.refresh_contributors()  # one look at the scoreboard when it is on
+	Events.progress_changed.connect(_on_progress_changed)
+	_fill()
+
+
+func _on_progress_changed(_machine: String) -> void:
+	if is_inside_tree():
+		_fill()
+
+
+func _fill() -> void:
+	UiKit.clear_children(_box)
 	var scroll := ScrollContainer.new()
 	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	box.add_child(scroll)
+	_box.add_child(scroll)
 	var list := VBoxContainer.new()
 	list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	list.add_theme_constant_override("separation", 6)

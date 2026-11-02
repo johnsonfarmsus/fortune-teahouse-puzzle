@@ -45,6 +45,9 @@ func _build(box: VBoxContainer) -> void:
 		row.add_child(inner)
 		box.add_child(row)
 		_rows[part] = {"light": light, "label": text}
+	var crew := UiKit.button("See crew progress", Vector2(0, 48))
+	crew.pressed.connect(func() -> void: Router.push(Paths.CREW_PROGRESS, {"machine": machine}))
+	box.add_child(crew)
 	Events.progress_changed.connect(_on_progress_changed)
 	refresh()
 
