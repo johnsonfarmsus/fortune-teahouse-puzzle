@@ -1,0 +1,13 @@
+# SPDX-License-Identifier: AGPL-3.0-or-later
+[Unit]
+Description=Daily backup of the Fortune Teahouse scoreboard database
+
+[Timer]
+# 03:30 server time every day. Persistent runs a missed backup after the VM was off.
+OnCalendar=*-*-* 03:30:00
+Persistent=true
+RandomizedDelaySec=300
+Unit=fortune-scoreboard-backup.service
+
+[Install]
+WantedBy=timers.target

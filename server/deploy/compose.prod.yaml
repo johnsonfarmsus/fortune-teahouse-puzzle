@@ -1,0 +1,77 @@
+# SPDX-License-Identifier: AGPL-3.0-or-later
+# Production stack for the Fortune Teahouse scoreboard: the app plus Caddy (automatic TLS).
+#
+# Run from the repository root:
+#   cp server/deploy/.env.example server/deploy/.env   # then edit it
+#   docker compose -f server/deploy/compose.prod.yaml up -d --build
+#
+# Compose reads server/deploy/.env automatically (it sits next to this file). Variables written
+# ${NAME:?message} are required: `up` and `config` refuse to run while they are unset or empty,
+# so there are no default secrets. See docs/DEPLOY.md.
+name: fortune-scoreboard
+
+x-logging: &default-logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "5"
+
+services:
+  scoreboard:
+    build:
+      context: ..          # the server/ directory (Dockerfile, app/, static/)
+    image: fortune-teahouse-scoreboard:${SCOREBOARD_IMAGE_TAG:-latest}
+    restart: unless-stopped
+    # No published ports: only Caddy (same network) can reach the app, so every request carries
+    # the X-Forwarded-For hop that TRUST_PROXY relies on.
+    expose:
+      - "8000"
+    volumes:
+      - scoreboard-data:/data
+    environment:
+      DATABASE_PATH: /data/scoreboard.db
+      ADMIN_SECRET: ${ADMIN_SECRET:?Set ADMIN_SECRET in server/deploy/.env (openssl rand -hex 24)}
+      CORS_ORIGINS: ${CORS_ORIGINS:?Set CORS_ORIGINS in server/deploy/.env (https://johnsonfarmsus.github.io)}
+      GNU_NOTE_CODES: ${GNU_NOTE_CODES:?Set GNU_NOTE_CODES in server/deploy/.env (comma-separated note codes)}
+      GNU_NOTES_K: ${GNU_NOTES_K:-3}
+      START_CODE: ${START_CODE:?Set START_CODE in server/deploy/.env (the line start code)}
+      FINALE_SAFETY_NET_AT: ${FINALE_SAFETY_NET_AT:-}
+      REPO_URL: ${REPO_URL:-https://github.com/johnsonfarmsus/fortune-teahouse-puzzle}
+      TRUST_PROXY: ${TRUST_PROXY:-true}
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    logging: *default-logging
+    # Same probe as the image's HEALTHCHECK, but sooner, so Caddy starts quickly after `up`.
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request as u; u.urlopen('http://127.0.0.1:8000/api/v1/health', timeout=2)"]
+      interval: 15s
+      timeout: 3s
+      retries: 3
+      start_period: 10s
+
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    depends_on:
+      scoreboard:
+        condition: service_healthy
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"      # HTTP/3
+    environment:
+      DOMAIN: ${DOMAIN:?Set DOMAIN in server/deploy/.env (for example scoreboard.example.org)}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data       # certificates and ACME account: keep this volume
+      - caddy-config:/config
+    security_opt:
+      - no-new-privileges:true
+    logging: *default-logging
+
+volumes:
+  scoreboard-data:
+  caddy-data:
+  caddy-config:

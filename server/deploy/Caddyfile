@@ -1,0 +1,26 @@
+# SPDX-License-Identifier: AGPL-3.0-or-later
+# Caddy obtains and renews the TLS certificate for $DOMAIN by itself (Let's Encrypt), redirects
+# http to https, and proxies everything to the scoreboard container. The API and the big screen
+# (/bigscreen/) share this one origin. CORS headers come from the app (CORS_ORIGINS), not here.
+{$DOMAIN} {
+	encode zstd gzip
+
+	header {
+		Strict-Transport-Security "max-age=31536000"
+		X-Content-Type-Options "nosniff"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		-Server
+	}
+
+	log {
+		output stdout
+		format console
+	}
+
+	# Caddy sets X-Forwarded-For to the real client address and replaces anything a client sent,
+	# which is what the app's TRUST_PROXY=true expects (rightmost entry).
+	reverse_proxy scoreboard:8000 {
+		health_uri /api/v1/health
+		health_interval 30s
+	}
+}
