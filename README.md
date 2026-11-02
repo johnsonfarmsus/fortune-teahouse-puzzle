@@ -2,7 +2,9 @@
 
 A collaborative, phone-first puzzle game for SeaGL 2027: attendees get custom fortune cookies, form crews by the fortune they hold, and fix a retired gnu's three fortune cookie machines together. Godot 4.7 (GDScript), web export, free software under the GNU AGPL.
 
-**Status:** Phase 1 is done. All three machines (Fortune Machine, Cookie Machine and Oven) are playable with six parts each, the scoreboard server and the game's scoreboard client work together, and the web build exports at about 10 MB gzipped (357 tests pass). The exported build has been run in a desktop browser with touch emulation and against a local scoreboard, but not yet on a real phone. The finale is built on the game side (handoff puzzles, Elephant's Archive, the start code and the README; see docs/FINALE-DESIGN.md) with the big-screen page on the server side; it has not been played end to end on real phones. Still to come: real art and story content, the Hetzner deploy of the scoreboard, and real-device testing. See "Phase 1 outcome" in [PLAN.md](PLAN.md).
+**Status:** Phases 1 and 2 are done. All three machines (Fortune Machine, Cookie Machine and Oven) are playable with six parts each, the scoreboard server and the game's scoreboard client work together, and the web build exports at about 10 MB gzipped (357 game tests and 45 server tests pass). The finale is implemented end to end (handoff notes and words, the dials puzzle for three handoffs, Elephant's Archive, the start code, the README and the big-screen reveal; see docs/FINALE-DESIGN.md) and has been run against a real local scoreboard by a headless script and in a desktop browser with touch emulation, but not yet on a real phone or with a crowd. Still to come: real art, the Hetzner deploy of the scoreboard, a real-device finale test, and answers to the open event questions. See "Phase 1 outcome" and "Phase 2 outcome" in [PLAN.md](PLAN.md).
+
+To repeat the end-to-end finale run, start a scoreboard with the finale settings (see "Finale integration run" below) and run `$GODOT --headless --path game -s ../tools/dev/finale_integration.gd`.
 
 - [DESIGN.md](DESIGN.md) is the game design.
 - [PLAN.md](PLAN.md) is the build plan and work packages.
@@ -44,6 +46,22 @@ By default the game is offline-only: progress lives on the phone. To share progr
 
 A browser blocks a plain `http://` scoreboard from an `https://` page, and the server must list the game's origin in `CORS_ORIGINS`.
 
+## Finale integration run
+
+`tools/dev/finale_integration.gd` plays the whole finale against a real scoreboard with three simulated phones, using the game's own `HttpTransport`, `FinaleClient`, `FinaleState` and `DialRules`. It is not part of CI. It runs all three machines through plain API calls, then checks handoff words and gating, the dials, four gnu-note codes, an early and a wrong start code, and the right one, against `GET /finale` and `GET /summary`. It exits 0 when every check passes.
+
+```sh
+cd server
+DATABASE_PATH=/tmp/sb.db ADMIN_SECRET=test HANDOFF_SETTINGS_TOTAL=3 GNU_NOTES_K=4 START_CODE=3141592653 \
+  GNU_NOTE_CODES=KETTLE27,GULLWING41,DRIPCOFFEE08,CROSSWIND63,INKBLOT19,SALTWATER52 \
+  python3 -m uvicorn app.main:create_app --factory --port 8000 &
+cd ..
+$GODOT --headless --path game --import
+$GODOT --headless --path game -s ../tools/dev/finale_integration.gd
+```
+
+Set `SCOREBOARD_URL` for another address. The run starts the line, so reset the server (`POST /api/v1/admin/reset` with `{"confirm":"reset","scope":"progress"}`) before running it again.
+
 ## Export the web build
 
 ```sh
@@ -73,7 +91,7 @@ CI fails if the exported build exceeds 12 MB **gzipped**, which is what a phone 
 | --- | --- |
 | `game/` | The Godot project. `autoload/` singletons, `scripts/core/` plain classes, `scenes/` (`main`, `world`, `hud`, `ui`, `screens`, `puzzles`), `data/` (puzzle JSON and per-machine parts), `test/`. Start with [game/ARCHITECTURE.md](game/ARCHITECTURE.md) |
 | `puzzles/` | Every clue as YAML; `tools/solver/export_json.py` turns it into `game/data/puzzles/*.json` |
-| `tools/dev/` | Developer scripts: `get-godot.sh`, `get-gdunit4.sh`, `check-size.sh` |
+| `tools/dev/` | Developer scripts: `get-godot.sh`, `get-gdunit4.sh`, `check-size.sh`, `finale_integration.gd` (see "Finale integration run") |
 | `tools/solver/` | Python solver and clue generator |
 | `server/` | Scoreboard service and big-screen page |
 | `docs/` | Design review and other documents |

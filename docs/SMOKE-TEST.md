@@ -166,6 +166,29 @@ Needs a running scoreboard server. Open the big screen on a laptop.
 - [ ] Turn the server off or put the phone in airplane mode: the game keeps playing. Turn it back on and "Sync now" sends what waited.
   Note: ______________________
 
+## 12. Finale
+
+Needs a running scoreboard with the finale settings (`GNU_NOTE_CODES`, `GNU_NOTES_K=4`, the start code) and at least two phones, each in a different crew, plus the big screen on a laptop. Open the game with `?scoreboard=` on every phone. To skip solving 18 parts, run the three machines from the admin side or with `tools/dev/finale_integration.gd` against a scratch server; to rehearse again, reset progress (`POST /api/v1/admin/reset`). Handoff words: `BATTERBOWL` (Cookie Machine note), `PAPERCHUTE` (Fortune Machine note), `GOLDENROUND` (Oven note). Gnu note codes: `KETTLE 27`, `GULLWING 41`, `DRIPCOFFEE 08`, `CROSSWIND 63`, `INKBLOT 19`, `SALTWATER 52`. Start code: `3141592653`.
+
+- [ ] **Handoff notes appear when the machine runs.** When your crew's machine runs, Clues shows "Handoff notes" first with your crew's note, ending "Handoff word: <WORD>. Share it with someone from another crew." The maintainer line in The line says "Your crew's handoff word: <WORD>. Share it!"
+  Note: ______________________
+- [ ] **The line, before and after it opens.** Before all three machines run, Shop > "The line" says it opens when they all run (or at the safety-net time) and shows each machine's progress. Once it is open, it says "The finale is open: make the line run!" with three handoff rows, the notes row and the start-code row. The "The line" button is easy to hit (the gnu's voicemail marker next to it must not catch the tap).
+  Note: ______________________
+- [ ] **Share handoff words.** Tell a phone from another crew your word; on that phone type it on the Lucky word keypad. It says "Handoff note collected! See it under Clues." Typing it again says "You already have that note."
+  Note: ______________________
+- [ ] **Gate messages.** Opening a handoff without the second note says "You need <note>. Find someone from the <crew> crew and ask for their handoff word." Opening one while a machine it touches does not run says it waits for that machine.
+  Note: ______________________
+- [ ] **Dials and the test batch.** With both notes, the handoff opens with three dials, a preview, and "- / +" buttons you can hit with a thumb (48 px). Setting one dial right and tapping "Run a test batch" locks it ("Set - OK") and the others say too low or too high. The header counts "Settings set by everyone: N of 3. On this phone: M of 3." and the big screen shows the same count within about 5 seconds. Finishing all three dials shows "connected on this phone" and Continue. The hint ladder works and the last rung asks before revealing.
+  Note: ______________________
+- [ ] **Archive codes.** In Town, Archive (Elephant) takes a code from one of the six gnu notes with the keypad. A right code says "Elephant files it. Thank you!" and the count "Notes found by everyone: F of 6 (4 needed)" goes up on every phone; a repeat says Elephant already has it; a wrong one says it is not one of the gnu's notes. A code typed before the finale opens waits ("It goes in when the finale opens") and posts when it opens. A note's in-game twin puzzle files the note when solved without the answer being revealed.
+  Note: ______________________
+- [ ] **Start code.** When all three handoffs are connected and four notes are found, The line says "The line is ready!" and shows the keypad. A wrong code says "Wrong code. Read both cookie backs again." The right code says "The line is running!" on that phone, and the others show it within about 15 seconds. ClueBoard gains "The gnu's last fortune". The start code is online only: with no connection it is not sent or queued.
+  Note: ______________________
+- [ ] **Big screen.** At `<server address>/bigscreen/` the page goes from "Finale locked" to "The finale is open: make the line run!" (handoff rows, notes count), to "The line is ready!", then plays the reveal ("Starting the line..." over 3.141592653, the four machines lighting in turn, the gnu's message, the README) and settles on "The line is running!" with the full README and the contributors. `?replay=1` (or the R key) plays the reveal again and any key skips it.
+  Note: ______________________
+- [ ] **Offline and late joiners.** With the scoreboard off, settings and notes queue and send after "Sync now". A phone that joins a running crew late gets its crew's note straight away and can play the whole finale.
+  Note: ______________________
+
 ## Result
 
 - Overall: [ ] pass  [ ] pass with notes  [ ] fail
