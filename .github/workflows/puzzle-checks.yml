@@ -11,12 +11,14 @@ on:
     paths:
       - "puzzles/**"
       - "tools/solver/**"
+      - "game/data/puzzles/**"
       - ".github/workflows/puzzle-checks.yml"
   push:
     branches: [main]
     paths:
       - "puzzles/**"
       - "tools/solver/**"
+      - "game/data/puzzles/**"
       - ".github/workflows/puzzle-checks.yml"
 
 permissions:
@@ -46,6 +48,14 @@ jobs:
 
       - name: Check puzzles (vendor-140 profile)
         run: python -m solver check puzzles/
+
+      - name: Game JSON is up to date
+        run: |
+          python -m solver export-json puzzles/ "$RUNNER_TEMP/exported" > /dev/null
+          if ! diff -r -q "$RUNNER_TEMP/exported" game/data/puzzles; then
+            echo "::error::game/data/puzzles is stale. Run: PYTHONPATH=tools python -m solver export-json puzzles/ game/data/puzzles/ and commit the result."
+            exit 1
+          fi
 
       - name: Write JSON report
         if: always()

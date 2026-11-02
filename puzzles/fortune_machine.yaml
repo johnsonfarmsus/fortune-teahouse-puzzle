@@ -5,6 +5,7 @@ schema_version: 1
 machine:
   id: fortune_machine
   name: Fortune Machine
+  puzzle_title: Phrase banks
 domain:
   item_noun: phrase bank
   position_noun: printer slot
