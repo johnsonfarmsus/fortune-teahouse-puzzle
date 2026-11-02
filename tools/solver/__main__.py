@@ -8,6 +8,8 @@
   generate --items a,b,c,d,e [--seed N]
       Print a new verified fact set for a domain. This DOES print the answer
       and facts: run it locally when writing clues, never in CI.
+  export-json DIR OUT
+      Write OUT/<machine>.json for the game (game/ARCHITECTURE.md section 2).
 """
 
 from __future__ import annotations
@@ -19,6 +21,7 @@ from pathlib import Path
 from typing import Any
 
 from .checks import DEFAULT_PROFILE, LIMIT_PROFILES, run_checks
+from .export_json import main as export_main
 from .generate import generate_facts
 
 
@@ -63,7 +66,13 @@ def main(argv: list[str] | None = None) -> int:
     g = sub.add_parser("generate")
     g.add_argument("--items", required=True, help="comma-separated item ids")
     g.add_argument("--seed", type=int, default=None)
+    e = sub.add_parser("export-json")
+    e.add_argument("puzzle_dir", type=Path)
+    e.add_argument("out_dir", type=Path)
     args = parser.parse_args(argv)
+
+    if args.command == "export-json":
+        return export_main([str(args.puzzle_dir), str(args.out_dir)])
 
     if args.command == "generate":
         items = [s.strip() for s in args.items.split(",") if s.strip()]

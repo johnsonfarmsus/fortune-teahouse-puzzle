@@ -6,6 +6,7 @@ schema_version: 1
 machine:
   id: oven
   name: Oven
+  puzzle_title: Heat zones
 domain:
   item_noun: temperature
   position_noun: heat zone
