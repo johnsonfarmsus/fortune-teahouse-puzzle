@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import sqlite3
-import uuid
 from contextlib import contextmanager
 from datetime import datetime
 from typing import Any, Iterator
@@ -49,11 +48,11 @@ def tx(conn: sqlite3.Connection) -> Iterator[None]:
 
 # ---------------------------------------------------------------- validation
 
-def canon_device_id(value: str) -> str:
-    try:
-        return str(uuid.UUID(value.strip()))
-    except (ValueError, AttributeError):
-        raise ValueError("device_id must be a UUID")
+def check_device_id(value: str) -> str:
+    """device_id is an opaque string (the client sends 32 hex chars); stored and echoed unchanged."""
+    if not value or len(value) > 64 or value != value.strip() or not value.isprintable():
+        raise ValueError("device_id must be a non-empty string of at most 64 printable characters")
+    return value
 
 
 def check_machine(machine: str) -> str:
@@ -197,7 +196,8 @@ def crew_view(conn: sqlite3.Connection, machine: str, with_contributors: bool = 
     return out
 
 
-def solve_part(conn: sqlite3.Connection, device_id: str, machine: str, part: str, now: str) -> dict:
+def solve_part(conn: sqlite3.Connection, device_id: str, machine: str, part: str, now: str,
+               credited: bool = True) -> dict:
     with tx(conn):
         dev = get_device(conn, device_id)
         if dev["crew"] != machine:
@@ -205,16 +205,24 @@ def solve_part(conn: sqlite3.Connection, device_id: str, machine: str, part: str
                            f"Device is in crew {dev['crew']!r}, not {machine!r}. "
                            "POST /api/v1/devices to join first.")
         cur = conn.execute(
-            "INSERT OR IGNORE INTO part_solves (device_id, machine, part, solved_at) VALUES (?,?,?,?)",
-            (device_id, machine, part, now),
+            "INSERT OR IGNORE INTO part_solves (device_id, machine, part, solved_at, credited)"
+            " VALUES (?,?,?,?,?)", (device_id, machine, part, now, int(credited)),
         )
         newly = cur.rowcount == 1
-        conn.execute(
-            "INSERT OR IGNORE INTO contributors (device_id, machine, via, first_merged_at)"
-            " VALUES (?,?,?,?)", (device_id, machine, "solve", now),
-        )
+        if credited:
+            # A credited solve upgrades an earlier uncredited one for the same part.
+            conn.execute(
+                "UPDATE part_solves SET credited=1 WHERE device_id=? AND machine=? AND part=?",
+                (device_id, machine, part))
+            conn.execute(
+                "INSERT OR IGNORE INTO contributors (device_id, machine, via, first_merged_at)"
+                " VALUES (?,?,?,?)", (device_id, machine, "solve", now),
+            )
+        is_credited = conn.execute(
+            "SELECT credited FROM part_solves WHERE device_id=? AND machine=? AND part=?",
+            (device_id, machine, part)).fetchone()[0] == 1
     view = crew_view(conn, machine)
-    return {"newly_solved": newly, "crew": view}
+    return {"newly_solved": newly, "credited": is_credited, "crew": view}
 
 
 # -------------------------------------------------------------------- finale

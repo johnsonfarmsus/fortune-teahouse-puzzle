@@ -31,7 +31,8 @@ def test_register_and_update_device(client):
 
 
 def test_register_validation(client):
-    assert client.post(f"{API}/devices", json={"device_id": "nope"}).status_code == 422
+    assert client.post(f"{API}/devices", json={"device_id": ""}).status_code == 422
+    assert client.post(f"{API}/devices", json={"device_id": "x" * 65}).status_code == 422
     did = str(uuid.uuid4())
     r = client.post(f"{API}/devices", json={"device_id": did, "crew": "submarine"})
     assert r.status_code == 400 and r.json()["error"]["code"] == "unknown_crew"
@@ -39,11 +40,13 @@ def test_register_validation(client):
     assert r.status_code == 422 and r.json()["error"]["code"] == "validation_error"
 
 
-def test_device_id_is_case_insensitive(client):
-    did = str(uuid.uuid4())
-    client.post(f"{API}/devices", json={"device_id": did})
-    r = client.post(f"{API}/devices", json={"device_id": did.upper(), "crew": "oven"})
-    assert r.json()["created"] is False and r.json()["device_id"] == did
+def test_device_id_is_opaque_and_echoed_unchanged(client):
+    for did in ("0123456789abcdef0123456789ABCDEF", "Some-Opaque_ID.1", "z" * 64):
+        r = client.post(f"{API}/devices", json={"device_id": did, "crew": "oven"})
+        assert r.status_code == 200 and r.json()["device_id"] == did and r.json()["created"] is True
+        # ids are case-sensitive: no reformatting, no case folding
+        other = client.post(f"{API}/devices", json={"device_id": did.swapcase()}).json()
+        assert other["device_id"] == did.swapcase() and (did == did.swapcase() or other["created"])
 
 
 def test_unregistered_device_cannot_solve(client):
@@ -474,3 +477,36 @@ def test_bucket_cleanup_is_periodic_not_per_request():
     t[0] += 30.0
     b.allow("y")
     assert list(b._buckets) == ["y"]  # idle, fully refilled buckets swept; y is in use
+
+
+def test_uncredited_solve_counts_for_progress_but_not_contributors(client, h):
+    d = h.device("oven", "Quinn")
+    r = client.post(f"{API}/crews/oven/parts/logic/solve", json={"device_id": d, "credited": False}).json()
+    assert r["newly_solved"] is True and r["credited"] is False
+    assert r["crew"]["parts_solved"] == 1  # still counts for progress
+    assert client.get(f"{API}/contributors").json()["total"] == 0
+    # and for the machine-runs rule
+    for p in PARTS:
+        client.post(f"{API}/crews/oven/parts/{p}/solve", json={"device_id": d, "credited": False})
+    assert client.get(f"{API}/crews/oven").json()["runs"] is True
+    assert client.get(f"{API}/contributors").json()["total"] == 0
+
+
+def test_later_credited_solve_makes_contributor(client, h):
+    d = h.device("oven", "Quinn")
+    url = f"{API}/crews/oven/parts/logic/solve"
+    client.post(url, json={"device_id": d, "credited": False})
+    r = client.post(url, json={"device_id": d, "credited": True}).json()
+    assert r["newly_solved"] is False and r["credited"] is True
+    assert r["crew"]["parts"][0]["solved_count"] == 1
+    items = client.get(f"{API}/contributors").json()["contributors"]
+    assert [(i["name"], i["machine"], i["via"]) for i in items] == [("Quinn", "oven", "solve")]
+    # a later uncredited repeat does not take the credit back
+    r = client.post(url, json={"device_id": d, "credited": False}).json()
+    assert r["credited"] is True and client.get(f"{API}/contributors").json()["total"] == 1
+
+
+def test_credited_defaults_to_true(client, h):
+    d = h.device("oven")
+    r = h.solve(d, "oven", "logic").json()
+    assert r["credited"] is True and client.get(f"{API}/contributors").json()["total"] == 1
