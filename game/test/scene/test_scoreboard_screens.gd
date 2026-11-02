@@ -270,17 +270,110 @@ func test_settings_sync_now_flushes_and_shows_the_queue() -> void:
 	assert_bool(_has_text(screen, "Online")).is_true()
 
 
-func test_toggle_off_goes_back_to_the_local_store_and_on_returns() -> void:
+func test_toggle_off_stops_all_sending_and_on_starts_a_fresh_store() -> void:
 	_go_online()
+	var first := remote
+	Progress.use_scoreboard(true)  # same address: the store is kept
+	assert_object(Progress.store).is_same(first)
 	Progress.use_scoreboard(false)
 	assert_bool(Progress.store is RemoteProgressStore).is_false()
 	assert_bool(Progress.scoreboard_available()).is_true()
+	# The old store is retired: nothing it does reaches the network.
+	var before := fake.requests.size()
+	first.record_part_solved(MACHINE, "logic", GameState.device_id, true)
+	first.flush()
+	first.refresh()
+	first.tick(999999)
+	assert_int(fake.requests.size()).is_equal(before)
 	Progress.use_scoreboard(true)
 	assert_bool(Progress.store is RemoteProgressStore).is_true()
-	# Without a URL the toggle changes nothing.
+	assert_object(Progress.store).is_not_same(first)
+
+
+func test_the_toggle_does_nothing_without_a_url() -> void:
+	_go_online()
+	var current := Progress.store
 	Progress.scoreboard_url = ""
 	Progress.use_scoreboard(true)
+	assert_object(Progress.store).is_same(current)
 	assert_bool(Progress.store is RemoteProgressStore).is_true()
+
+
+func test_turning_the_scoreboard_on_sends_earlier_solves() -> void:
+	GameState.player.choose_crew(MACHINE)
+	GameState.player.mark_solved(MACHINE, "logic", true)
+	GameState.player.mark_solved(MACHINE, "wiring", false)
+	Progress.scoreboard_url = FakeScoreboard.BASE
+	Progress.use_scoreboard(true)
+	assert_bool(Progress.store is RemoteProgressStore).is_true()
+	assert_int(fake.count("POST", "/crews/cookie_machine/parts/logic/solve")).is_equal(1)
+	assert_int(fake.count("POST", "/crews/cookie_machine/parts/wiring/solve")).is_equal(1)
+	assert_int(Progress.queue_size()).is_equal(0)
+
+
+func test_server_counts_fix_each_part_once_and_the_machine_runs_once() -> void:
+	_go_online()
+	var fixed: Array = []
+	var running: Array = []
+	var on_fixed := func(machine: String, part: String) -> void: fixed.append(machine + "/" + part)
+	var on_running := func(machine: String) -> void: running.append(machine)
+	Events.part_fixed.connect(on_fixed)
+	Events.machine_running.connect(on_running)
+	fake.answer("GET", "/crews/cookie_machine", 200, FakeScoreboard.crew(MACHINE, {"logic": 1, "wiring": 2}))
+	remote.refresh()
+	assert_array(fixed).contains_exactly_in_any_order(["cookie_machine/logic", "cookie_machine/wiring"])
+	remote.refresh()  # the same answer again fixes nothing new
+	assert_int(fixed.size()).is_equal(2)
+	assert_array(running).is_empty()
+	fake.answer("GET", "/crews/cookie_machine", 200, FakeScoreboard.crew(MACHINE, ALL_SIX, true))
+	remote.refresh()
+	assert_int(fixed.size()).is_equal(6)
+	assert_array(running).contains_exactly([MACHINE])
+	remote.refresh()
+	assert_int(fixed.size()).is_equal(6)
+	assert_array(running).contains_exactly([MACHINE])
+	Events.part_fixed.disconnect(on_fixed)
+	Events.machine_running.disconnect(on_running)
+
+
+func test_reset_device_with_a_remote_store_forgets_the_old_crew() -> void:
+	_go_online()
+	fake.answer("GET", "/crews/cookie_machine", 200, FakeScoreboard.crew(MACHINE, ALL_SIX, true))
+	remote.refresh()
+	assert_bool(Progress.is_maintainer()).is_true()
+	GameState.reset_device()
+	assert_object(Progress.store).is_same(remote)  # still the remote store
+	assert_bool(Progress.is_maintainer()).is_false()
+	assert_bool(remote.server_runs(MACHINE)).is_false()
+	assert_int(remote.queue_size()).is_equal(0)
+	assert_int(Progress.store.get_crew_progress(MACHINE)["logic"]).is_equal(2)  # the server's answer is still cached
+	fake.requests.clear()
+	remote.refresh()
+	assert_int(fake.count("GET", "/crews/")).is_equal(0)
+
+
+func test_a_stale_nudge_list_adds_no_buttons() -> void:
+	_go_online()
+	fake.answer("GET", "/crews/cookie_machine", 200, FakeScoreboard.crew(MACHINE, ALL_SIX, true))
+	fake.answer("GET", "/hints/nudges", 200, {"nudges": ["reread_the_clue", "ask_a_crewmate"]})
+	var screen := Router.push(Paths.CREW_PROGRESS, {"machine": MACHINE})
+	await get_tree().process_frame
+	var count_before := screen.find_children("*", "Button", true, false).size()
+	var late: Array[String] = ["take_a_short_break"]
+	screen._on_nudge_ids(true, late, screen._nudge_serial - 1)
+	assert_int(screen.find_children("*", "Button", true, false).size()).is_equal(count_before)
+	assert_object(_button_with_text(screen, "Take a short break")).is_null()
+
+
+func test_part_states_are_spelled_out_not_only_coloured() -> void:
+	_go_online()
+	GameState.player.mark_solved(MACHINE, "logic", true)
+	fake.answer("GET", "/crews/cookie_machine", 200, FakeScoreboard.crew(MACHINE, {"logic": 3, "wiring": 1}))
+	var screen := Router.push(Paths.CREW_PROGRESS, {"machine": MACHINE})
+	await get_tree().process_frame
+	assert_bool(_has_text(screen, _title("logic") + ": fixed by you and 2 others")).is_true()
+	assert_bool(_has_text(screen, _title("wiring") + ": fixed by 1 crewmate")).is_true()
+	assert_bool(_has_text(screen, _title("rhythm") + ": Broken")).is_true()
 
 
 func test_contributors_screen_asks_the_scoreboard_once() -> void:

@@ -44,6 +44,8 @@ var clock_override: int = -1
 var _device_id := ""
 var _own_crew := ""
 var _registered_id := ""
+var _backfilled_id := ""  # device whose earlier solves were queued once
+var _retired := false
 var _online := false
 var _in_flight := false
 var _generation := 0
@@ -79,6 +81,35 @@ func _init(
 func detach() -> void:
 	if local.progress_changed.is_connected(_on_local_changed):
 		local.progress_changed.disconnect(_on_local_changed)
+
+
+## Stops this store for good: no more requests, no more writes to the queue
+## file, and answers still in flight are ignored. Progress calls this when it
+## switches the scoreboard off or to another address.
+func retire() -> void:
+	_retired = true
+	_generation += 1
+	_in_flight = false
+	transport = Callable()  # _save() writes nothing without a transport
+	_watched = []
+	_hint_polling = false
+	detach()
+
+
+## Queues the solves this device made before the scoreboard was on (idempotent
+## on the server), once per device. `solved` is PlayerState.solved_parts.
+func backfill_solves(device_id: String, solved: Dictionary) -> void:
+	if _retired or _backfilled_id == device_id:
+		return
+	_backfilled_id = device_id
+	for machine: String in solved:
+		for part: String in solved[machine]:
+			queue.append(
+				{"op": "record_part_solved", "machine": machine, "part": part, "device_id": device_id, "credited": bool(solved[machine][part])}
+			)
+	_save()
+	status_changed.emit()
+	_pump()
 
 
 # --- ProgressStore ------------------------------------------------------------------
@@ -144,7 +175,11 @@ func reset_local() -> void:
 	_generation += 1
 	_in_flight = false
 	_registered_id = ""
+	_backfilled_id = ""
 	_last_hint_ids = {}
+	_device_id = ""  # the old identity: no more nudges or polling under it
+	_own_crew = ""
+	_runs = {}
 	_save()
 	local.reset_local()
 	status_changed.emit()
@@ -387,9 +422,11 @@ func _fetch_crew(machine: String) -> void:
 	_call("GET", "/crews/" + machine, {}, _on_crew.bind(machine))
 
 
-func _on_crew(status: int, data: Dictionary, _retry_after: int, machine: String) -> void:
+func _on_crew(status: int, data: Dictionary, retry_after: int, machine: String) -> void:
 	_fetching.erase(machine)
-	if _note_status(status):
+	if _retired:
+		return
+	if _note_read(status, retry_after):
 		_apply_crew(data)
 
 
@@ -410,16 +447,21 @@ func _apply_crew(data: Dictionary) -> void:
 		if _entries.get(machine, []) != entries:
 			changed = true
 		_entries[machine] = entries
-	if bool(data.get("runs", false)) and not _runs.has(machine):
-		_runs[machine] = true
+	var runs := bool(data.get("runs", false))
+	if runs != _runs.has(machine):
+		# An admin reset can turn a running machine back off.
+		if runs:
+			_runs[machine] = true
+		else:
+			_runs.erase(machine)
 		changed = true
 		_save()
 	if changed:
 		progress_changed.emit(machine)
 
 
-func _on_all_contributors(status: int, data: Dictionary, _retry_after: int) -> void:
-	if not _note_status(status):
+func _on_all_contributors(status: int, data: Dictionary, retry_after: int) -> void:
+	if _retired or not _note_read(status, retry_after):
 		return
 	var by_machine: Dictionary = {}
 	for machine in Ids.MACHINES:
@@ -461,9 +503,9 @@ func _poll_hints() -> void:
 	_call("GET", path, {}, _on_hints.bind(_own_crew, after))
 
 
-func _on_hints(status: int, data: Dictionary, _retry_after: int, crew: String, after: int) -> void:
+func _on_hints(status: int, data: Dictionary, retry_after: int, crew: String, after: int) -> void:
 	_polling_hints = false
-	if not _note_status(status):
+	if _retired or not _note_read(status, retry_after):
 		return
 	var hints: Array[Dictionary] = []
 	for raw: Variant in data.get("hints", []):
@@ -484,6 +526,8 @@ func _on_hints(status: int, data: Dictionary, _retry_after: int, crew: String, a
 
 
 func _on_nudge_ids(status: int, data: Dictionary, _retry_after: int, done: Callable) -> void:
+	if _retired:
+		return
 	var ids: Array[String] = []
 	if _note_status(status):
 		for id: Variant in data.get("nudges", []):
@@ -493,6 +537,8 @@ func _on_nudge_ids(status: int, data: Dictionary, _retry_after: int, done: Calla
 
 
 func _on_nudge_sent(status: int, data: Dictionary, _retry_after: int, done: Callable) -> void:
+	if _retired:
+		return
 	var ok := false
 	var message := ""
 	var answered := _note_status(status) or (status > 0 and status < 500)
@@ -523,6 +569,14 @@ func _call(method: String, path: String, body: Dictionary, done: Callable) -> vo
 		done.call(0, {}, 0)
 		return
 	transport.call(method, base_url + API_PREFIX + path, body, done)
+
+
+## Like _note_status for a poll. A 429 also pushes the next poll out to
+## Retry-After, never sooner than the usual 10 s.
+func _note_read(status: int, retry_after: int) -> bool:
+	if status == 429:
+		_next_poll_msec = maxi(_next_poll_msec, _now() + maxi(retry_after * 1000, POLL_INTERVAL_MSEC))
+	return _note_status(status)
 
 
 ## Records the outcome of a request and returns true for a 2xx answer.
@@ -562,6 +616,7 @@ func _save() -> void:
 			"version": QUEUE_VERSION,
 			"queue": queue,
 			"registered_device": _registered_id,
+			"backfilled_device": _backfilled_id,
 			"last_hint_ids": _last_hint_ids,
 			"running": _runs.keys(),
 		}
@@ -578,6 +633,7 @@ func _load() -> void:
 		if item is Dictionary and item.get("op") is String:
 			queue.append(item)
 	_registered_id = str(data.get("registered_device", ""))
+	_backfilled_id = str(data.get("backfilled_device", ""))
 	for crew: Variant in data.get("last_hint_ids", {}):
 		_last_hint_ids[str(crew)] = int(data["last_hint_ids"][crew])
 	for machine: Variant in data.get("running", []):

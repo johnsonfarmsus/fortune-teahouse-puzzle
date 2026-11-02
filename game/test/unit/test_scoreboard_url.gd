@@ -63,3 +63,16 @@ func test_nudges_have_words_and_the_banner_line_names_the_sender() -> void:
 	assert_str(line).starts_with("Mina (Oven) says:")
 	assert_str(line).contains(Nudges.text("ask_a_crewmate"))
 	assert_str(Nudges.describe({"from_name": "anonymous", "nudge_id": "nope"})).starts_with("A maintainer says:")
+
+
+func test_the_query_accepts_https_and_only_local_http() -> void:
+	assert_str(ScoreboardUrl.from_query("?scoreboard=https://board.example.org")).is_equal("https://board.example.org")
+	assert_str(ScoreboardUrl.from_query("?scoreboard=http://localhost:8000")).is_equal("http://localhost:8000")
+	assert_str(ScoreboardUrl.from_query("?scoreboard=http://127.0.0.1:8000/")).is_equal("http://127.0.0.1:8000")
+	assert_str(ScoreboardUrl.from_query("?scoreboard=http://[::1]:8000")).is_equal("http://[::1]:8000")
+	assert_str(ScoreboardUrl.from_query("?scoreboard=http://board.example.org")).is_empty()
+	assert_str(ScoreboardUrl.from_query("?scoreboard=http://localhost.evil.org")).is_empty()
+	assert_str(ScoreboardUrl.from_query("?scoreboard=http://localhost@evil.org")).is_empty()
+	assert_str(ScoreboardUrl.from_query("?scoreboard=http://evil.org/localhost")).is_empty()
+	# The project setting is the maintainers' own choice, so it may be plain http.
+	assert_str(ScoreboardUrl.resolve("http://board.lan:8000", "")).is_equal("http://board.lan:8000")

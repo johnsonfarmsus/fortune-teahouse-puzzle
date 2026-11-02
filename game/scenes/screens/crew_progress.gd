@@ -22,6 +22,7 @@ var _rows: Dictionary = {}  # part -> {light, label}
 var _contributors: VBoxContainer
 var _nudge_box: VBoxContainer
 var _nudge_key := ""
+var _nudge_serial := 0
 var _nudge_result: Label
 var _target_buttons: Dictionary = {}
 
@@ -105,7 +106,14 @@ func _refresh() -> void:
 			colour = AMBER
 		if count > 0:
 			working += 1
-			if online:
+			if GameState.player.is_part_credited(machine, part):
+				# Green: the words say who, so colour is never the only cue.
+				var others := count - 1
+				if online and others > 0:
+					state = "fixed by you and %d other%s" % [others, "" if others == 1 else "s"]
+				else:
+					state = "fixed by you"
+			elif online:
 				state = "fixed by %d crewmate%s" % [count, "" if count == 1 else "s"]
 			else:
 				state = "fixed on this phone"
@@ -153,6 +161,7 @@ func _refresh_nudge_section(online: bool) -> void:
 	if key == _nudge_key:
 		return
 	_nudge_key = key
+	_nudge_serial += 1  # answers still on their way for the old section are now stale
 	UiKit.clear_children(_nudge_box)
 	_target_buttons = {}
 	if not maintainer:
@@ -179,7 +188,7 @@ func _refresh_nudge_section(online: bool) -> void:
 	_nudge_box.add_child(_nudge_result)
 	_update_target_buttons()
 	var store := Progress.store as RemoteProgressStore
-	store.fetch_nudge_ids(_on_nudge_ids)
+	store.fetch_nudge_ids(_on_nudge_ids.bind(_nudge_serial))
 
 
 func choose_target(crew: String) -> void:
@@ -192,8 +201,9 @@ func _update_target_buttons() -> void:
 		(_target_buttons[crew] as Button).text = Ids.machine_title(crew) + (" (selected)" if crew == target_crew else "")
 
 
-func _on_nudge_ids(ok: bool, ids: Array[String]) -> void:
-	if not is_inside_tree() or _nudge_result == null:
+func _on_nudge_ids(ok: bool, ids: Array[String], serial: int) -> void:
+	# An answer for an older section (rebuilt since) is dropped, so buttons never double up.
+	if not is_inside_tree() or _nudge_result == null or serial != _nudge_serial:
 		return
 	if not ok:
 		_nudge_result.text = "Could not load the nudges. Try again in a moment."

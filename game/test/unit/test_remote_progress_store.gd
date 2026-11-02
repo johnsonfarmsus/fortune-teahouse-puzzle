@@ -433,3 +433,102 @@ func test_a_revealed_solve_is_sent_as_uncredited() -> void:
 	var store := _store()
 	store.record_part_solved(COOKIE, "logic", "dev1", false)
 	assert_dict(fake.last_post_body()).is_equal({"device_id": "dev1", "credited": false})
+
+
+# --- Retiring, resetting, backfill, throttling --------------------------------------------
+
+
+func test_a_retired_store_ignores_a_late_answer_and_writes_nothing() -> void:
+	var store := _store()
+	store.join_crew("dev1", COOKIE)
+	fake.hold = true
+	fake.answer("GET", "/crews/cookie_machine", 200, FakeScoreboard.crew(COOKIE, {"logic": 3}))
+	store.refresh()
+	store.record_part_solved(COOKIE, "wiring", "dev1", true)  # in flight
+	assert_int(fake.held.size()).is_equal(2)
+	var seen: Array = []
+	store.progress_changed.connect(func(machine: String) -> void: seen.append(machine))
+	store.retire()
+	fake.release()
+	assert_array(seen).is_empty()
+	assert_int(store.get_crew_progress(COOKIE)["logic"]).is_equal(0)
+	assert_int(store.queue_size()).is_equal(1)  # the late "ok" did not remove it
+	assert_int(JsonFile.read(QUEUE)["queue"].size()).is_equal(1)  # and nothing rewrote the file
+	fake.hold = false
+	fake.requests.clear()
+	store.flush()
+	store.tick(999999)
+	store.refresh()
+	assert_int(fake.requests.size()).is_equal(0)
+
+
+func test_backfill_queues_earlier_solves_once() -> void:
+	fake.offline = true
+	var store := _store()
+	var solved := {COOKIE: {"logic": true, "wiring": false}}
+	store.backfill_solves("dev1", solved)
+	assert_int(store.queue_size()).is_equal(2)
+	assert_bool(store.queue[0]["credited"]).is_true()
+	assert_bool(store.queue[1]["credited"]).is_false()
+	store.backfill_solves("dev1", solved)
+	assert_int(store.queue_size()).is_equal(2)
+	var again := _store()
+	again.backfill_solves("dev1", solved)
+	assert_int(again.queue_size()).is_equal(2)
+	fake.offline = false
+	assert_int(again.flush()).is_equal(0)
+	assert_dict(fake.last_post_body()).is_equal({"device_id": "dev1", "credited": false})
+
+
+func test_reset_forgets_the_old_identity_and_the_runs_cache() -> void:
+	var store := _store()
+	store.join_crew("dev1", COOKIE)
+	var all := {"logic": 1, "wiring": 1, "sequence": 1, "word": 1, "rhythm": 1, "helper": 1}
+	fake.answer("GET", "/crews/cookie_machine", 200, FakeScoreboard.crew(COOKIE, all, true))
+	store.refresh()
+	assert_bool(store.server_runs(COOKIE)).is_true()
+	store.reset_local()
+	assert_bool(store.server_runs(COOKIE)).is_false()
+	assert_bool(_store().server_runs(COOKIE)).is_false()
+	fake.requests.clear()
+	store.set_watching(_none(), true)
+	store.refresh()
+	assert_int(fake.count("GET", "/crews/")).is_equal(0)
+	assert_int(fake.count("GET", "/hints?")).is_equal(0)
+
+
+func test_a_crew_that_no_longer_runs_loses_its_maintainers() -> void:
+	var store := _store()
+	store.join_crew("dev1", COOKIE)
+	var all := {"logic": 1, "wiring": 1, "sequence": 1, "word": 1, "rhythm": 1, "helper": 1}
+	fake.answer("GET", "/crews/cookie_machine", 200, FakeScoreboard.crew(COOKIE, all, true))
+	store.refresh()
+	assert_bool(store.server_runs(COOKIE)).is_true()
+	var seen: Array = []
+	store.progress_changed.connect(func(machine: String) -> void: seen.append(machine))
+	fake.answer("GET", "/crews/cookie_machine", 200, FakeScoreboard.crew(COOKIE, {}, false))  # an admin reset
+	store.refresh()
+	assert_bool(store.server_runs(COOKIE)).is_false()
+	assert_array(seen).contains([COOKIE])
+	assert_bool(_store().server_runs(COOKIE)).is_false()
+
+
+func test_a_429_on_a_poll_waits_for_retry_after() -> void:
+	fake.answer_once("GET", "/crews/cookie_machine", 429, {}, 45)
+	var store := _store()
+	store.join_crew("dev1", COOKIE)
+	var machines: Array[String] = [COOKIE]
+	store.set_watching(machines, false)  # clock 1000: 429, no poll before 46000
+	assert_int(fake.count("GET", "/crews/cookie_machine")).is_equal(1)
+	store.tick(11000)
+	store.tick(45999)
+	assert_int(fake.count("GET", "/crews/cookie_machine")).is_equal(1)
+	store.tick(46000)
+	assert_int(fake.count("GET", "/crews/cookie_machine")).is_equal(2)
+	# A small Retry-After never shortens the usual 10 s.
+	fake.answer_once("GET", "/crews/cookie_machine", 429, {}, 1)
+	store.tick(60000)
+	store.tick(65000)
+	assert_int(fake.count("GET", "/crews/cookie_machine")).is_equal(3)
+	store.tick(70000)
+	assert_int(fake.count("GET", "/crews/cookie_machine")).is_equal(4)

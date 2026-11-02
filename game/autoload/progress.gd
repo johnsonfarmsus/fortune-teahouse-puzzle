@@ -104,10 +104,6 @@ func use_scoreboard(on: bool) -> void:
 		JsonFile.write(SETTINGS_PATH, {"enabled": on})
 	if scoreboard_available():
 		_build_store()
-		if scoreboard_active():
-			var remote := store as RemoteProgressStore
-			remote.set_identity(GameState.device_id, GameState.crew, GameState.display_name)
-			remote.refresh()
 
 
 ## "Sync now": tries the queue at once and looks at the scoreboard. Returns
@@ -138,9 +134,14 @@ func refresh_contributors() -> void:
 		(store as RemoteProgressStore).refresh_contributors()
 
 
+## Makes `store` match the settings. A remote store for the same address is
+## kept; any other is retired (set_store does that) before a new one starts.
 func _build_store() -> void:
 	if scoreboard_url == "" or not scoreboard_enabled:
-		set_store(_local)
+		if store != _local:
+			set_store(_local)
+		return
+	if store is RemoteProgressStore and (store as RemoteProgressStore).base_url == scoreboard_url:
 		return
 	var send := transport_override
 	if not send.is_valid():
@@ -152,6 +153,8 @@ func _build_store() -> void:
 	var remote := RemoteProgressStore.new(scoreboard_url, _local, send, queue_path)
 	set_store(remote)
 	remote.set_identity(GameState.device_id, GameState.crew, GameState.display_name)
+	# Solves made before the scoreboard was on reach it too (the server ignores repeats).
+	remote.backfill_solves(GameState.device_id, GameState.player.solved_parts)
 	remote.refresh()
 
 
@@ -160,9 +163,7 @@ func _unwire(remote: RemoteProgressStore) -> void:
 		remote.status_changed.disconnect(_on_status_changed)
 	if remote.hint_arrived.is_connected(_on_hint_arrived):
 		remote.hint_arrived.disconnect(_on_hint_arrived)
-	remote.set_watching([], false)
-	if remote.local == _local:
-		remote.detach()
+	remote.retire()
 
 
 func _connect_router() -> void:

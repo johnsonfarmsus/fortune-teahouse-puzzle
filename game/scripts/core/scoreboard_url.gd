@@ -3,7 +3,7 @@ class_name ScoreboardUrl
 extends RefCounted
 ## Where the scoreboard lives. The project setting `fortune/scoreboard_url`
 ## (empty means offline only) can be overridden on the web build with a
-## `?scoreboard=https://...` query parameter.
+## `?scoreboard=https://...` query parameter (https only; http for localhost).
 
 const SETTING := "fortune/scoreboard_url"
 const QUERY_KEY := "scoreboard"
@@ -34,8 +34,27 @@ static func from_query(query: String) -> String:
 		if eq < 0:
 			continue
 		if pair.substr(0, eq).uri_decode() == QUERY_KEY:
-			return normalise(pair.substr(eq + 1).replace("+", " ").uri_decode())
+			var url := normalise(pair.substr(eq + 1).replace("+", " ").uri_decode())
+			return url if allowed_in_query(url) else ""
 	return ""
+
+
+## A link must not point the game at an unencrypted remote server: https, or
+## http only for this machine (localhost, 127.0.0.1, [::1]).
+static func allowed_in_query(url: String) -> bool:
+	if url.begins_with("https://"):
+		return true
+	if not url.begins_with("http://"):
+		return false
+	var authority := url.substr(7).get_slice("/", 0)
+	if authority.contains("@"):
+		return false
+	var host := authority
+	if authority.begins_with("["):
+		host = authority.get_slice("]", 0) + "]"
+	else:
+		host = authority.get_slice(":", 0)
+	return ["localhost", "127.0.0.1", "[::1]"].has(host)
 
 
 ## The override from the page address; "" off the web or when absent.
