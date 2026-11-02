@@ -457,3 +457,9 @@ func test_dialogue_types_out_and_advances() -> void:
 	assert_int(d.pages_left()).is_equal(2)
 	d.skip_all()
 	assert_bool(d.is_open()).is_false()
+
+
+func test_room_query_for_playtesting() -> void:
+	assert_str(Adventure.room_from_query("?a=1&room=harbour", Adventure.rooms)).is_equal("harbour")
+	assert_str(Adventure.room_from_query("?room=nowhere", Adventure.rooms)).is_equal("")
+	assert_str(Adventure.room_from_query("", Adventure.rooms)).is_equal("")

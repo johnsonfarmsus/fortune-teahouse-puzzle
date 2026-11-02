@@ -117,6 +117,9 @@ func _ready() -> void:
 	add_child(banner_layer)
 	banner_layer.add_child(load(Paths.HINT_BANNER).instantiate())
 	Adventure.inventory_changed.connect(_refresh_items)
+	Events.crew_changed.connect(func(_m: String) -> void: _refresh_items())
+	Events.clue_collected.connect(func(_c: String) -> void: _refresh_items())
+	Events.scoreboard_status_changed.connect(_refresh_items)
 	get_viewport().size_changed.connect(_layout)
 	_layout()
 	for e in Adventure.visible_items():
@@ -135,6 +138,7 @@ func _process(_delta: float) -> void:
 	_catcher.visible = talking and closeup == null
 	if room != null:
 		room.input_enabled = not talking and closeup == null and not _transitioning and Router.depth() == 0
+		room.celebrations_allowed = closeup == null and not _transitioning
 
 
 # --- Layout -------------------------------------------------------------------------

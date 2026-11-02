@@ -76,8 +76,9 @@ func _ready() -> void:
 		jar.pos = _home(i)
 		jar.target = jar.pos
 		_jars[jar.item] = jar
-	_status = _label(Vector2(6, 6), 164, 14)
+	_status = _label(Vector2(6, 26), 164, 14)
 	_feedback = _label(Vector2(6, 200), 164, 15)
+	_place_labels()
 	_refresh_text()
 
 
@@ -318,11 +319,17 @@ func _label(at: Vector2, width: float, font_size: int) -> Label:
 
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_RESIZED:
-		for child in get_children():
-			if child is Label and child.has_meta("px"):
-				(child as Label).position = child.get_meta("px") * _px_scale()
-				(child as Label).size = Vector2(float(child.get_meta("w")) * _px_scale(), 0)
+		_place_labels()
 		queue_redraw()
+
+
+func _place_labels() -> void:
+	for child in get_children():
+		if child is Label and child.has_meta("px"):
+			var l := child as Label
+			l.custom_minimum_size = Vector2(float(l.get_meta("w")) * _px_scale(), 0)
+			l.position = l.get_meta("px") * _px_scale()
+			l.size = Vector2(float(l.get_meta("w")) * _px_scale(), 0)
 
 
 func _refresh_text() -> void:
@@ -365,8 +372,8 @@ func _draw() -> void:
 		draw_set_transform(centre, jar.tilt * 0.08, Vector2(lift, lift))
 		draw_texture_rect(tex, Rect2(-JAR * s / 2.0, JAR * s), false, glow)
 		draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
-		if not _placement.has(item) or item == _drag_item:
-			draw_string(font, Vector2(x * s - 4 * s, (jar.pos.y + JAR.y + 9) * s), _item_name(item), HORIZONTAL_ALIGNMENT_CENTER, (JAR.x + 8) * s, int(5 * s), Color(0.98, 0.95, 0.85))
+		var name_y := jar.pos.y + JAR.y + 9 if not _placement.has(item) or item == _drag_item else jar.pos.y - 3
+		draw_string(font, Vector2(x * s - 4 * s, name_y * s), _item_name(item), HORIZONTAL_ALIGNMENT_CENTER, (JAR.x + 8) * s, int(6 * s), Color(0.98, 0.95, 0.85))
 
 
 func _gui_input(event: InputEvent) -> void:

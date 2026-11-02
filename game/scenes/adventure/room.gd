@@ -15,7 +15,7 @@ signal exit_reached(exit: Dictionary)
 signal walk_finished
 
 const TILE := 16
-const WALK_SPEED := 80.0  # pixels per second (5 tiles)
+const WALK_SPEED := 96.0  # pixels per second (6 tiles)
 const WATER_SECONDS := 0.45
 const VIEW := Vector2(176, 320)
 
@@ -53,6 +53,9 @@ var rig: CookieMachineRig
 var input_enabled: bool = true
 ## An inventory item picked for the next tap on a thing (tap-to-use).
 var use_item: String = ""
+## False while a close-up, a screen or dialogue has the player's attention, so
+## the Cookie Machine saves a part's moment until it can be seen.
+var celebrations_allowed: bool = true
 
 var _nodes: Dictionary = {}  # thing id -> CanvasItem
 var _path: Array[Vector2i] = []
@@ -273,22 +276,27 @@ func face_towards(point: Vector2) -> void:
 	player.play("idle_" + _facing)
 
 
+## Moves along the path; distance left over at a cell carries on to the next,
+## so a slow frame never slows the walk down.
 func _walk(delta: float) -> void:
-	var next: Vector2i = _path[0]
-	var goal := _bottom_left(next)
-	var d := goal - player.position
-	if d.x != 0 and absf(d.x) >= absf(d.y):
-		_facing = "right" if d.x > 0 else "left"
-	elif d.y != 0:
-		_facing = "down" if d.y > 0 else "up"
-	if player.animation != "walk_" + _facing:
-		player.play("walk_" + _facing)
-	var step := WALK_SPEED * delta
-	if d.length() <= step:
-		player.position = goal
-		_reach(next)
-	else:
-		player.position += d.normalized() * step
+	var budget := WALK_SPEED * minf(delta, 0.25)
+	while budget > 0.0 and not _path.is_empty():
+		var next: Vector2i = _path[0]
+		var goal := _bottom_left(next)
+		var d := goal - player.position
+		if d.x != 0 and absf(d.x) >= absf(d.y):
+			_facing = "right" if d.x > 0 else "left"
+		elif d.y != 0:
+			_facing = "down" if d.y > 0 else "up"
+		if player.animation != "walk_" + _facing:
+			player.play("walk_" + _facing)
+		if d.length() <= budget:
+			budget -= d.length()
+			player.position = goal
+			_reach(next)
+		else:
+			player.position += d.normalized() * budget
+			budget = 0.0
 
 
 func _reach(cell: Vector2i) -> void:

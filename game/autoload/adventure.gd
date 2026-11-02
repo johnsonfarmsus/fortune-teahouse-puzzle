@@ -46,12 +46,29 @@ func _ready() -> void:
 	var place := JsonFile.read(PLACE_PATH) if persist else {}
 	room_id = str(place.get("room", ""))
 	cell = Vector2i(int(place.get("x", -1)), int(place.get("y", -1)))
+	# Playtesting and screenshots: ?room=<id> on the web build starts in that room.
+	if OS.has_feature("web"):
+		var search: Variant = JavaScriptBridge.eval("window.location.search", true)
+		var jump := room_from_query(str(search) if search != null else "", rooms)
+		if jump != "":
+			room_id = jump
+			cell = rooms.spawn(jump, str((rooms.room(jump).get("spawns", {}) as Dictionary).keys()[0]))
 	_build_inventory()
 
 
 func _exit_tree() -> void:
 	assets = null
 	AssetLoader.release_shared()
+
+
+## The `room` value of a query string such as "?room=depot", if it names a room.
+func room_from_query(query: String, graph: RoomGraph) -> String:
+	var q := query.strip_edges().trim_prefix("?")
+	for pair in q.get_slice("#", 0).split("&", false):
+		if pair.get_slice("=", 0) == "room":
+			var id := pair.get_slice("=", 1).uri_decode()
+			return id if graph.has_room(id) else ""
+	return ""
 
 
 ## In-memory chain state and inventory with no scoreboard (tests).

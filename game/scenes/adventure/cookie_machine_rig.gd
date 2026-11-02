@@ -100,7 +100,8 @@ func _process(delta: float) -> void:
 		if r.position.x > SIZE.x:
 			rounds.erase(r)
 			r.queue_free()
-	if not _pending.is_empty() and Router.depth() == 0 and is_visible_in_tree():
+	var allowed: bool = room == null or bool(room.get("celebrations_allowed"))
+	if not _pending.is_empty() and allowed and Router.depth() == 0 and is_visible_in_tree():
 		celebrate(_pending.pop_front())
 
 

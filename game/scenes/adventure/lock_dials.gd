@@ -14,7 +14,7 @@ const DOOR := Vector2(24, 40)
 const DIAL_Y := 104.0
 const DIAL_GAP := 28.0
 const HANDLE := Vector2(56, 168)
-const LABEL := Vector2(116, 52)
+const LABEL := Vector2(132, 124)
 const DRAG_STEP_PX := 7.0
 
 var lock_id: String = ""
