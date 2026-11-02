@@ -15,6 +15,7 @@ const NOTE_POSITIONS := {
 
 func _ready() -> void:
 	_town_button.pressed.connect(func() -> void: Router.go_to_place("town"))
+	$LineButton.pressed.connect(func() -> void: Router.push(Paths.FINALE_VIEW))
 	add_story_markers("shop", NOTE_POSITIONS)
 
 

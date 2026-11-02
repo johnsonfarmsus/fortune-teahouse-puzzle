@@ -2,7 +2,7 @@
 
 A collaborative, phone-first puzzle game for SeaGL 2027: attendees get custom fortune cookies, form crews by the fortune they hold, and fix a retired gnu's three fortune cookie machines together. Godot 4.7 (GDScript), web export, free software under the GNU AGPL.
 
-**Status:** Phase 1 is done. All three machines (Fortune Machine, Cookie Machine and Oven) are playable with six parts each, the scoreboard server and the game's scoreboard client work together, and the web build exports at about 10 MB gzipped (207 tests pass). The exported build has been run in a desktop browser with touch emulation and against a local scoreboard, but not yet on a real phone. Still to come: the finale, real art and story content, the Hetzner deploy of the scoreboard, and real-device testing. See "Phase 1 outcome" in [PLAN.md](PLAN.md).
+**Status:** Phase 1 is done. All three machines (Fortune Machine, Cookie Machine and Oven) are playable with six parts each, the scoreboard server and the game's scoreboard client work together, and the web build exports at about 10 MB gzipped (357 tests pass). The exported build has been run in a desktop browser with touch emulation and against a local scoreboard, but not yet on a real phone. The finale is built on the game side (handoff puzzles, Elephant's Archive, the start code and the README; see docs/FINALE-DESIGN.md) with the big-screen page on the server side; it has not been played end to end on real phones. Still to come: real art and story content, the Hetzner deploy of the scoreboard, and real-device testing. See "Phase 1 outcome" in [PLAN.md](PLAN.md).
 
 - [DESIGN.md](DESIGN.md) is the game design.
 - [PLAN.md](PLAN.md) is the build plan and work packages.

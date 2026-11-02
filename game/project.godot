@@ -20,6 +20,7 @@ Hints="*res://autoload/hints.gd"
 Story="*res://autoload/story.gd"
 Audio="*res://autoload/audio.gd"
 Router="*res://autoload/router.gd"
+Finale="*res://autoload/finale.gd"
 
 [display]
 

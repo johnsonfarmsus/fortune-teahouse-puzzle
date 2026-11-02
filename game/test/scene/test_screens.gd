@@ -10,6 +10,8 @@ const MACHINE := "cookie_machine"
 func before_test() -> void:
 	_cleanup()
 	GameState.persist = false
+	Finale.set_client(null)
+	Finale.set_state(FinaleState.new(""))  # never touch user://finale.json
 	GameState.player = PlayerState.new()
 	GameState.player.ensure_device_id()
 	Progress.set_store(LocalProgressStore.new(PROGRESS_PATH))
@@ -190,7 +192,7 @@ func test_town_hotspots_and_tap_hit_test() -> void:
 	await get_tree().physics_frame
 	await get_tree().physics_frame
 	var hotspots := town.find_children("*", "Hotspot", true, false)
-	assert_int(hotspots.size()).is_equal(3)
+	assert_int(hotspots.size()).is_equal(4)
 	for node in hotspots:
 		var shape := (node as Hotspot).get_node("Shape") as CollisionShape2D
 		var size: Vector2 = (shape.shape as RectangleShape2D).size

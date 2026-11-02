@@ -40,6 +40,12 @@ place_id = "teahouse"
 label_text = "Teahouse
 Red Panda"
 
+[node name="Archive" parent="Hotspots" instance=ExtResource("2")]
+position = Vector2(295, 240)
+place_id = "archive"
+label_text = "Archive
+Elephant"
+
 [node name="Avatar" type="ColorRect" parent="."]
 offset_left = 179.0
 offset_top = 540.0

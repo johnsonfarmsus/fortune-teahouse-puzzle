@@ -105,5 +105,6 @@ func reset_device() -> void:
 	player.ensure_device_id()
 	save()
 	Progress.reset()
+	Finale.reset()
 	Events.crew_changed.emit("")
 	Events.display_name_changed.emit("")
