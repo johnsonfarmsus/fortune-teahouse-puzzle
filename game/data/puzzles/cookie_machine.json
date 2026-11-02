@@ -91,6 +91,14 @@
     }
   ],
   "domain": {
+    "item_names": {
+      "butter": "Butter",
+      "egg": "Egg",
+      "flour": "Flour",
+      "sugar": "Sugar",
+      "vanilla": "Vanilla"
+    },
+    "item_noun": "ingredient",
     "items": [
       "sugar",
       "flour",

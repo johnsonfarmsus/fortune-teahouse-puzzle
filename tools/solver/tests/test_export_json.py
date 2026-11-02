@@ -35,8 +35,22 @@ class SampleExportTests(unittest.TestCase):
                 "items": ["sugar", "flour", "butter", "vanilla", "egg"],
                 "positions": ["Jar 1", "Jar 2", "Jar 3", "Jar 4", "Jar 5"],
                 "position_noun": "jar",
+                "item_names": {
+                    "sugar": "Sugar",
+                    "flour": "Flour",
+                    "butter": "Butter",
+                    "vanilla": "Vanilla",
+                    "egg": "Egg",
+                },
+                "item_noun": "ingredient",
             },
         )
+
+    def test_oven_item_names_are_plain_ascii(self):
+        data = machine_to_json(load_machine(PUZZLES / "oven.yaml"))
+        self.assertEqual(data["domain"]["item_noun"], "temperature")
+        self.assertEqual(sorted(data["domain"]["item_names"].values()), ["120 C", "140 C", "160 C", "180 C", "200 C"])
+        self.assertEqual(sorted(data["domain"]["item_names"]), sorted(data["domain"]["items"]))
 
     def test_answer_is_one_based(self):
         self.assertEqual(self.data["answer"], {"sugar": 1, "flour": 2, "vanilla": 3, "butter": 4, "egg": 5})

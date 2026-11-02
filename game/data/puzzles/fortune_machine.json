@@ -91,6 +91,14 @@
     }
   ],
   "domain": {
+    "item_names": {
+      "love": "Love",
+      "luck": "Luck",
+      "travel": "Travel",
+      "wisdom": "Wisdom",
+      "work": "Work"
+    },
+    "item_noun": "phrase bank",
     "items": [
       "luck",
       "love",
