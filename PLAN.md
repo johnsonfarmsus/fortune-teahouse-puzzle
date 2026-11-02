@@ -52,6 +52,38 @@ Phase 1 is the only phase with hard time pressure. Phases 2 to 5 run on the norm
 their dates are indicative; SeaGL 2027's date is not yet announced (expect a Friday and
 Saturday in late October or early November).
 
+### Phase 1 outcome
+
+**Merged to `main`:** WP0 repo prep, WP1 foundation (Godot project, CI, scripts), WP2 solver, generator and the 18 fortunes, WP2b JSON exporter, WP2c item display names, WP3 game shell and the batter puzzle, WP4 reusable puzzle components and the remaining Cookie Machine parts, WP5 scoreboard service and big screen, WP5b credited flag on part solves, WP6 Fortune Machine and Oven (six parts each), WP7 game-to-scoreboard client. WP8 (this pass) adds the smoke-test checklist and documentation only; it changes no game or server code.
+
+**Numbers (2 Nov, Godot 4.7.2):** 207 gdUnit4 test cases in 16 suites, 0 failures, no `ERROR` in the import, test or export logs. Web export: 38.21 MB uncompressed (`index.wasm` 39.5 MB of that), 9.87 MB gzipped against the 12 MB budget (`index.wasm` 10.08 MB gzipped; everything else under 0.5 MB).
+
+**Not done:**
+
+- Finale mechanics (DESIGN.md has no concrete mechanics yet) and the finale implementation (the scoreboard has the finale state and the line's handoffs; the game does not use them).
+- Art (everything is coloured rectangles and labels), story content (the gnu's notes, the Anglerfish, character dialogue beyond the helper parts) and audio.
+- Hetzner deploy of the scoreboard (it runs locally and in Docker only).
+- Real-device testing: the checklist is in [docs/SMOKE-TEST.md](docs/SMOKE-TEST.md) and nobody has run it on an iPhone or Android phone yet.
+- GitHub Pages enablement: the deploy job exists but the repository setting (Settings > Pages > Source: GitHub Actions) and the first deploy have not been confirmed.
+
+**WP8 browser smoke test (headless Chromium, 390x844, touch, `http.server`):**
+
+- The exported build loads and runs: the canvas is up in about 2 seconds on localhost, the start screen, town, Lucky word keypad (tapping keys), result line, Clues, Shop, machine view and the batter puzzle all rendered and responded to taps. The browser log has no errors and no page errors; the only warnings are Chromium's "GPU stall due to ReadPixels" (software WebGL, not the game).
+- Against a local scoreboard (`?scoreboard=http://localhost:8000`, CORS for `http://localhost:8765`) the phone registered itself (`POST /api/v1/devices`, then `GET /api/v1/crews/cookie_machine` shows `members: 1`), and the big-screen page renders.
+- Transfer without compression was 40 MB (`python3 -m http.server` does not gzip); on GitHub Pages it is about 10 MB. First-load time on venue Wi-Fi is not measured; the phone checklist asks for it.
+
+### Known gaps for Phase 2
+
+- Finale: design concrete mechanics in `DESIGN.md` and build them (gate on `finale.open`, three handoffs, the gnu's notes k of N).
+- Real-device results: run docs/SMOKE-TEST.md on iPhone Safari and Android Chrome and fix what it finds (touch size, audio unlock, memory, rotating, private-tab storage).
+- Load time: the 10 MB gzipped engine is the whole download; check it on venue-like Wi-Fi and consider a cached or lighter build if it is slow.
+- Scoreboard deploy: Hetzner host, TLS, `CORS_ORIGINS`, admin secret, note codes, backups; point the Pages build at it with the `fortune/scoreboard_url` project setting.
+- Pages: enable it, and confirm the build deployed from `main` loads at `https://johnsonfarmsus.github.io/fortune-teahouse-puzzle/`.
+- Art, audio and story content; replace the rectangle placeholders (part fixtures, hotspots, avatar).
+- Fortunes: human approval of the 18 fortunes, and vendor limits on cookie text.
+- Accessibility pass: contrast, text size, screen reader behaviour of the canvas build.
+- Layout nit: on the Lucky word screen the keypad shifts down about 3 px when the result line appears.
+
 ## 3. Phase 1 schedule (credit window)
 
 Times are Pacific. Each row is one worker session. Sessions in the same block run in parallel.
