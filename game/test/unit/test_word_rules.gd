@@ -16,9 +16,17 @@ func test_parse_line_handles_edges_and_several_blanks() -> void:
 	var segs := WordRules.parse_line("{0} and {12}.")
 	assert_dict(segs[0]).is_equal({"blank": 0})
 	assert_dict(segs[1]).is_equal({"text": "and"})
-	assert_dict(segs[2]).is_equal({"blank": 12})
-	assert_dict(segs[3]).is_equal({"text": "."})
+	assert_dict(segs[2]).is_equal({"blank": 12, "after": "."})
+	assert_int(segs.size()).is_equal(3)
 	assert_array(WordRules.parse_line("")).is_empty()
+
+
+func test_punctuation_stays_attached_to_the_blank() -> void:
+	var segs := WordRules.parse_line("A patient mixer bakes the {0}, ({1}).")
+	assert_int(segs.size()).is_equal(7)
+	assert_dict(segs[5]).is_equal({"blank": 0, "after": ","})
+	assert_dict(segs[6]).is_equal({"blank": 1, "before": "(", "after": ")."})
+	assert_dict(WordRules.parse_line("the {3}.")[1]).is_equal({"blank": 3, "after": "."})
 
 
 func test_all_correct_is_solved() -> void:

@@ -123,7 +123,10 @@ func test_wiring_labels_carry_the_meaning_not_just_colour() -> void:
 	var texts: Array = []
 	for b in puzzle.find_children("*", "Button", true, false):
 		texts.append((b as Button).text)
-	assert_bool(texts.has("Brown band (1) -> Socket 1 (brown)")).is_true()
+	var first: String = config["connections"].keys()[0]
+	var socket: String = config["connections"][first]
+	var row := "%s -> %s" % [_label_of(config["terminals"], first), _label_of(config["sockets"], socket)]
+	assert_bool(texts.has(row)).is_true()
 
 
 func test_wiring_solves_with_the_answer() -> void:
@@ -152,44 +155,59 @@ func test_wiring_wrong_and_partial_emit_nothing() -> void:
 	assert_array(results).is_empty()
 
 
+func _label_of(list: Array, id: String) -> String:
+	for def: Dictionary in list:
+		if def["id"] == id:
+			return str(def["label"])
+	return id
+
+
 func test_wiring_tap_flow_and_removal() -> void:
 	var puzzle := _make("wiring")
-	puzzle.tap_terminal("band_red")
-	puzzle.tap_socket("socket_2")
-	assert_dict(puzzle.wires()).is_equal({"band_red": "socket_2"})
+	var config := _config("wiring")
+	var answer: Dictionary = config["connections"]
+	var t: Array = answer.keys()
+	var s0: String = answer[t[0]]
+	var s1: String = answer[t[1]]
+	puzzle.tap_terminal(t[0])
+	puzzle.tap_socket(s0)
+	assert_dict(puzzle.wires()).is_equal({t[0]: s0})
 	# Socket first, then terminal, also works.
-	puzzle.tap_socket("socket_1")
-	puzzle.tap_terminal("band_brown")
-	assert_dict(puzzle.wires()).is_equal({"band_red": "socket_2", "band_brown": "socket_1"})
+	puzzle.tap_socket(s1)
+	puzzle.tap_terminal(t[1])
+	assert_dict(puzzle.wires()).is_equal({t[0]: s0, t[1]: s1})
 	# Re-using a socket moves the wire.
-	puzzle.connect_wire("band_green", "socket_2")
-	assert_dict(puzzle.wires()).is_equal({"band_brown": "socket_1", "band_green": "socket_2"})
-	puzzle.remove_wire("band_green")
-	assert_dict(puzzle.wires()).is_equal({"band_brown": "socket_1"})
+	puzzle.connect_wire(t[2], s0)
+	assert_dict(puzzle.wires()).is_equal({t[1]: s1, t[2]: s0})
+	puzzle.remove_wire(t[2])
+	assert_dict(puzzle.wires()).is_equal({t[1]: s1})
 	# The list row removes a wire when tapped.
-	_button_with_text(puzzle, "Brown band (1) -> Socket 1 (brown)").pressed.emit()
+	var row := "%s -> %s" % [_label_of(config["terminals"], t[1]), _label_of(config["sockets"], s1)]
+	_button_with_text(puzzle, row).pressed.emit()
 	assert_dict(puzzle.wires()).is_empty()
 
 
 func test_wiring_tapping_the_drawn_wire_removes_it() -> void:
 	var puzzle := _make("wiring")
-	puzzle.connect_wire("band_red", "socket_2")
-	puzzle.connect_wire("band_brown", "socket_1")
+	var answer: Dictionary = _config("wiring")["connections"]
+	var t: Array = answer.keys()
+	puzzle.connect_wire(t[0], answer[t[0]])
+	puzzle.connect_wire(t[1], answer[t[1]])
 	await get_tree().process_frame
 	await get_tree().process_frame
 	var segments: Array = puzzle._segments()
 	assert_int(segments.size()).is_equal(2)
-	var red: Dictionary = segments.filter(func(s: Dictionary) -> bool: return s["id"] == "band_red")[0]
+	var first: Dictionary = segments.filter(func(s: Dictionary) -> bool: return s["id"] == t[0])[0]
 	var click := InputEventMouseButton.new()
 	click.button_index = MOUSE_BUTTON_LEFT
 	click.pressed = true
-	click.position = (red["from"] as Vector2).lerp(red["to"], 0.5)
+	click.position = (first["from"] as Vector2).lerp(first["to"], 0.5)
 	puzzle._canvas._gui_input(click)
-	assert_dict(puzzle.wires()).is_equal({"band_brown": "socket_1"})
+	assert_dict(puzzle.wires()).is_equal({t[1]: answer[t[1]]})
 	# A tap far from every wire does nothing.
 	click.position = Vector2(-500, -500)
 	puzzle._canvas._gui_input(click)
-	assert_dict(puzzle.wires()).is_equal({"band_brown": "socket_1"})
+	assert_dict(puzzle.wires()).is_equal({t[1]: answer[t[1]]})
 
 
 func test_wiring_hints_and_reveal() -> void:
@@ -329,7 +347,7 @@ func test_word_wrong_and_partial_emit_nothing() -> void:
 	var puzzle := _make("word")
 	var results := _results(puzzle)
 	var blanks: Array = _config("word")["blanks"]
-	puzzle.fill(0, blanks[0]["answer"])
+	puzzle.fill(int(blanks[0]["index"]), blanks[0]["answer"])
 	assert_bool(puzzle.check()).is_false()  # partial
 	for i in blanks.size():  # every word shifted one blank along
 		puzzle.fill(int(blanks[i]["index"]), blanks[(i + 1) % blanks.size()]["answer"])
@@ -340,27 +358,31 @@ func test_word_wrong_and_partial_emit_nothing() -> void:
 func test_word_tap_blank_then_word_and_clear() -> void:
 	var puzzle := _make("word")
 	var blanks: Array = _config("word")["blanks"]
-	puzzle.tap_blank(2)
-	assert_int(puzzle.selected_blank()).is_equal(2)
-	puzzle.choose_word("thin")
-	assert_dict(puzzle.filled()).is_equal({2: "thin"})
+	var i0 := int(blanks[0]["index"])
+	var i1 := int(blanks[1]["index"])
+	var a0: String = blanks[0]["answer"]
+	var a1: String = blanks[1]["answer"]
+	puzzle.tap_blank(i1)
+	assert_int(puzzle.selected_blank()).is_equal(i1)
+	puzzle.choose_word(a1)
+	assert_dict(puzzle.filled()).is_equal({i1: a1})
 	assert_int(puzzle.selected_blank()).is_equal(-1)
 	# A used word cannot go in a second blank.
-	puzzle.fill(1, "thin")
-	assert_dict(puzzle.filled()).is_equal({2: "thin"})
+	puzzle.fill(i0, a1)
+	assert_dict(puzzle.filled()).is_equal({i1: a1})
 	# Tapping a filled blank clears it.
-	puzzle.tap_blank(2)
+	puzzle.tap_blank(i1)
 	assert_dict(puzzle.filled()).is_empty()
 	# With nothing selected a word goes in the first empty blank.
-	puzzle.choose_word(blanks[0]["answer"])
-	assert_dict(puzzle.filled()).is_equal({int(blanks[0]["index"]): blanks[0]["answer"]})
+	puzzle.choose_word(a0)
+	assert_dict(puzzle.filled()).is_equal({i0: a0})
 
 
 func test_word_hints_and_reveal() -> void:
 	var puzzle := _make("word")
 	var config := _config("word")
 	assert_str(puzzle.get_hint_text(1)).is_equal(config["hints"][0])
-	assert_str(puzzle.get_hint_text(2)).starts_with("Blank 1")
+	assert_str(puzzle.get_hint_text(2)).starts_with("Blank %d" % (int(config["blanks"][0]["index"]) + 1))
 	puzzle.reveal()
 	assert_bool(WordRules.is_solved(puzzle.filled(), config["blanks"])).is_true()
 	assert_str(puzzle.get_hint_text(2)).is_equal(config["hints"][1])

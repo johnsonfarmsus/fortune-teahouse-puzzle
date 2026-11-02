@@ -59,8 +59,19 @@ func _ready() -> void:
 				var b := UiKit.button("", BLANK_SIZE)
 				b.add_theme_font_size_override("font_size", 20)
 				b.pressed.connect(tap_blank.bind(index))
-				flow.add_child(b)
 				_blank_buttons[index] = b
+				if seg.has("before") or seg.has("after"):
+					# Punctuation travels with its blank.
+					var unit := HBoxContainer.new()
+					unit.add_theme_constant_override("separation", 0)
+					if seg.has("before"):
+						unit.add_child(UiKit.label(str(seg["before"]), 22))
+					unit.add_child(b)
+					if seg.has("after"):
+						unit.add_child(UiKit.label(str(seg["after"]), 22))
+					flow.add_child(unit)
+				else:
+					flow.add_child(b)
 			else:
 				flow.add_child(UiKit.label(str(seg["text"]), 22))
 

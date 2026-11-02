@@ -86,7 +86,7 @@
     {
       "config": {
         "hints": [
-          "Ingredients go in before anything is mixed, and the batter must rest before it is pressed.",
+          "Dry ingredients go in the bowl first, then the wet ones are stirred in. Mixing comes next, and the batter must rest before it is pressed.",
           "The press comes just before the rounds ride away to the Oven."
         ],
         "intro": "Penguin's recipe card got shuffled. Put the steps back in the order the Cookie Machine does them.",
@@ -105,7 +105,7 @@
           },
           {
             "id": "dry",
-            "label": "Measure the sugar and flour"
+            "label": "Put the dry sugar and flour in the bowl"
           },
           {
             "id": "send",
@@ -117,7 +117,7 @@
           },
           {
             "id": "wet",
-            "label": "Add the butter, egg and vanilla"
+            "label": "Stir in the wet butter, egg and vanilla"
           },
           {
             "id": "mix",
@@ -132,43 +132,33 @@
     {
       "config": {
         "bank": [
-          "thin",
-          "worst",
-          "smooth",
-          "neat",
-          "rough",
-          "thick",
           "best",
-          "messy"
+          "neat",
+          "thick",
+          "smooth",
+          "loud",
+          "burnt"
         ],
         "blanks": [
           {
-            "answer": "smooth",
+            "answer": "best",
             "index": 0
           },
           {
-            "answer": "best",
-            "index": 1
-          },
-          {
-            "answer": "thin",
-            "index": 2
-          },
-          {
             "answer": "neat",
-            "index": 3
+            "index": 1
           }
         ],
         "hints": [
-          "Say each pair of lines aloud. The last words of a pair should sound alike: rest goes with one word, beat with another.",
-          "Every blank has a word that fits. Try the rhymes first."
+          "Say each pair of lines aloud. The missing word at the end of a pair must sound like the word that ends the line above it.",
+          "Look at the word that ends the line above each blank, then pick the bank word that rhymes with it and makes sense."
         ],
-        "intro": "The gnu left a maintenance note, but some words rubbed off. Fill the gaps so each pair of lines rhymes and makes sense. The gnu liked his batter smooth and his rounds thin.",
+        "intro": "The gnu left a maintenance note for the mixer, but the last word of two lines rubbed off. Pick the words that finish each rhyme.",
         "lines": [
-          "Stir it {0}, then let it rest,",
-          "A quiet batter bakes the {1}.",
-          "Press it {2} and keep the beat,",
-          "Then the rounds roll out {3}."
+          "Stir the batter slow, then let it rest,",
+          "A patient mixer bakes the {0}.",
+          "Press it thin and keep the beat,",
+          "Then the rounds roll out {1}."
         ]
       },
       "part": "word",

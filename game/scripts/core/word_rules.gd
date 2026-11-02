@@ -5,25 +5,27 @@ extends RefCounted
 ## the config array [{index, answer}].
 
 
-## Splits "The mixer hums when the {0} is tight" into segments: {"text": word}
-## for each plain word and {"blank": 0} for a blank. Plain text is split per
-## word so a flow container can wrap it.
+## Splits "The mixer hums when the {0}, tight" into one segment per
+## space-separated token: {"text": word} for a plain word and {"blank": 0} for a
+## blank. Punctuation stuck to a blank stays with it as "before" / "after" (keys
+## only present when non-empty), so a comma or full stop is rendered with the
+## blank and never wraps onto a line of its own.
 static func parse_line(line: String) -> Array:
 	var out: Array = []
 	var re := RegEx.new()
-	re.compile("\\{(\\d+)\\}")
-	var pos := 0
-	for m in re.search_all(line):
-		_add_words(out, line.substr(pos, m.get_start() - pos))
-		out.append({"blank": int(m.get_string(1))})
-		pos = m.get_end()
-	_add_words(out, line.substr(pos))
+	re.compile("^([^{}\\s]*)\\{(\\d+)\\}([^{}\\s]*)$")
+	for token in line.split(" ", false):
+		var m := re.search(token)
+		if m == null:
+			out.append({"text": token})
+			continue
+		var seg := {"blank": int(m.get_string(2))}
+		if m.get_string(1) != "":
+			seg["before"] = m.get_string(1)
+		if m.get_string(3) != "":
+			seg["after"] = m.get_string(3)
+		out.append(seg)
 	return out
-
-
-static func _add_words(out: Array, text: String) -> void:
-	for word in text.split(" ", false):
-		out.append({"text": word})
 
 
 static func normalise(word: String) -> String:

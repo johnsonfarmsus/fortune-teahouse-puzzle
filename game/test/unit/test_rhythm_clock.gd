@@ -164,3 +164,22 @@ func test_bad_pattern_falls_back_to_every_beat() -> void:
 	assert_bool(clock.is_lit(1)).is_true()
 	var empty := RhythmClock.new(100.0, [], 180.0, 2)
 	assert_bool(empty.is_lit(3)).is_true()
+
+
+func test_bar_wrap_first_beat_of_the_second_bar_is_on_beat() -> void:
+	# Pattern length 4: beats 0-3 are the first bar, beat 4 (t = 2.5) is the
+	# first beat of the second bar and is lit again; beat 5 (t = 3.0) is dim.
+	var clock := _clock(8)
+	assert_bool(clock.is_lit(4)).is_true()
+	assert_bool(clock.is_lit(5)).is_false()
+	for t in [0.5, 1.5, 2.0]:  # the lit beats of the first bar
+		clock.advance(t - clock.time)
+		assert_bool(clock.press()).is_true()
+	assert_int(clock.streak).is_equal(3)
+	clock.advance(2.5 - clock.time)
+	assert_int(clock.last_beat()).is_equal(4)
+	assert_bool(clock.press()).is_true()
+	assert_int(clock.streak).is_equal(4)
+	clock.advance(0.5)  # beat 5 is dim
+	assert_bool(clock.press()).is_false()
+	assert_int(clock.streak).is_equal(0)
