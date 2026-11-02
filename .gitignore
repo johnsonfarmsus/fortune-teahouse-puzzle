@@ -1,0 +1,21 @@
+# Godot (.import files must stay committed in Godot 4, so *.import is NOT ignored)
+.godot/
+build/
+export/
+*.translation.tmp
+export_credentials.cfg
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+
+# Node
+node_modules/
+
+# OS
+.DS_Store
+
+# Server data
+server/data/*.db

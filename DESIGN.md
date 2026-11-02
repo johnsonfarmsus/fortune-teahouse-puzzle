@@ -14,7 +14,7 @@ The Fortune Teahouse is a collaborative puzzle game for SeaGL 2027. It starts wi
 - **Anyone can finish.** Each crew can always win using only the non-technical clues. Technical clues are shortcuts and conversation starters, not gates.
 - **Every crew gets every kind of puzzle.** Developers, hardware people and riddle-lovers all have something to do in every crew.
 - **There is always a path to the end.** Thresholds (any 4 of 6 clues, any k of N of the gnu's notes) mean a missing person or a lost cookie never blocks a win.
-- **About 40 to 60 minutes per player,** in short bursts between talks, plus a conference-wide finale on day two.
+- **About 40 to 60 minutes of play per player,** in short bursts between talks over day one, plus a conference-wide finale on day two. TeaGL itself is only a 30 to 40 minute tea break, so it is the kickoff, not the whole game.
 - **Built entirely through GitHub.** Godot project as plain text, cloud sessions write the code, CI proves every puzzle is solvable, every merge deploys. Free software under the GNU AGPL.
 
 ## Story and characters
@@ -42,25 +42,35 @@ Nobody in town has the whole manual, but lots of characters hold a piece of it. 
 
 ## How it plays at SeaGL
 
-Three crews each fix one machine during TeaGL; when all three run, a conference-wide finale opens for the rest of the event.
+Three crews each fix one machine, starting at TeaGL and carrying on through day one; when all three run, a conference-wide finale opens for the rest of the event. TeaGL is a 30 to 40 minute tea break held at about 3:30pm on both days of SeaGL (in 2026, Fri-Sat Oct 23-24 at the UW HUB; the 2027 dates are not yet announced).
 
 **Crews.** Each of the 18 fortunes belongs to one machine. Entering a fortune's lucky word in the game puts the player in that crew: Fortune Machine, Cookie Machine or Oven. With roughly 33 cookies per crew, crewmates are scattered across the room, so the first job is getting up and finding them.
 
 **No cookie, no problem.** The whole game is playable without a cookie. Players can explore, solve side puzzles and join a crew by teaming up with cookie holders.
 
-**Fast finishers become mentors.** Once a crew's machine runs, its members become "maintainers": the game lets them send hints to other crews, and their names go on those crews' contributors lists too. The people who would finish in 25 minutes spend the rest of TeaGL helping.
+**Fast finishers become mentors.** Once a crew's machine runs, its members become "maintainers": the game lets them send hints to other crews, and their names go on those crews' contributors lists too. The people who finish first spend the rest of day one helping.
 
-**Latecomers.** About 10 cookies are held back in a "lost fortunes" jar at registration for day two.
+**Latecomers.** About 10 cookies are held back in a "lost fortunes" jar at registration for day two. The handful is drawn at random from the mixed pile, not stacks of one fortune, so no machine is left short.
 
 **Two-day timeline**
 
-1. **TeaGL (about 50 minutes):** cookies handed out, crews form, most crews get their machine running in 40 to 60 minutes.
-2. **Rest of day one:** remaining crews finish; finished players mentor.
+1. **TeaGL on day one (30 to 40 minutes, about 3:30pm):** the kickoff. Cookies come out, crews form and the first clues get pooled.
+2. **Rest of day one:** crews fix their machines in short bursts between talks (40 to 60 minutes of play per player in all); finished players mentor.
 3. **When all three machines run** (or at end of day one as a safety net): the finale opens: making the three machines work together as one line.
-4. **Day two:** the whole conference works out the handoffs between machines.
+4. **Day two:** the whole conference works out the handoffs between machines. TeaGL on day two is a second chance for latecomers, who draw from the lost fortunes jar.
 5. **Closing session:** the full line runs end to end on the big screen and the first cookie comes out.
 
-If TeaGL falls on day two, the finale shrinks to fit the remaining hours.
+If the organizers would rather kick off on day two, the finale shrinks to fit the remaining hours.
+
+### Rules the code needs
+
+These are the rules the game and the scoreboard are built on.
+
+- **Everyone solves on their own device.** Every player solves each part for themselves, so everyone plays. A crew's machine runs when each of its six parts has been solved by at least one crew member. Progress syncs through the scoreboard; offline, the device shows its own progress (device-local) and syncs later.
+- **Crew assignment.** The first lucky word a player enters sets their crew; later words only collect clues. A player can switch crews from the menu, and players with no cookie choose a crew.
+- **Lucky words will leak.** They will be said aloud, and that is fine: finding people is the only gate. There is no anti-cheat.
+- **Hint ladder.** Nudge, then a stronger nudge, then reveal the solution without credit. Maintainers (see above) can push one nudge to another crew.
+- **Contributors list.** Names go on a big screen, so the list uses a display name the player chooses, and anonymous is allowed.
 
 ## The three machines
 
@@ -75,7 +85,7 @@ The gnu's shop is one production line made of three machines. A cookie moves thr
 
 This matches how real fortune cookies are made: baked flat first, then filled and folded while warm.
 
-Each machine is a set of broken parts, and every machine has every puzzle type.
+Each machine is a set of broken parts, and every machine has every puzzle type. All three core logic puzzles have the same shape: five items matched to five ordered positions (five jars, five phrase banks feeding five printer slots, five heat zones at five temperatures), so one solver and one puzzle scene serve all three.
 
 | Puzzle type | Fortune Machine (composes and prints) | Cookie Machine (mixes and presses) | Oven (bakes, folds and packages) |
 | --- | --- | --- | --- |
@@ -84,7 +94,9 @@ Each machine is a set of broken parts, and every machine has every puzzle type.
 | Wiring / hardware | Fix the ink pump circuit | Repair the mixer's motor controller | Rewire the thermostat |
 | Sequence (code without typing) | Order the compose, print and send steps | Order the mix, rest and press steps | Order the bake, fold, cool and package stages |
 | Word / poem | Fix the jumbled fortunes in the phrase bank | Decode the gnu's rhyming maintenance note | Restore the smudged packaging label |
-| Pattern / sound | Tune the printer's rhythm | Sync the batter press to the conveyor beat | Time the folding arms to the warm cookies coming out |
+| Pattern / rhythm | Tune the printer's rhythm | Sync the batter press to the conveyor beat | Time the folding arms to the warm cookies coming out |
+
+Rhythm puzzles are visual-first (pulsing lights, a conveyor beat), with sound and haptics as optional extras, because the hall is loud and phones are muted.
 
 **Where the fortunes come in.** Each machine has one core logic puzzle that can only be solved with that crew's fortune clues: the phrase banks, the batter jars and the heat zones. The other parts are solvable in-game, with optional hints, so a player is never stuck waiting for clues.
 
@@ -96,13 +108,13 @@ Each machine is a set of broken parts, and every machine has every puzzle type.
 
 ## The fortune cookies
 
-100 cookies with 18 different fortunes for $198: 3 machines × 6 clues, one clue in each of six styles. Each machine needs any 4 of its 6 clues.
+100 cookies with 18 different fortunes for $198, from Fortune Cookie Guy (fortunecookieguy.com; custom messages, individually wrapped): 3 machines × 6 clues, one clue in each of six styles. Each machine needs any 4 of its 6 clues.
 
 **Vendor limits**
 
 - Packs of 50 cookies; up to 9 different front messages per pack.
 - One back message per pack (the same on all 50).
-- 140 characters maximum on the front and on the back.
+- 140 characters maximum on the front and on the back (confirmed with the vendor).
 
 **Six clue styles, one of each per machine**
 
@@ -127,7 +139,7 @@ The first four styles can always reach the 4-clue threshold alone, so a crew of 
 | Poem | Vanilla came first, then butter so near: one jar to the right, and the butter is here. Lucky word: SPRINKLE | 107 |
 | Penguin | Like a penguin and her chick, sugar and flour stand close: sugar on the left, flour just beside. Lucky word: HUDDLE | 115 |
 | Open source | Count the letters in the kernel Linus Torvalds wrote. That number is the egg's jar. Lucky word: TUX | 99 |
-| Code | `assert jar.index("vanilla") == jar.index("flour") + 1` Lucky word: PATCH | 71 |
+| Code | `assert jar.index("vanilla") == jar.index("flour") + 1` Lucky word: PATCH | 71 (73 if the backticks print) |
 | Hardware | Read the jars like resistor bands, left to right: butter's band comes just before egg's. Lucky word: SOLDER | 107 |
 
 Verified with a solver: any 4 of these 6 give exactly one answer, and no 3 are enough. The structure that makes this work is two clues that fix a jar outright plus four that link neighbouring jars into a chain; random clue sets almost never meet the rule. The real puzzle will use a shuffled answer, not the jars in order.
@@ -137,13 +149,13 @@ Verified with a solver: any 4 of these 6 give exactly one answer, and no 3 are e
 - Pack A: Fix the gnu's fortune machine! Play at fortune.ataary.com  Lucky numbers: 3 1 4 1 5 (83 characters)
 - Pack B: Fix the gnu's fortune machine! Play at fortune.ataary.com  Lucky numbers: 9 2 6 5 3 (83 characters)
 
-Together the lucky numbers are the first digits of pi (3.14159 26535), needed in the finale, which quietly makes people from both packs meet. The address is a placeholder.
+Together the lucky numbers are the first ten digits of pi (3.141592653), needed in the finale, which quietly makes people from both packs meet. The address is a placeholder.
 
 **Distribution**
 
 - Each pack holds 9 fortunes: 3 Fortune Machine, 3 Cookie Machine, 3 Oven. That is about 5 or 6 copies of each fortune.
-- Mix both packs together before handing out.
-- Hold about 10 back for the lost fortunes jar.
+- **Mix both packs together before handing out. This is a required step:** each pack holds only 3 of each machine's 6 clues, so a crew whose cookies all came from one pack could never collect more than 3 and could never finish.
+- Hold about 10 back for the lost fortunes jar, picked at random from the mixed pile. Never hold back stacks of one fortune: two whole fortunes gone would leave a machine at exactly its 4-clue threshold.
 
 **Budget**
 
@@ -184,9 +196,11 @@ A failing check sends the work back to the session that wrote it; only passing c
 
 **Engine choices**
 
-- **Godot 4.7.x with GDScript.** Scenes and resources are plain text, so agents can write them and every change is a readable diff.
+- **Godot 4.7.2-stable with GDScript,** pinned everywhere (engine, export templates, test action) and bumped on purpose. Scenes and resources are plain text, so agents can write them and every change is a readable diff.
 - **2D, phone-first.** Tap-to-move town and touch puzzles. Web export uses Godot's Compatibility renderer (WebGL 2), which runs on most phones.
 - **Web build only for SeaGL.** Attendees open it from the address on the cookie; no install, no app store.
+- **Single-threaded web export** (thread support off), so it runs on GitHub Pages without special headers.
+- **Tap-to-start screen** before anything else, so audio is unlocked by a gesture on phones.
 
 **Repository layout**
 
@@ -205,6 +219,7 @@ A failing check sends the work back to the session that wrote it; only passing c
 - Every fortune front and back is 140 characters or fewer.
 - Lucky words are unique across all 18 fortunes.
 - Godot imports headless, unit tests pass (GUT or gdUnit4), and a web export builds.
+- Size budget: the exported web build fails CI above 12 MB uncompressed, and its gzip size is reported. About 100 phones will load it at once on venue Wi-Fi.
 - A human (or reviewing agent) confirms each styled clue says what its fact says. The solver checks facts, not poems.
 
 **Deploys:** every merge to main exports the web build and publishes it (GitHub Pages first; itch.io via butler optional).
@@ -214,6 +229,10 @@ A failing check sends the work back to the session that wrote it; only passing c
 **License:** the whole project is licensed under the GNU Affero General Public License, version 3 or later (AGPL-3.0-or-later). That covers the game, the solver and tools, the puzzle data and the scoreboard server. The repo carries the full license text in `LICENSE`, and each source file starts with an `SPDX-License-Identifier: AGPL-3.0-or-later` line. Because the scoreboard runs as a network service, the AGPL requires offering its source to players; the game and the big-screen page link to the public repo to do that.
 
 ## Cloud session plan
+
+The live build plan is `PLAN.md`: dated, dependency-ordered work packages, each with a model assignment, inputs, outputs and acceptance criteria. This section is kept only for history.
+
+### Original session prompts (superseded by PLAN.md)
 
 The $250 credit expires Tuesday, November 4 at 11:59 PM PST, so it goes on the hard engineering: the foundation, the solver, the game shell, the machines and the scoreboard. Art, writing polish and characters can follow over the year on the normal plan.
 
@@ -259,11 +278,13 @@ Read DESIGN.md, especially The finale and Technology and pipeline. In server/, b
 
 ## Open questions and next steps
 
-- [ ] Which day is TeaGL, and roughly how many people attend? Sets the finale's length and crew sizes.
-- [ ] Can the two cookie packs have different back messages? If not, the pi digits move elsewhere in the finale.
+- [x] Which day is TeaGL, and roughly how many people attend? Answered: TeaGL is 30 to 40 minutes at about 3:30pm on both days, so the kickoff is day one's. Attendance is still a rough guess (sponsor prospectuses say 400+ over two days, in person and online).
+- [x] Pick a cookie vendor. Answered: Fortune Cookie Guy (fortunecookieguy.com).
+- [x] Is 140 characters really the limit? Answered: yes, confirmed for both fronts and backs.
+- [ ] Confirm with Fortune Cookie Guy that the two cookie packs can carry different back messages. If not, the pi digits move elsewhere in the finale.
 - [ ] Confirm SeaGL organizers are happy with the game, cookies at TeaGL, codes around the venue and a big screen.
 - [ ] Pick the game's address (fortune.ataary.com is a placeholder).
-- [ ] Note allergens on or near the cookies (they usually contain wheat and egg).
+- [ ] Note allergens on or near the cookies (they usually contain wheat and egg), and get a written allergen statement from the vendor.
 - [ ] Choose how many of the gnu's notes to hide around the venue (N) and how many the finale needs (k).
 - [ ] Order cookies with enough lead time once all 18 fortunes pass CI and a human read-through.
 - [ ] Art style and original character designs (after the credit; normal plan).
