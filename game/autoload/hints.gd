@@ -24,7 +24,9 @@ func reset(puzzle_id: String) -> void:
 	GameState.save()
 
 
-## Stub for WP7: a mentor's pushed nudge arrives here.
+## A mentor's pushed nudge arrives here (Progress passes puzzle_id "" for a
+## nudge to the whole crew). The Hud shows it as a dismissible banner.
 func receive_pushed_nudge(puzzle_id: String, text: String) -> void:
 	pushed_nudges[puzzle_id] = text
 	nudge_received.emit(puzzle_id, text)
+	Events.hint_received.emit(text)
