@@ -58,6 +58,17 @@ CREATE TABLE IF NOT EXISTS hints (
   created_at TEXT NOT NULL,
   UNIQUE (from_device, to_crew, nudge_id)
 );
+CREATE TABLE IF NOT EXISTS crew_items (
+  machine TEXT NOT NULL,
+  item_id TEXT NOT NULL,
+  state TEXT NOT NULL CHECK (state IN ('found', 'installed')),
+  found_by TEXT NOT NULL REFERENCES devices(id),
+  found_at TEXT NOT NULL,
+  installed_by TEXT REFERENCES devices(id),
+  installed_at TEXT,
+  place TEXT,
+  PRIMARY KEY (machine, item_id)
+);
 CREATE TABLE IF NOT EXISTS settings (
   key TEXT PRIMARY KEY,
   value TEXT NOT NULL
@@ -65,7 +76,7 @@ CREATE TABLE IF NOT EXISTS settings (
 """
 
 # Tables cleared by a rehearsal reset (devices are kept unless scope is "all").
-PROGRESS_TABLES = ("hints", "gnu_notes", "handoff_settings", "contributors", "part_solves")
+PROGRESS_TABLES = ("crew_items", "hints", "gnu_notes", "handoff_settings", "contributors", "part_solves")
 
 
 def connect(path: str) -> sqlite3.Connection:

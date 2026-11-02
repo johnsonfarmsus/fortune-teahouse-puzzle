@@ -1,7 +1,7 @@
 # Scoreboard server
 
 A small FastAPI + SQLite service that holds the shared state of The Fortune Teahouse: crew
-progress, the finale, the gnu's notes, mentor hints and the contributors list. It also serves the
+progress, the finale, the gnu's notes, mentor hints, each crew's shared item inventory and the contributors list. It also serves the
 big-screen page for the conference hallway. The game still plays if this service is down; only
 shared progress pauses.
 
@@ -76,12 +76,12 @@ so the defaults are generous; the note and start-code endpoints get a tighter ex
 
 ```
 app/config.py     settings from env, fixed ids (crews, parts, handoffs, nudges)
-app/db.py         SQLite schema
+app/db.py         SQLite schema (includes crew_items, the shared crew inventory)
 app/service.py    all game rules and queries
 app/main.py       FastAPI routes, CORS, rate limit, big-screen route
 app/ratelimit.py  in-memory token bucket
 static/bigscreen/ the big-screen page and readme.json (plain HTML and JS, no build step)
-tests/            pytest suite (httpx TestClient)
+tests/            pytest suite (test_inventory.py: crew inventory) (httpx TestClient)
 ```
 
 ## Notes

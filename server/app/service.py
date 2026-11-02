@@ -2,6 +2,7 @@
 """Game rules and queries. Everything here takes an open sqlite3 connection."""
 from __future__ import annotations
 
+import re
 import sqlite3
 from contextlib import contextmanager
 from datetime import datetime
@@ -24,6 +25,9 @@ MACHINE_NAMES = {
     "oven": "Oven",
 }
 ANONYMOUS = "anonymous"
+ITEM_ID_RE = re.compile(r"^[a-z0-9_]{1,64}$")
+ITEM_STATES = ("found", "installed")
+MAX_PLACE = 64
 
 
 class ApiError(Exception):
@@ -65,6 +69,27 @@ def check_part(part: str) -> str:
     if part not in PARTS:
         raise ApiError(404, "unknown_part", f"Unknown part {part!r}. Use one of {list(PARTS)}.")
     return part
+
+
+def check_item_id(item_id: str) -> str:
+    if not ITEM_ID_RE.fullmatch(item_id):
+        raise ApiError(400, "bad_item_id", "item_id must match ^[a-z0-9_]{1,64}$.")
+    return item_id
+
+
+def check_item_state(state: str) -> str:
+    if state not in ITEM_STATES:
+        raise ApiError(400, "bad_state", f"state must be one of {list(ITEM_STATES)}.")
+    return state
+
+
+def clean_place(value: str | None) -> str | None:
+    if value is None:
+        return None
+    place = " ".join("".join(ch for ch in value if ch.isprintable()).split())
+    if len(place) > MAX_PLACE:
+        raise ApiError(400, "bad_place", f"place must be {MAX_PLACE} characters or fewer.")
+    return place or None
 
 
 def clean_display_name(value: str | None) -> str | None:
@@ -165,6 +190,14 @@ def contributor_count(conn: sqlite3.Connection) -> int:
     return conn.execute("SELECT COUNT(*) FROM contributors").fetchone()[0]
 
 
+def item_counts(conn: sqlite3.Connection, machine: str) -> dict[str, int]:
+    r = conn.execute(
+        "SELECT COUNT(*) AS found, COALESCE(SUM(state='installed'), 0) AS installed"
+        " FROM crew_items WHERE machine=?", (machine,)).fetchone()
+    # "found" counts every item the crew has found, installed ones included.
+    return {"items_found": r["found"], "items_installed": r["installed"]}
+
+
 def crew_view(conn: sqlite3.Connection, machine: str, with_contributors: bool = True) -> dict[str, Any]:
     rows = conn.execute(
         "SELECT part, COUNT(*) AS n, MIN(solved_at) AS first FROM part_solves"
@@ -190,6 +223,7 @@ def crew_view(conn: sqlite3.Connection, machine: str, with_contributors: bool = 
         "parts_total": len(PARTS),
         "members": members,
         "parts": parts,
+        **item_counts(conn, machine),
     }
     if with_contributors:
         out["contributors"] = contributors(conn, machine)
@@ -223,6 +257,53 @@ def solve_part(conn: sqlite3.Connection, device_id: str, machine: str, part: str
             (device_id, machine, part)).fetchone()[0] == 1
     view = crew_view(conn, machine)
     return {"newly_solved": newly, "credited": is_credited, "crew": view}
+
+
+# ----------------------------------------------------------- crew inventory
+
+def item_view(row: sqlite3.Row) -> dict[str, Any]:
+    return {k: row[k] for k in ("item_id", "state", "found_by", "found_at",
+                                "installed_by", "installed_at", "place")}
+
+
+def list_items(conn: sqlite3.Connection, machine: str) -> list[dict]:
+    rows = conn.execute(
+        "SELECT * FROM crew_items WHERE machine=? ORDER BY found_at, rowid", (machine,)).fetchall()
+    return [item_view(r) for r in rows]
+
+
+def set_item(conn: sqlite3.Connection, device_id: str, machine: str, item_id: str,
+             state: str, place: str | None, now: str) -> dict:
+    """State only moves forward (found, then installed). A repeat write changes nothing
+    and returns the current row. found_by is the first writer. Installing an item nobody
+    reported found (for example an out-of-order offline queue) records the installer as
+    the finder too."""
+    with tx(conn):
+        dev = get_device(conn, device_id)
+        if dev["crew"] != machine:
+            raise ApiError(403, "not_in_crew",
+                           f"Device is in crew {dev['crew']!r}, not {machine!r}. "
+                           "POST /api/v1/devices to join first.")
+        row = conn.execute("SELECT * FROM crew_items WHERE machine=? AND item_id=?",
+                           (machine, item_id)).fetchone()
+        if row is None:
+            if state == "found":
+                conn.execute(
+                    "INSERT INTO crew_items (machine, item_id, state, found_by, found_at, place)"
+                    " VALUES (?,?,?,?,?,?)", (machine, item_id, "found", device_id, now, place))
+            else:
+                conn.execute(
+                    "INSERT INTO crew_items (machine, item_id, state, found_by, found_at,"
+                    " installed_by, installed_at, place) VALUES (?,?,?,?,?,?,?,?)",
+                    (machine, item_id, "installed", device_id, now, device_id, now, place))
+        elif state == "installed" and row["state"] == "found":
+            conn.execute(
+                "UPDATE crew_items SET state='installed', installed_by=?, installed_at=?,"
+                " place=COALESCE(?, place) WHERE machine=? AND item_id=?",
+                (device_id, now, place, machine, item_id))
+        row = conn.execute("SELECT * FROM crew_items WHERE machine=? AND item_id=?",
+                           (machine, item_id)).fetchone()
+    return item_view(row)
 
 
 # -------------------------------------------------------------------- finale
