@@ -39,13 +39,16 @@ Defaults are given so work can start today. Reply to change any of them.
 
 ## 2. Phases and dates
 
+Revised 2 Nov 2026 for design revision 2 (the world, game feel, art and sound). Phases 0 to 2 are complete; section 9 defines Phase 3 in detail.
+
 | Phase | When | Goal | Exit criterion |
 | --- | --- | --- | --- |
 | 0 Repo prep | Today, 2 Nov | Repo ready for parallel workers | `DESIGN.md`, `PLAN.md`, LICENSE, PR template, labels, issues for every WP |
 | 1 Credit window | 2 Nov to 4 Nov 23:59 PST | All hard engineering merged: foundation, solver and 18 fortunes, game shell, Cookie Machine slice, puzzle components, Fortune Machine and Oven, scoreboard | Web build deploys from `main`; a phone can enter a lucky word, join a crew, solve the batter puzzle and appear on the contributors list; CI proves the 4-of-6 rule for all three machines |
 | 2 Design completion | Nov to Jan | Finale mechanics, story content plan, 18 fortunes human-approved, art direction brief | Finale section of `DESIGN.md` has concrete mechanics; fortunes frozen (pending vendor limits) |
-| 3 Content and polish | Feb to Jun | Original character art, town art, writing (Gnu's notes, Anglerfish), finale implemented, scoreboard deployed to Hetzner, three playtests | Playtest 3: a cold group of 8 to 12 finishes a machine in under 60 min with no help |
-| 4 Logistics | Jul to Sep | Vendor terms confirmed, cookies ordered, organizer sign-off, venue notes (k of N) designed, ops runbook | Cookies in hand, allergen card printed, runbook rehearsed |
+| 3 Hands-on rebuild (revision 2, section 9) | Nov to Apr | Rebuild the player-facing layer as a pixel-art adventure: walkable town, item chains with misdirects, shared inventory, animated machines, sound; one focused session at a time, each slice played by Trevor on a phone before the next | Every machine has its six chains; finale runs in the new layer; playtest 3 passes (a cold group of 8 to 12 finishes a machine in under 60 min with no help) |
+| 3b Art and audio (local session on Trevor's Mac) | Nov onward, in parallel | Pixel art and sound per DESIGN.md "Art and sound", landing by filename against the asset list | Character references approved by Trevor; placeholders replaced room by room |
+| 4 Logistics | May to Sep | Vendor terms confirmed, cookies ordered, organizer sign-off, venue notes (k of N) designed, ops runbook | Cookies in hand, allergen card printed, runbook rehearsed |
 | 5 Event | Oct or Nov 2027 | Dress rehearsal, code freeze two weeks out, run the event, retrospective | Closing-session reveal runs on the big screen |
 
 Phase 1 is the only phase with hard time pressure. Phases 2 to 5 run on the normal plan and
@@ -257,6 +260,15 @@ reads, AGPL SPDX header on every new source file, and tests for anything with lo
 - SPDX header `# SPDX-License-Identifier: AGPL-3.0-or-later` on every `.gd`, `.py`, `.js`,
   `.yml`; the game's about screen and the big-screen footer link to the repo.
 - Colour is never the only carrier of information; tap targets at least 44 px; no timers.
+- Game feel (DESIGN.md) applies to every player-facing pull request from Phase 3 on: direct
+  manipulation, feedback within a tenth of a second, a walking character, scenes not screens,
+  machines that animate part by part, sound on every interaction, 60 frames per second target
+  on a mid-range Android and a recent iPhone. Every gameplay PR carries screenshots or a short
+  capture, and Trevor plays each slice on a phone before the next slice starts.
+- Art is loaded by filename from an asset list with a placeholder fallback, so code never waits
+  for art. `ASSETS.md` records source, licence and author for every asset.
+- Accessibility becomes an option (text-assist mode) rather than the default from Phase 3; the
+  44 px and colour-plus-text rules still apply to the default UI where they cost nothing.
 - If D0 switches to a web stack, WP1 becomes: Vite plus TypeScript plus PixiJS, Vitest,
   Playwright smoke test against the built site, same `puzzles/` schema, same Pages deploy.
   WP3 to WP7 keep their scope; only the implementation language changes.
@@ -300,3 +312,107 @@ Not blocking Phase 1:
 3. Organizer contact and whether to approach them now or after a playable build exists.
 4. Whether a human artist is planned for the original character designs.
 5. Who the playtest groups will be (a local user group would be ideal).
+
+## 9. Revision 2: the hands-on rebuild (2 Nov 2026)
+
+### 9.1 What changed in the design
+
+DESIGN.md gained three sections and two live session prompts. The game lives in a town of nine
+places, not the shop: each machine part is reached through a chain of parts, tools and knowledge
+found around town, with dead ends and misdirects that cost time but never progress, and one or
+two decoy answers per machine that lead to a real place which explains the mistake. Crews share
+an inventory through the scoreboard. Game feel is now a requirement on every pull request:
+direct manipulation, a walking character, scenes not screens, animated machines, physics where
+it is fun, portraits, sound everywhere, 60 frames per second. The look is NES-style top-down
+pixel art on a 16 by 16 grid with one strict palette, built from CC0 Ninja Adventure and Kenney
+tiles plus assets generated on Trevor's local machine and pixelized by one script. The design
+also says how to build it: one focused session rebuilds the player-facing layer as a vertical
+slice, and Trevor plays it on a phone before anything else is built on it.
+
+### 9.2 What this means for what exists
+
+| Keep as is | Rebuild on top of it | Rework later |
+| --- | --- | --- |
+| Solver, 18 fortunes, puzzle data and exporter, CI puzzle checks | Town: nine walkable pixel-art rooms with flip-screen transitions and a walking player | Finale dials become hands-on controls on the animated line, and the closing reveal becomes the line simulation |
+| Scoreboard service, API, deploy kit, big screen | Puzzles: direct manipulation inside the room where the chain says they happen, replacing button lists | Hint ladder stays, re-skinned as Red Panda's help |
+| Game state, progress store, scoreboard client, finale client and data | Chains: parts, tools and knowledge as an inventory; misdirects and decoys as data | Big-screen page unchanged |
+| Story data and the Story catalog | Characters as sprites with idle and walk frames and portrait dialogue | |
+| gdUnit4 tests for logic; CI and Pages deploy | Machines as animated contraptions that start moving part by part | |
+
+The current screens stay reachable behind a debug setting until each slice replaces them, as the
+design's rebuild prompt says.
+
+### 9.3 How the work runs from here
+
+- **One player-facing session at a time.** The rebuild slice is one focused session on an
+  Opus-class model, with an integrator review and then Trevor's phone test as the gate. Fleets
+  of parallel Sonnet workers continue only for data, server, docs and tests.
+- **Art and audio come from Trevor's Mac,** on the normal plan, through pull requests reviewed
+  here. Cloud sessions never generate art; they load it by filename and ship placeholders.
+- **Gate at every slice:** CI green, review, screenshots in the PR, Trevor plays it on a phone,
+  then the next package starts. Nothing is built on an unplayed slice.
+
+### 9.4 Decisions for the rebuild (defaults apply unless Trevor says otherwise)
+
+| ID | Decision | Default |
+| --- | --- | --- |
+| D9 | Pixel viewport | 176 by 320 base (11 by 20 tiles of 16 px), integer-scaled with no smoothing, letterboxed on odd phones; inventory and dialogue use the bars above and below |
+| D10 | Shared inventory | New scoreboard endpoints for crew inventory (item found, found-by, installed), queued offline like solves; everything findable alone without the scoreboard |
+| D11 | Asset list | `game/assets.json` maps logical names to files, frames and sizes; a missing file shows a labelled placeholder; CI checks that every referenced file exists or is declared as a placeholder |
+| D12 | Sound in cloud sessions | Effects generated by a committed script into small WAV files with their settings in data; ambient loops and music come from the local art session |
+| D13 | Chains as data | `game/data/chains/<machine>.json`: steps (find, decode, repair, install), places, items, tools, misdirects with tells, decoys with their named mistake and destination; CI checks every decoy follows from its mistake and matches no valid 4-clue set |
+| D14 | Accessibility | Text-assist mode (list of interactive objects, button alternatives) is a Phase 3 package, off by default |
+
+### 9.5 Phase 3 work packages
+
+Model sizing follows section 6: Opus for the slice and the chain design, Sonnet for data,
+server and tests, Haiku for mechanical edits.
+
+- **WP16 Rebuild slice: the town and one full chain (Opus, one session).** The design's
+  "Rebuild" prompt verbatim: six connected rooms (teahouse, shop, pier, workshop, depot,
+  scrapyard), walking character and camera, characters with idle animation and portraits,
+  drag-to-use shared inventory through the scoreboard client, the Cookie Machine as an animated
+  contraption, the cutter-die chain with its scrapyard and Anglerfish misdirects and the
+  outdated-locker-code decoy to the harbour, the batter-jar puzzle rebuilt as dragging jars onto a
+  shelf, Ninja Adventure tiles, art by filename with placeholders, a sound on every interaction,
+  old screens behind a debug setting, tests for the chain logic, screenshots in the PR.
+  Acceptance: Trevor plays it on a phone and approves; 60 fps on his iPhone.
+- **WP5c Crew inventory API (Sonnet, parallel with WP16).** Endpoints per D10, idempotent,
+  tests, API.md, deploy kit env unchanged.
+- **WP17 Chain design for all 18 parts (Opus, after WP16 approval).** `docs/CHAINS.md` and the
+  chain data per D13: six chains per machine with places, items, tools, misdirects with tells
+  and one or two decoys per machine; the twelve existing puzzle configs mapped to the room where
+  each now happens; the fortune clues' second job (where to look, which part is real, lock
+  codes). Reviewed by the integrator for the "fair in hindsight" and "still approachable" rules.
+- **WP18 Decoy and asset checks in CI (Sonnet).** The decoy check in the solver and the asset
+  list check per D11 and D13.
+- **WP19 Cookie Machine, remaining five chains (Opus or Sonnet per slice, one at a time).**
+- **WP20 Fortune Machine chains and rooms (archive, cottage, harbour) (one at a time).**
+- **WP21 Oven chains (one at a time).**
+- **WP22 Finale in the new layer (Opus design pass, Sonnet build).** Hands-on handoff controls
+  on the animated line, the line simulation for the reveal, Archive as Elephant's room.
+- **WP23 Text-assist mode (Sonnet).**
+- **WP24 Performance and polish pass (Sonnet, repeated).** Frame budget on a mid-range Android
+  and an iPhone, download size, audio latency, physics counts.
+- **WP14 rounds 1 to 3** interleave: round 1 after WP19, round 2 after WP21, round 3 after WP22.
+- **Art landing (local session, continuous):** character references first, then tiles for the
+  slice, then room by room, each as its own PR reviewed here against `ASSETS.md`.
+
+### 9.6 Risks added by revision 2
+
+| Risk | Likelihood | Mitigation |
+| --- | --- | --- |
+| Scope: nine rooms, eighteen chains, animation, sound and physics is several times the Phase 1 scope | High | One slice at a time with a phone gate; chains as data so content scales without code; cut rooms before cutting chains |
+| 60 fps on web Godot with physics and shaders on mid-range phones | Medium | Pixel viewport keeps fill rate tiny; few physics bodies; profile on a real Android after the slice; palette-swap shader optional |
+| Shared inventory races and double-finds | Medium | Server is the source of truth with idempotent item ids; found-by is first writer |
+| Decoys frustrate newcomers | Medium | Design rules (fair in hindsight, approachable, hint ladder within two minutes) enforced in WP17 review and playtest round 1 |
+| Art and code drift (sizes, frame counts) | Medium | Asset list is the contract; CI checks existence; placeholders labelled with the expected size |
+| Licensing of generated assets and audio | Low | Pinned Apache 2.0 image models, Stable Audio 3 community licence recorded in `ASSETS.md`; no research-only model upgrades |
+| Single-session cadence slows throughput | Certain | Run data, server, docs and art work in parallel with each slice; only player-facing code is serialised |
+
+### 9.7 Immediate next steps
+
+1. Merge this revision (DESIGN.md and PLAN.md).
+2. Start WP16, the rebuild slice, as one Opus session, and WP5c in parallel.
+3. Trevor starts the local art and audio session on his Mac with the steam-machine brief.
+4. After WP16 lands: review, screenshots, Trevor's phone test, then WP17.

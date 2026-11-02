@@ -1,6 +1,6 @@
 # The Fortune Teahouse: SeaGL Puzzle Game Design
 
-Nov 1, 2026 · @Trevor Johnson
+Nov 1, 2026 · @Trevor Johnson · revised Nov 2, 2026 (the world, game feel, art and sound)
 
 ## Overview
 
@@ -72,6 +72,136 @@ These are the rules the game and the scoreboard are built on.
 - **Hint ladder.** Nudge, then a stronger nudge, then reveal the solution without credit. Maintainers (see above) can push one nudge to another crew.
 - **Contributors list.** Names go on a big screen, so the list uses a display name the player chooses, and anonymous is allowed.
 
+## The world: a town to explore
+
+The game lives in the town, not the shop. The machines sit in the gnu's shop, but almost nothing needed to fix them is there: clues and puzzles send players around town to find the parts, tools and knowledge each repair needs. That is what makes it a full world, and what makes room for dead ends and misdirects.
+
+**Three things to find**
+
+- **Parts:** physical pieces, such as a cutter die, a mixer belt, a heat-zone dial or an ink cartridge.
+- **Tools:** things that let you repair or install a part, such as a spanner from Penguin or the gnu's key ring.
+- **Knowledge:** settings, codes and how-tos, from fortunes, the gnu's notes, signs and what characters remember.
+
+**The town**
+
+| Place | Who is there | What you find there |
+| --- | --- | --- |
+| Teahouse | Red Panda | The hub: lucky-word entry, crew meetups, gentle hints |
+| The gnu's shop | Nobody; the gnu's sticky labels | The three machines and what each one is missing |
+| The pier | Crab, Seagull | The contributors board; Seagull's nest of lost fortune scraps, some useful, some outdated |
+| Penguin's workshop | Penguin | Tools, and a bench for repairing bent or broken parts |
+| Parcel depot | Gopher | Lockers, misdelivered parcels, the gnu's forwarded mail |
+| Town archive | Elephant | Records and old manuals, some for older versions of the machines; the gnu's notes during the finale |
+| The gnu's cottage | Nobody | Locked drawers, half-finished notes, things he forgot to pass on |
+| Scrapyard | Nobody | Look-alike parts: the home of misdirects |
+| Harbour | Anglerfish | Shiny FortuneCloud "replacement parts" that never quite fit |
+
+**Example chain: the Cookie Machine's cutter**
+
+1. The cutter is missing its die. A sticky label says: "Die out for sharpening. – G."
+2. Penguin says the gnu never sharpened anything at the workshop: "Try the depot, he mailed everything."
+3. At the depot, a parcel addressed to the gnu sits in a locker with a code lock. The code comes from the crew's fortune clues, or a lucky find in Seagull's scraps.
+4. The parcel holds the die, but it is bent.
+5. Misdirects along the way: the scrapyard has a die that looks right but has the wrong number of teeth; Anglerfish offers a gleaming FortuneCloud die with a connector that fits nothing.
+6. Straighten the die on Penguin's bench, a hands-on physical interaction.
+7. Install it at the machine: drag the die into place and tighten it. The cutter starts stamping rounds.
+
+Each machine has six chains like this, one per puzzle type in the table below. The puzzle happens wherever it belongs in the chain: a lock at the depot, a wiring job in the workshop, a smudged manual in the archive.
+
+**Rules for dead ends and misdirects**
+
+- **They cost time, never progress.** Nothing is lost for good, no choice is permanent, and wrong parts can be put back.
+- **Fair in hindsight.** Every misdirect has a tell: the wrong tooth count, "v1" on an old manual, a date on a scrap.
+- **On theme.** Outdated docs (Seagull's old scraps, the archive's manual for an older model), lock-in (Anglerfish's parts) and knowledge nobody wrote down.
+- **Never a trap.** Red Panda's hint ladder gets anyone out of a dead end within a couple of minutes.
+- **Still approachable.** No misdirect can only be spotted with technical knowledge.
+
+**Wrong answers that lead somewhere.** A handful of puzzles, about one or two per machine, have a tempting wrong answer that sends players to the wrong place instead of simply saying "wrong".
+
+- **Each decoy comes from one believable mistake:** trusting one of Seagull's outdated scraps, misreading a cipher, following the archive's manual for the older model, or skipping a clue.
+- **Decoys lead to real places:** the harbour (Anglerfish's lock-in pitch), the scrapyard, the archive's old-manual shelf, or a drawer in the gnu's cottage.
+- **The wrong place explains the mistake** and points back toward the right path. A drawer might hold a note: "Not this one. I changed it after the flood. – G."
+
+Example: at the depot, a locker code from Seagull's scrap is out of date. The locker screen flashes "Code changed. Parcel forwarded: HARBOUR." At the harbour, Anglerfish offers a FortuneCloud die "compatible with all your old codes." The date on his forwarding slip is newer than Seagull's scrap, which is the tell: the scrap was old, so the real code has to come from the crew's fortunes.
+
+**Exploring together.** Each crew shares an inventory through the scoreboard: a part one crewmate finds appears for the whole crew, with "found by" credit. Crews naturally split up to search different places and call out across the room. Without the scoreboard, everything can still be found alone.
+
+**Where the fortunes fit.** Fortune clues still solve each machine's core logic puzzle, and they also point around town: where to look, which part is the real one, what a lock's code is.
+
+## Game feel
+
+The game should feel like a hands-on adventure, not a form. These requirements apply to every scene and every pull request, because an agent cannot play the game and will leave feel out unless it is spelled out.
+
+- **Direct manipulation.** No puzzle is played mainly through buttons or lists. Players drag, turn, pull and tap things in the scene. Items are used by dragging them from the inventory onto what they act on.
+- **Feedback on every action.** Every tap answers within a tenth of a second with a sound, an animation or both. A success gets a bigger moment: sparks, steam, a clunk, a short camera shake.
+- **A world that moves.** The player is a walking character, not a block. Characters idle and walk. Water, lanterns, gulls and steam give every place ambient motion.
+- **Scenes, not screens.** Places are walkable scenes joined by paths and doors, with a camera that follows the player. Menus are only for settings, the inventory and the clue board.
+- **Machines come alive part by part.** Each fix starts its piece moving. A fully repaired machine runs on its own, with cookies visibly moving through it.
+- **Physics where it is fun.** Cables that sag and swing in wiring puzzles, parts that tumble into bins, cookies sliding along conveyors, and the finale's line simulation.
+- **Characters talk.** Portraits with expressions, short lines, tap to continue.
+- **NES-style pixel art.** See Art and sound. Art is loaded by filename, so better art can replace placeholders without changing the gameplay.
+- **Sound everywhere.** An effect for every interaction and a quiet ambient loop per place, unlocked by a tap-to-start screen on phones.
+- **Smooth on real phones.** Aim for 60 frames per second, never below 30, on a mid-range Android and a recent iPhone, within the existing download budget.
+- **Accessibility as an option, not the default.** A text-assist mode lists interactive objects and offers button alternatives for anyone who needs them.
+- **Judged by a person.** Every gameplay pull request includes screenshots or a short capture, and Trevor plays each slice on a phone before the next one starts.
+
+## Art and sound
+
+The game looks like an NES-era top-down Zelda: pixel art on a 16×16 grid with a strict palette. Open CC0 tiles set the style, Trevor's local AI stack on the steam-machine fills the gaps, and a script turns everything into true pixel art so it all looks like one game.
+
+**The look**
+
+- **Top-down, 16×16 tiles.** Characters are 16×16 or 16×32 sprites.
+- **Room by room.** Each place is one screen; walking off an edge slides to the next. Doors lead into interiors.
+- **One strict palette** for the whole game, based on the Ninja Adventure pack, with at most 3 colours plus transparency per sprite.
+- **Chunky and readable,** with 2 to 4 animation frames per action.
+- **Inspired by, not copied.** No Link, Triforce, Zelda item sprites, fonts or map layouts. One nod is fine: Red Panda hands over the first tool with "It's dangerous to code alone."
+- **Godot does the rest:** tilemaps, palette-swap shaders for crew colours and dusk lighting, flip-screen transitions, pixel sparks and steam, an optional subtle retro-screen filter.
+
+**On a phone**
+
+- **Portrait rooms** about 11 tiles wide and taller than they are wide, scaled up by whole numbers with no smoothing. The inventory and dialogue box use the space above and below.
+- **Tap to walk** by default, with an optional on-screen D-pad.
+- **Repairs zoom in** to larger pixel-art close-ups, so hands-on puzzles still have room.
+
+**Where the art comes from**
+
+| Asset | Source | Notes |
+| --- | --- | --- |
+| Base tiles: ground, water, buildings | [Ninja Adventure pack](https://pixel-boy.itch.io/ninja-adventure-asset-pack) (CC0); Kenney 16×16 packs (CC0) | Also the style and palette reference for everything else |
+| Props, items, machine parts | Text-file sprites in the repo, or generated and pixelized | A text sprite is a grid of characters, one per pixel, turned into an image by the build |
+| The 8 characters | Generated reference, pixelized, then hand-polished in Pixelorama | Walk frames by hand; poses and expressions by editing the approved reference |
+| Dialogue portraits, machine close-ups, title screen | Generated on the steam-machine, pixelized | Where AI generation works best |
+| Concept art and mood boards | Generated | Reference only, not shipped |
+| Trailer | MiniMax H3 on the steam-machine | For SeaGL and the blog |
+
+**The generation pipeline**
+
+1. **Pinned, cleanly licensed models only:** Z-Image-Turbo and Qwen-Image-2512 for images, Qwen-Image-Edit-2511 for edits, all Apache 2.0. Newer Qwen-Image releases (2.1 and later) carry a research-only license, so no upgrades without a license check.
+2. **Generate large** on the steam-machine through ComfyUI or the pairvis media API.
+3. **Pixelize with one script,** `tools/art/pixelize.py`: shrink to the sprite grid, lock to the game palette, remove the background, add the outline. Every asset goes through it.
+4. **Consistency through edits.** One approved reference image per character; new poses and expressions are edits of that image, never fresh generations.
+5. **Hand cleanup** in Pixelorama where needed.
+6. **Finished sprites go in the repo;** raw generations stay on the steam-machine.
+
+**Sound**
+
+- **Sound effects:** classic retro blips and clunks generated by a script, with their settings committed.
+- **Music:** FamiStudio for true NES-style tracks; ACE-Step 1.5 on the steam-machine for quick drafts.
+- **Ambience:** Stable Audio 3, sparingly, where it suits the 8-bit look (Stability AI Community License; outputs are ours).
+- **No voice acting.** Text dialogue with short per-character babble beeps, as on the NES.
+
+**Provenance**
+
+- `ASSETS.md` lists every asset with its source (pack, text sprite, generated, hand-made), license and author.
+- Generated assets are labelled AI-generated, with model, prompt, seed and ComfyUI workflow file kept in `art-src/`.
+- Pixel-boy and AAA (Ninja Adventure) and Kenney are credited, even though CC0 does not require it.
+
+**Who does what**
+
+- **Cloud sessions write code.** The game loads art by filename from the asset list and shows placeholders until each real file lands, so art and code never block each other.
+- **Claude on Trevor's Mac makes art and audio** on the steam-machine and opens art pull requests. It follows the steam-machine access brief: one render at a time on the B70, and free ComfyUI's memory after a batch if the model lane needs it.
+
 ## The three machines
 
 The gnu's shop is one production line made of three machines. A cookie moves through it like this:
@@ -103,8 +233,6 @@ Rhythm puzzles are visual-first (pulsing lights, a conveyor beat), with sound an
 **Fixing things changes the world.** Each repaired part visibly changes the shop: a light comes on, a gear turns, a character gets their right fortune back.
 
 **Fixes are contributions.** Solving a part "submits a patch"; Crab, the apprentice, merges it and the player's name joins the contributors list. Non-coders learn what a pull request is without anyone explaining it.
-
-**Exploring.** A small town of five or six places (the shop, the pier, the penguins' shed, the seagulls' rooftop, the teahouse) with tap-to-move controls and side puzzles that need no clues.
 
 ## The fortune cookies
 
@@ -210,6 +338,9 @@ A failing check sends the work back to the session that wrote it; only passing c
 | `puzzles/` | Every clue as data: styled fortune text, lucky word, style, and the machine-readable fact it encodes |
 | `tools/solver/` | Python solver and clue generator |
 | `server/` | Scoreboard service and big-screen page |
+| `tools/art/` | Pixelize script, text-sprite builder, sound-effect generator |
+| `art-src/` | Prompts, seeds and ComfyUI workflow files for every generated asset |
+| `ASSETS.md` | Source, license and author of every asset |
 | `.github/workflows/` | CI checks, builds and deploys |
 
 **What CI checks on every pull request**
@@ -217,7 +348,7 @@ A failing check sends the work back to the session that wrote it; only passing c
 - For each machine: every 4 of its 6 clues gives exactly one answer; no 3 do.
 - The four approachable styles alone reach the threshold.
 - Every fortune front and back is 140 characters or fewer.
-- Lucky words are unique across all 18 fortunes.
+- Lucky words are unique across all 18 fortunes. Every decoy answer follows from its named mistake and matches no valid set of clues.
 - Godot imports headless, unit tests pass (GUT or gdUnit4), and a web export builds.
 - Size budget: the exported web build fails CI above 12 MB uncompressed, and its gzip size is reported. About 100 phones will load it at once on venue Wi-Fi.
 - A human (or reviewing agent) confirms each styled clue says what its fact says. The solver checks facts, not poems.
@@ -230,7 +361,7 @@ A failing check sends the work back to the session that wrote it; only passing c
 
 ## Cloud session plan
 
-The live build plan is `PLAN.md`: dated, dependency-ordered work packages, each with a model assignment, inputs, outputs and acceptance criteria. This section is kept only for history.
+The live build plan is `PLAN.md`: dated, dependency-ordered work packages, each with a model assignment, inputs, outputs and acceptance criteria. The two prompts under "Next sessions" below are live and are mirrored there; the original five are kept for history.
 
 ### Original session prompts (superseded by PLAN.md)
 
@@ -275,6 +406,24 @@ Read DESIGN.md, especially The finale and Technology and pipeline. In server/, b
 ```
 
 **Watch the spend:** each session draws from the credit while it works. Check remaining credit after the first round; any left after Monday can go to a second round on whatever needs the most work.
+
+### Next sessions
+
+**Rebuild: the town and one full chain (after phase 1)**
+
+The first build delivered solid plumbing (solver, fortunes, game state, scoreboard, CI) but a menu-style game layer. The next step is one focused session, not a fleet of workers, that rebuilds the player-facing layer as a vertical slice. Trevor plays it on a phone before anything else is built on it.
+
+```text
+Read DESIGN.md, especially The world, Game feel and The three machines, and game/ARCHITECTURE.md. The current game works but plays like a set of menus: the town is coloured rectangles and the puzzles are button lists. Rebuild the player-facing layer as a hands-on 2D adventure, keeping what already works underneath: puzzle data, the solver, game state, the scoreboard client and CI. Scope this pull request to a vertical slice: (1) a walkable town with the teahouse, the gnu's shop, the pier, Penguin's workshop, the parcel depot and the scrapyard as connected scenes, a walking player character and a camera that follows; (2) characters with idle animation and portrait dialogue; (3) a drag-to-use inventory shared by the crew through the existing scoreboard client; (4) the Cookie Machine as an animated contraption whose parts visibly start working as they are fixed; (5) one complete chain, the cutter die, as in the example chain, including the scrapyard and Anglerfish misdirects and the outdated-locker-code decoy that leads to the harbour, plus the batter-jar logic puzzle rebuilt as dragging jars onto the shelf. Use the NES pixel style in Art and sound: Ninja Adventure tiles for the town, and art loaded by filename from the asset list with placeholders where a file has not landed yet. Give every interaction a sound, generated in code or by a script in the repo. Meet every Game feel requirement. Keep the old screens reachable behind a debug setting until the slice replaces them. Keep all tests passing and add tests for the chain logic. Include screenshots in the pull request where possible. Open a pull request.
+```
+
+**Local art and audio session (Claude on Trevor's Mac)**
+
+Runs alongside the cloud sessions, on the normal plan rather than the credit, because only a machine on Trevor's network can reach the steam-machine. Give it the steam-machine access brief along with this prompt.
+
+```text
+Read DESIGN.md (especially Art and sound, The world and the character table) and the steam-machine access brief. You are the art and audio session for the fortune-teahouse-puzzle repo, working from Trevor's Mac with SSH access to the steam-machine. Setup: (1) get the Ninja Adventure asset pack (CC0; if it cannot be downloaded automatically, ask Trevor to download it) and choose the game palette and tile scale from it; (2) write tools/art/pixelize.py (shrink to the sprite grid, lock to the palette, remove the background, add the outline) and a build step that turns text-file sprites into PNGs; (3) rewrite docs/ART-BRIEF.md for the NES pixel style, replacing the flat sticker style, with an asset list (file name, size, frames, scene) the game code loads by filename; (4) create ASSETS.md for provenance. Then produce for review: an approved reference image for each of the 8 characters (generated with Qwen-Image-2512 or Z-Image-Turbo, pixelized, with prompt, seed and ComfyUI workflow saved in art-src/), the tiles for the town slice, and sound effects for walking, picking up, using an item, success and failure. Use only the pinned models in DESIGN.md. Follow the access brief: one render at a time on the B70, free ComfyUI memory after each batch, never edit /opt. Open one pull request per batch, and stop for Trevor's review after the character references.
+```
 
 ## Open questions and next steps
 

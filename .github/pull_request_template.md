@@ -17,3 +17,4 @@
 - [ ] No puzzle answers are printed in CI logs
 - [ ] For puzzle data changes: a human confirmed each styled clue text says what its fact says
 - [ ] Scenes and data stay plain text
+- [ ] Gameplay PRs (Phase 3 on): screenshots or a short capture attached; Game feel requirements in DESIGN.md met; old screens still reachable behind the debug setting until replaced
