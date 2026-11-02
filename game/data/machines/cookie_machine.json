@@ -11,25 +11,187 @@
       "type": "matching"
     },
     {
-      "config": {},
+      "config": {
+        "connections": {
+          "band_brown": "socket_1",
+          "band_green": "socket_5",
+          "band_orange": "socket_3",
+          "band_red": "socket_2",
+          "band_yellow": "socket_4"
+        },
+        "hints": [
+          "Each band label has a number in brackets. The band goes to the socket with that same number.",
+          "Start with the brown band. Brown is 1."
+        ],
+        "intro": "The mixer's motor controller has a faded label. Its five resistor bands stand for the numbers 1 to 5. Wire each band to the socket with the same number.",
+        "sockets": [
+          {
+            "color": "saddlebrown",
+            "id": "socket_1",
+            "label": "Socket 1 (brown)"
+          },
+          {
+            "color": "red",
+            "id": "socket_2",
+            "label": "Socket 2 (red)"
+          },
+          {
+            "color": "orange",
+            "id": "socket_3",
+            "label": "Socket 3 (orange)"
+          },
+          {
+            "color": "gold",
+            "id": "socket_4",
+            "label": "Socket 4 (yellow)"
+          },
+          {
+            "color": "green",
+            "id": "socket_5",
+            "label": "Socket 5 (green)"
+          }
+        ],
+        "terminals": [
+          {
+            "color": "red",
+            "id": "band_red",
+            "label": "Red band (2)"
+          },
+          {
+            "color": "green",
+            "id": "band_green",
+            "label": "Green band (5)"
+          },
+          {
+            "color": "saddlebrown",
+            "id": "band_brown",
+            "label": "Brown band (1)"
+          },
+          {
+            "color": "gold",
+            "id": "band_yellow",
+            "label": "Yellow band (4)"
+          },
+          {
+            "color": "orange",
+            "id": "band_orange",
+            "label": "Orange band (3)"
+          }
+        ]
+      },
       "part": "wiring",
       "title": "Mixer motor controller",
       "type": "wiring"
     },
     {
-      "config": {},
+      "config": {
+        "hints": [
+          "Ingredients go in before anything is mixed, and the batter must rest before it is pressed.",
+          "The press comes just before the rounds ride away to the Oven."
+        ],
+        "intro": "Penguin's recipe card got shuffled. Put the steps back in the order the Cookie Machine does them.",
+        "order": [
+          "dry",
+          "wet",
+          "mix",
+          "rest",
+          "press",
+          "send"
+        ],
+        "steps": [
+          {
+            "id": "press",
+            "label": "Press into thin rounds"
+          },
+          {
+            "id": "dry",
+            "label": "Measure the sugar and flour"
+          },
+          {
+            "id": "send",
+            "label": "Send the rounds to the Oven"
+          },
+          {
+            "id": "rest",
+            "label": "Let the batter rest"
+          },
+          {
+            "id": "wet",
+            "label": "Add the butter, egg and vanilla"
+          },
+          {
+            "id": "mix",
+            "label": "Mix until smooth"
+          }
+        ]
+      },
       "part": "sequence",
       "title": "Mix, rest and press",
       "type": "sequence"
     },
     {
-      "config": {},
+      "config": {
+        "bank": [
+          "thin",
+          "worst",
+          "smooth",
+          "neat",
+          "rough",
+          "thick",
+          "best",
+          "messy"
+        ],
+        "blanks": [
+          {
+            "answer": "smooth",
+            "index": 0
+          },
+          {
+            "answer": "best",
+            "index": 1
+          },
+          {
+            "answer": "thin",
+            "index": 2
+          },
+          {
+            "answer": "neat",
+            "index": 3
+          }
+        ],
+        "hints": [
+          "Say each pair of lines aloud. The last words of a pair should sound alike: rest goes with one word, beat with another.",
+          "Every blank has a word that fits. Try the rhymes first."
+        ],
+        "intro": "The gnu left a maintenance note, but some words rubbed off. Fill the gaps so each pair of lines rhymes and makes sense. The gnu liked his batter smooth and his rounds thin.",
+        "lines": [
+          "Stir it {0}, then let it rest,",
+          "A quiet batter bakes the {1}.",
+          "Press it {2} and keep the beat,",
+          "Then the rounds roll out {3}."
+        ]
+      },
       "part": "word",
       "title": "The gnu's rhyming note",
       "type": "word"
     },
     {
-      "config": {},
+      "config": {
+        "bpm": 80,
+        "hints": [
+          "Watch the light. Tap Press only while it glows, and let the dim beats go by.",
+          "The beat is a little slower now. Take your time."
+        ],
+        "intro": "The press has to thump with the conveyor. Watch the light and press with it.",
+        "pattern": [
+          1,
+          0,
+          1,
+          1
+        ],
+        "required": 6,
+        "tolerance_ms": 180
+      },
       "part": "rhythm",
       "title": "Press and conveyor beat",
       "type": "rhythm"
