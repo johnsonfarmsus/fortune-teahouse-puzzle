@@ -15,9 +15,11 @@ func _ready() -> void:
 		set_store(local)
 	else:
 		set_store(RemoteProgressStore.new(url, local))
-	# Tell the store who this device is (idempotent).
-	store.set_display_name(GameState.device_id, GameState.display_name)
-	if GameState.crew != "":
+	# Tell the store who this device is, only when that is news to it, so a
+	# remote store does not queue the same writes at every boot.
+	if GameState.display_name != "" and local.names.get(GameState.device_id, "") != GameState.display_name:
+		store.set_display_name(GameState.device_id, GameState.display_name)
+	if GameState.crew != "" and local.crews.get(GameState.device_id, "") != GameState.crew:
 		store.join_crew(GameState.device_id, GameState.crew)
 
 
@@ -29,11 +31,11 @@ func set_store(new_store: ProgressStore) -> void:
 	_snapshot()
 
 
-## "Reset this device": forget local progress and start fresh.
+## "Reset this device": the active store forgets this device's local progress
+## (a remote store resets its local part and keeps being the remote store).
 func reset() -> void:
-	var fresh := LocalProgressStore.new()
-	fresh.clear()
-	set_store(fresh)
+	store.reset_local()
+	_snapshot()
 	for machine in Ids.MACHINES:
 		Events.progress_changed.emit(machine)
 

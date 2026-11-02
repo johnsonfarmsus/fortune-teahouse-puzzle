@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 extends CanvasLayer
-## The first screen. The first press on "Tap to start" is the gesture browsers
+## The first screen. The first tap on "Tap to start" (released, since iOS unlocks audio on touchend) is the gesture browsers
 ## need before they allow sound.
 
 signal started
@@ -9,4 +9,4 @@ signal started
 
 
 func _ready() -> void:
-	_button.button_down.connect(func() -> void: started.emit())
+	_button.pressed.connect(func() -> void: started.emit())

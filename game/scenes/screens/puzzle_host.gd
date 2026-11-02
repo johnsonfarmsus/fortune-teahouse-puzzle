@@ -9,6 +9,7 @@ var part: String = ""
 var puzzle: PuzzleBase
 
 var _hint_button: Button
+var _confirm_row: HBoxContainer
 var _hint_label: Label
 var _slot: Control
 var _title: String = ""
@@ -28,11 +29,21 @@ func _screen_title() -> String:
 
 func _build(box: VBoxContainer) -> void:
 	_hint_button = UiKit.button("Hint", Vector2(80, 48))
-	_hint_button.pressed.connect(func() -> void: puzzle.request_hint())
+	_hint_button.pressed.connect(_on_hint_pressed)
 	header.add_child(_hint_button)
 	_hint_label = UiKit.label("", 18)
 	_hint_label.visible = false
 	box.add_child(_hint_label)
+	_confirm_row = HBoxContainer.new()
+	_confirm_row.visible = false
+	_confirm_row.add_theme_constant_override("separation", 8)
+	var sure := UiKit.button("Reveal", Vector2(120, 48))
+	sure.pressed.connect(_on_reveal_confirmed)
+	var keep := UiKit.button("Keep trying", Vector2(140, 48))
+	keep.pressed.connect(func() -> void: _hide_confirm())
+	_confirm_row.add_child(sure)
+	_confirm_row.add_child(keep)
+	box.add_child(_confirm_row)
 	_slot = Control.new()
 	_slot.name = "PuzzleSlot"
 	_slot.size_flags_vertical = Control.SIZE_EXPAND_FILL
@@ -45,6 +56,9 @@ func _build(box: VBoxContainer) -> void:
 	var scene: PackedScene = load(Paths.puzzle_scene(str(def.get("type", ""))))
 	puzzle = scene.instantiate() as PuzzleBase
 	puzzle.puzzle_id = "%s/%s" % [machine, part]
+	# A returning player starts the ladder again, so the first tap is a nudge.
+	if not GameState.player.is_part_credited(machine, part):
+		Hints.reset(puzzle.puzzle_id)
 	puzzle.machine = machine
 	puzzle.part = part
 	puzzle.configure(config)
@@ -60,6 +74,28 @@ func _on_back() -> void:
 		puzzle.quit()
 	else:
 		Router.pop()
+
+
+func _on_hint_pressed() -> void:
+	if puzzle.next_hint_level() >= HintLadder.MAX_LEVEL:
+		_hint_label.visible = true
+		_hint_label.text = "Reveal the answer? You will not get credit."
+		_confirm_row.visible = true
+		_hint_button.disabled = true
+	else:
+		puzzle.request_hint()
+
+
+func _on_reveal_confirmed() -> void:
+	_hide_confirm()
+	puzzle.request_hint()
+
+
+func _hide_confirm() -> void:
+	_confirm_row.visible = false
+	_hint_button.disabled = false
+	_hint_label.text = ""
+	_hint_label.visible = false
 
 
 func _on_hint_requested(level: int) -> void:

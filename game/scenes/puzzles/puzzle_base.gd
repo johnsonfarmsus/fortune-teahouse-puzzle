@@ -32,6 +32,13 @@ func reveal() -> void:
 	pass
 
 
+## The level the next request_hint() will reach, without advancing the ladder.
+## PuzzleHost uses it to ask for confirmation before level 3 (the reveal).
+func next_hint_level() -> int:
+	var cap := HintLadder.MAX_LEVEL if can_reveal() else HintLadder.MAX_LEVEL_WITHOUT_REVEAL
+	return mini(Hints.level(puzzle_id) + 1, cap)
+
+
 func request_hint() -> void:
 	var level := Hints.advance(puzzle_id, can_reveal())
 	hint_requested.emit(level)

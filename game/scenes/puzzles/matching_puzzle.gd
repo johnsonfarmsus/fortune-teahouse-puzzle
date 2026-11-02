@@ -72,10 +72,15 @@ func configure(config: Dictionary) -> void:
 
 
 func _ready() -> void:
+	# The whole body scrolls, so nothing is cut off on a 390x844 viewport.
+	var body := ScrollContainer.new()
+	body.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	body.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	add_child(body)
 	var box := VBoxContainer.new()
-	box.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	box.add_theme_constant_override("separation", 6)
-	add_child(box)
+	body.add_child(box)
 	var noun := str(_domain.get("position_noun", "place"))
 	var item_noun := str(_domain.get("item_noun", ""))
 	if item_noun == "":
@@ -123,15 +128,11 @@ func _ready() -> void:
 	box.add_child(UiKit.label("Clues: %d of %d (%d needed)" % [_clues.size(), _total_clues, _threshold], 20))
 	if _clues.is_empty():
 		box.add_child(UiKit.label("Find your crewmates and enter their lucky words at the Teahouse.", UiKit.CLUE_SIZE))
-	var scroll := ScrollContainer.new()
-	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	scroll.custom_minimum_size = Vector2(0, 100)
-	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	box.add_child(scroll)
 	var list := VBoxContainer.new()
 	list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	list.custom_minimum_size = Vector2(0, 0)
 	list.add_theme_constant_override("separation", 6)
-	scroll.add_child(list)
+	box.add_child(list)
 	for clue: Dictionary in _clues:
 		var card: ClueCard = load(Paths.CLUE_CARD).instantiate()
 		card.setup(clue)

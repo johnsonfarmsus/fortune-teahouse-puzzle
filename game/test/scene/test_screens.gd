@@ -134,19 +134,51 @@ func test_merge_celebration_screens() -> void:
 		Router.pop()
 
 
-func test_merge_celebration_asks_for_a_name_once() -> void:
-	var screen := Router.push(Paths.MERGE_CELEBRATION, {"machine": MACHINE, "part": "logic", "credited": true})
+func _button_with_text(root: Node, text: String) -> Button:
+	for node in root.find_children("*", "Button", true, false):
+		if (node as Button).text == text:
+			return node
+	return null
+
+
+func _merge_screen(credited: bool = true) -> ScreenBase:
+	var screen := Router.push(Paths.MERGE_CELEBRATION, {"machine": MACHINE, "part": "logic", "credited": credited})
 	await get_tree().process_frame
 	screen.skip()
-	var buttons := screen.find_children("*", "Button", true, false)
-	var anon: Button
-	for node in buttons:
-		if (node as Button).text == "Stay anonymous":
-			anon = node
+	return screen
+
+
+func test_merge_celebration_asks_for_a_name_once() -> void:
+	var screen := await _merge_screen()
+	var anon := _button_with_text(screen, "Stay anonymous")
 	assert_object(anon).is_not_null()
 	anon.pressed.emit()
 	assert_bool(GameState.name_asked).is_true()
 	assert_str(GameState.display_name).is_empty()
+	Router.pop()
+	# A second credited solve does not ask again.
+	var second := await _merge_screen()
+	assert_object(_button_with_text(second, "Stay anonymous")).is_null()
+	assert_object(_button_with_text(second, "Add my name")).is_null()
+	assert_object(_button_with_text(second, "Continue")).is_not_null()
+
+
+func test_merge_celebration_add_my_name() -> void:
+	var screen := await _merge_screen()
+	var keypad := screen.find_children("*", "LetterKeypad", true, false)[0] as LetterKeypad
+	for ch in "TUX":
+		keypad.type_char(ch)
+	_button_with_text(screen, "Add my name").pressed.emit()
+	assert_bool(GameState.name_asked).is_true()
+	assert_str(GameState.display_name).is_equal("TUX")
+	assert_object(_button_with_text(screen, "Continue")).is_not_null()
+	assert_object(_button_with_text(screen, "Add my name")).is_null()
+
+
+func test_uncredited_merge_never_asks_for_a_name() -> void:
+	var screen := await _merge_screen(false)
+	assert_object(_button_with_text(screen, "Stay anonymous")).is_null()
+	assert_bool(GameState.name_asked).is_false()
 
 
 # --- World --------------------------------------------------------------------
@@ -364,3 +396,59 @@ func test_machine_view_counts_parts() -> void:
 	for part in Ids.PARTS:
 		Progress.store.record_part_solved(MACHINE, part, GameState.device_id, true)
 	assert_str(summary.text).is_equal("Running!")
+
+
+func test_host_restarts_the_ladder_for_an_uncredited_part() -> void:
+	GameState.player.hint_levels["cookie_machine/logic"] = 2
+	var host := Router.push(Paths.PUZZLE_HOST, {"machine": MACHINE, "part": "logic"})
+	await get_tree().process_frame
+	assert_int(Hints.level("cookie_machine/logic")).is_equal(0)
+	Router.pop()
+	GameState.mark_solved(MACHINE, "logic", true)
+	GameState.player.hint_levels["cookie_machine/logic"] = 2
+	Router.push(Paths.PUZZLE_HOST, {"machine": MACHINE, "part": "logic"})
+	await get_tree().process_frame
+	assert_int(Hints.level("cookie_machine/logic")).is_equal(2)
+
+
+func test_host_asks_before_revealing() -> void:
+	for id: String in _all_clue_ids(MACHINE):
+		GameState.player.collected_clue_ids.append(id)
+	var host := Router.push(Paths.PUZZLE_HOST, {"machine": MACHINE, "part": "logic"})
+	await get_tree().process_frame
+	var hint := _button_with_text(host, "Hint")
+	hint.pressed.emit()
+	hint.pressed.emit()
+	assert_int(Hints.level("cookie_machine/logic")).is_equal(2)
+	hint.pressed.emit()
+	# Level 3 waits for a confirmation.
+	assert_int(Hints.level("cookie_machine/logic")).is_equal(2)
+	assert_int(Router.depth()).is_equal(1)
+	assert_str(host._hint_label.text).is_equal("Reveal the answer? You will not get credit.")
+	_button_with_text(host, "Keep trying").pressed.emit()
+	assert_int(Hints.level("cookie_machine/logic")).is_equal(2)
+	assert_bool(hint.disabled).is_false()
+	hint.pressed.emit()
+	_button_with_text(host, "Reveal").pressed.emit()
+	await get_tree().process_frame
+	assert_str(Router.top().scene_file_path).is_equal(Paths.MERGE_CELEBRATION)
+	assert_bool(GameState.player.is_part_solved(MACHINE, "logic")).is_true()
+	assert_bool(GameState.player.is_part_credited(MACHINE, "logic")).is_false()
+
+
+func test_helper_hint_two_is_honest_when_nothing_is_crossed_off() -> void:
+	var puzzle := _helper()
+	assert_str(puzzle.get_hint_text(2)).not_contains("crossed")
+	puzzle.request_hint()
+	puzzle.request_hint()
+	assert_str(puzzle.get_hint_text(2)).contains("crossed")
+
+
+func test_reset_keeps_a_remote_store_remote() -> void:
+	var local := LocalProgressStore.new(PROGRESS_PATH)
+	Progress.set_store(RemoteProgressStore.new("https://example.invalid", local))
+	Progress.store.record_part_solved(MACHINE, "logic", GameState.device_id, true)
+	Progress.reset()
+	assert_bool(Progress.store is RemoteProgressStore).is_true()
+	assert_int(Progress.store.get_crew_progress(MACHINE)["logic"]).is_equal(0)
+	assert_int((Progress.store as RemoteProgressStore).flush()).is_equal(0)

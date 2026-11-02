@@ -32,6 +32,12 @@ func get_contributors(_machine: String) -> Array[String]:
 	return []
 
 
+## Forgets this device's local progress ("Reset this device"). A remote store
+## resets the local part it wraps and drops writes it has not sent.
+func reset_local() -> void:
+	pass
+
+
 func is_online() -> bool:
 	return false
 

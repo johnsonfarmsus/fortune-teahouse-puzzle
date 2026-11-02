@@ -15,6 +15,7 @@ var _nudge: String = ""
 
 var _line_index: int = 0
 var _removed: Array[int] = []
+var _crossed_off_now: bool = false
 var _line_label: Label
 var _next_button: Button
 var _question_box: VBoxContainer
@@ -99,7 +100,9 @@ func remaining_choices() -> int:
 func get_hint_text(level: int) -> String:
 	if level == 1:
 		return _nudge
-	return "%s crossed one wrong answer off for you." % _speaker
+	if _crossed_off_now:
+		return "%s crossed one wrong answer off for you." % _speaker
+	return "Only two answers are left. Think about what %s said." % _speaker
 
 
 func reveal() -> void:
@@ -119,6 +122,7 @@ func _show_line() -> void:
 func _on_hint_requested(level: int) -> void:
 	if level != 2:
 		return
+	_crossed_off_now = false
 	# Cross off one wrong choice, always leaving the right one and one wrong.
 	if remaining_choices() <= 2:
 		return
@@ -127,4 +131,5 @@ func _on_hint_requested(level: int) -> void:
 			_removed.append(i)
 			_choice_buttons[i].disabled = true
 			_choice_buttons[i].text = "(crossed off)"
+			_crossed_off_now = true
 			return

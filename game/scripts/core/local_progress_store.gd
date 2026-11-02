@@ -63,7 +63,11 @@ func get_contributors(machine: String) -> Array[String]:
 	return out
 
 
-## Forgets everything on this device (used by "Reset this device").
+func reset_local() -> void:
+	clear()
+
+
+## Forgets everything on this device.
 func clear() -> void:
 	names = {}
 	crews = {}

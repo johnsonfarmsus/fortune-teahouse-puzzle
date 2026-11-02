@@ -40,6 +40,11 @@ func get_contributors(machine: String) -> Array[String]:
 	return local.get_contributors(machine)
 
 
+func reset_local() -> void:
+	queue.clear()
+	local.reset_local()
+
+
 func is_online() -> bool:
 	return false
 
