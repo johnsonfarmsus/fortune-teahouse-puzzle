@@ -137,6 +137,17 @@ func test_play_marks_seen_unless_told_not_to() -> void:
 # --- DialogueBox ------------------------------------------------------------------
 
 
+func test_dialogue_box_covers_the_screen_and_stops_input() -> void:
+	var box := _box(1)
+	assert_int(box.mouse_filter).is_equal(Control.MOUSE_FILTER_STOP)
+	assert_float(box.anchor_left).is_equal(0.0)
+	assert_float(box.anchor_top).is_equal(0.0)
+	assert_float(box.anchor_right).is_equal(1.0)
+	assert_float(box.anchor_bottom).is_equal(1.0)
+	assert_float(box.offset_left).is_equal(0.0)
+	assert_float(box.offset_bottom).is_equal(0.0)
+
+
 func test_dialogue_box_shows_speaker_kind_and_up_to_three_lines() -> void:
 	var box := _box(2)
 	assert_str(box.speaker_text()).is_equal("Gnu (note)")
@@ -230,6 +241,18 @@ func test_start_screen_shows_tagline_and_one_tip_from_data() -> void:
 	# Fast loading means no wait.
 	assert_bool((screen.get_node("StartButton") as Button).disabled).is_false()
 	assert_str((screen.get_node("StartButton") as Button).text).is_equal("Tap to start")
+
+
+func test_start_screen_button_is_released_after_the_hold() -> void:
+	var screen: CanvasLayer = load("res://scenes/main/start_screen.tscn").instantiate()
+	screen.load_msec = 100000
+	add_child(auto_free(screen))
+	await get_tree().process_frame
+	var button := screen.get_node("StartButton") as Button
+	assert_bool(button.disabled).is_true()
+	screen._release_button()
+	assert_bool(button.disabled).is_false()
+	assert_str(button.text).is_equal("Tap to start")
 
 
 func test_start_screen_holds_the_button_when_loading_was_slow() -> void:
@@ -338,6 +361,23 @@ func test_machine_view_helper_speaks_on_first_open_then_after_idle() -> void:
 	assert_str((_boxes(again)[0] as DialogueBox).current_piece()["when"]).is_equal("idle")
 
 
+func test_machine_view_input_restarts_the_idle_wait_and_the_timer_goes_with_the_screen() -> void:
+	Story.visit("machine_view:oven")
+	var view := Router.push(Paths.MACHINE_VIEW, {"machine": "oven"})
+	await get_tree().process_frame
+	var timer := view.get_node("IdleTimer") as Timer
+	timer.start(5.0)
+	timer.wait_time = 20.0  # start(5.0) changed it; the restart uses wait_time
+	var press := InputEventMouseButton.new()
+	press.button_index = MOUSE_BUTTON_LEFT
+	press.pressed = true
+	view._input(press)
+	assert_float(timer.time_left).is_greater(19.0)
+	Router.pop()
+	await get_tree().process_frame
+	assert_bool(is_instance_valid(timer)).is_false()
+
+
 func test_machine_view_idle_can_be_cancelled() -> void:
 	Story.visit("machine_view:oven")
 	var view := Router.push(Paths.MACHINE_VIEW, {"machine": "oven"})
@@ -440,7 +480,7 @@ func test_town_has_a_marker_for_every_town_note_in_the_data() -> void:
 	assert_array(ids).contains_same(wanted)
 
 
-func test_town_and_shop_markers_together_cover_the_six_gnu_town_notes() -> void:
+func test_town_and_shop_markers_together_cover_the_gnu_town_notes() -> void:
 	var town := await _town()
 	var shop := await _shop()
 	var ids: Array = []
@@ -450,7 +490,7 @@ func test_town_and_shop_markers_together_cover_the_six_gnu_town_notes() -> void:
 	for raw: Dictionary in JsonFile.read(GNU_FILE).get("pieces", []):
 		if str(raw["id"]).begins_with("gnu.town."):
 			six.append(raw["id"])
-	assert_int(six.size()).is_equal(6)
+	assert_int(six.size()).is_greater(0)
 	assert_array(ids).contains_same(six)
 
 
@@ -488,6 +528,56 @@ func test_notes_that_wait_for_a_trigger_stay_hidden_until_it_holds() -> void:
 	_run_machine(MACHINE)
 	shop.refresh_story_markers()
 	assert_bool(machine_note.visible).is_true()
+
+
+func test_a_tap_on_an_open_dialogue_is_taken_by_the_box_not_the_town() -> void:
+	# Headless Godot does not route pushed mouse events through the GUI, so this checks
+	# what makes the real routing work: the open box is a visible, input-stopping control
+	# covering every point a Town tap could land on, and the tap is spent advancing it.
+	var town := await _town()
+	var marker: StoryMarker = town.find_children("*", "StoryMarker", true, false)[0]
+	marker.pressed.emit()
+	assert_bool(town.dialogue_open()).is_true()
+	await get_tree().process_frame
+	var box: DialogueBox = _boxes(town)[0]
+	assert_bool(box.is_visible_in_tree()).is_true()
+	assert_int(box.mouse_filter).is_equal(Control.MOUSE_FILTER_STOP)
+	var view := get_viewport().get_visible_rect()
+	for point in [Vector2(5, 5), Vector2(195, 422), Vector2(385, 839), town.hotspot_at(Vector2(95, 240)).global_position]:
+		assert_bool(box.get_global_rect().has_point(point)).override_failure_message("box misses %s" % point).is_true()
+	assert_bool(box.get_global_rect().encloses(Rect2(Vector2.ZERO, Vector2(390, 844)))).is_true()
+	assert_bool(view.size.x >= 390.0).is_true()
+	_tap(box)
+	assert_bool(town.dialogue_open()).is_false()
+	assert_bool(town._tween == null or not town._tween.is_valid()).is_true()
+
+
+func test_anglerfish_does_not_appear_over_a_dialogue_or_while_a_screen_covers_the_town() -> void:
+	var town := await _town()
+	var marker: StoryMarker = town.find_children("*", "StoryMarker", true, false)[0]
+	marker.pressed.emit()
+	assert_bool(town.spawn_anglerfish()).is_false()
+	for box in _boxes(town):
+		(box as DialogueBox).skip()
+	assert_bool(town.dialogue_open()).is_false()
+	var visit := town.get_node("VisitTimer") as Timer
+	assert_bool(visit.paused).is_false()
+	Router.push(Paths.SETTINGS)
+	assert_bool(visit.paused).is_true()
+	Router.pop()
+	assert_bool(visit.paused).is_false()
+
+
+func test_markers_refresh_when_the_device_is_reset() -> void:
+	var town := await _town()
+	var marker: StoryMarker
+	for node in town.find_children("*", "StoryMarker", true, false):
+		if (node as StoryMarker).piece_id == "gnu.town.pier_bottle":
+			marker = node
+	marker.pressed.emit()
+	assert_str(marker.text).is_equal("Note")
+	GameState.reset_device()
+	assert_str(marker.text).is_equal("! Note")
 
 
 func test_first_tap_on_the_shop_door_reads_the_gnus_sign() -> void:

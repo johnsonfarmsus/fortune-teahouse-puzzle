@@ -65,6 +65,7 @@ func add_story_markers(place: String, positions: Dictionary) -> void:
 		story_markers.append(marker)
 		index += 1
 	Events.machine_running.connect(_on_machine_running)
+	Events.crew_changed.connect(_on_machine_running)  # also fires on reset_device
 	Story.flags_changed.connect(refresh_story_markers)
 
 

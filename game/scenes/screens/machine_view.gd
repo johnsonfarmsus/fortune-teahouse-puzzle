@@ -88,6 +88,7 @@ func _on_idle() -> void:
 func _helper_speaks() -> void:
 	var line := Story.pick("machine_view:" + machine, "idle")
 	if line.is_empty():
+		_idle_timer.start()
 		return
 	var box := Story.play(self, [line], false)
 	box.finished.connect(_idle_timer.start)

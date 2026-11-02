@@ -34,7 +34,10 @@ func _ready() -> void:
 	add_story_markers("town", NOTE_POSITIONS)
 	_build_anglerfish()
 	Story.flags_changed.connect(_on_flags_changed)
+	Events.crew_changed.connect(_on_crew_changed)
+	Router.stack_changed.connect(_on_stack_changed)
 	_on_flags_changed()
+	_on_stack_changed(Router.depth())
 
 
 func _on_hotspot_hit(hotspot: Hotspot) -> void:
@@ -120,10 +123,29 @@ func anglerfish_gone() -> bool:
 	return Story.is_seen("anglerfish.farewell")
 
 
+## True while a DialogueBox is showing in this town.
+func dialogue_open() -> bool:
+	for box in find_children("*", "DialogueBox", true, false):
+		if not (box as DialogueBox).is_done():
+			return true
+	return false
+
+
+## The visit clock stands still while a screen covers the town and resumes on return.
+func _on_stack_changed(depth: int) -> void:
+	_visit_timer.paused = depth > 0
+	_leave_timer.paused = depth > 0
+
+
+## A reset (or any crew change) can change which notes and farewell apply.
+func _on_crew_changed(_machine: String) -> void:
+	_on_flags_changed()
+
+
 ## Shows the next `interval` bit for ANGLER_STAYS seconds. Returns false (and
 ## does nothing) when the Anglerfish is gone, already here, or a screen is open.
 func spawn_anglerfish() -> bool:
-	if anglerfish_gone() or anglerfish.visible or Router.depth() > 0:
+	if anglerfish_gone() or anglerfish.visible or Router.depth() > 0 or dialogue_open():
 		return false
 	var bits := Story.pieces_for("town", "interval")
 	if bits.is_empty():
