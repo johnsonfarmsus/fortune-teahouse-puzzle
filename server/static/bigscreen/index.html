@@ -1,0 +1,103 @@
+<!-- SPDX-License-Identifier: AGPL-3.0-or-later -->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fortune Teahouse Scoreboard</title>
+<style>
+  :root {
+    --bg: #12100e; --panel: #1f1b17; --line: #3a322a; --text: #f6efe3; --dim: #b9ab96;
+    --gold: #ffc94a; --ok: #6fe39b; --warn: #ff9f6b; --off: #4a4036;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--bg); color: var(--text); }
+  body { font-family: system-ui, "Segoe UI", Roboto, sans-serif; font-size: 2vw; line-height: 1.25;
+         min-height: 100vh; display: flex; flex-direction: column; padding: 1.5vw 2.5vw; gap: 1.6vw; }
+  h1 { font-size: 4vw; margin: 0; color: var(--gold); letter-spacing: .02em; }
+  h2 { font-size: 2.6vw; margin: 0 0 .6vw; }
+  header { display: flex; justify-content: space-between; align-items: baseline; gap: 2vw; flex-wrap: wrap; }
+  #banner { font-size: 2.6vw; font-weight: 700; padding: .3em .8em; border-radius: 999px;
+            border: .25vw solid var(--line); color: var(--dim); }
+  #banner.open { color: var(--bg); background: var(--ok); border-color: var(--ok); }
+  #banner.started { color: var(--bg); background: var(--gold); border-color: var(--gold); }
+  .machines { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.6vw; }
+  .card { background: var(--panel); border: .2vw solid var(--line); border-radius: 1.2vw; padding: 1.4vw; }
+  .card.runs { border-color: var(--ok); }
+  .card h2 { display: flex; justify-content: space-between; align-items: baseline; gap: 1vw; }
+  .status { font-size: 1.9vw; color: var(--dim); }
+  .card.runs .status { color: var(--ok); font-weight: 700; }
+  .parts { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: 1fr 1fr; gap: .7vw 1.2vw; }
+  .part { display: flex; align-items: center; gap: .8vw; color: var(--dim); }
+  .light { flex: none; width: 2.6vw; height: 2.6vw; border-radius: 50%; border: .25vw solid var(--off);
+           display: grid; place-items: center; font-weight: 800; color: transparent; }
+  .part.on { color: var(--text); }
+  .part.on .light { background: var(--ok); border-color: var(--ok); color: var(--bg); box-shadow: 0 0 1.2vw var(--ok); }
+  .part .n { margin-left: auto; font-variant-numeric: tabular-nums; color: var(--dim); }
+  .finale { display: grid; grid-template-columns: 2fr 1fr; gap: 1.6vw; }
+  .handoff { margin-bottom: 1vw; }
+  .handoff .row { display: flex; justify-content: space-between; gap: 1vw; }
+  .bar { height: 2.2vw; background: var(--off); border-radius: 1.1vw; overflow: hidden; margin-top: .3vw; }
+  .bar > div { height: 100%; background: var(--gold); width: 0; transition: width .6s; }
+  .handoff.connected .bar > div { background: var(--ok); }
+  .handoff .st { color: var(--dim); }
+  .handoff.connected .st { color: var(--ok); font-weight: 700; }
+  .handoff.waiting .st, .handoff.locked .st { color: var(--warn); }
+  .big { font-size: 7vw; font-weight: 800; color: var(--gold); font-variant-numeric: tabular-nums; }
+  .pips { display: flex; flex-wrap: wrap; gap: .5vw; margin-top: .8vw; }
+  .pip { width: 1.8vw; height: 1.8vw; border-radius: 50%; border: .2vw solid var(--off); }
+  .pip.on { background: var(--gold); border-color: var(--gold); }
+  .ticker { overflow: hidden; white-space: nowrap; border-top: .2vw solid var(--line);
+            border-bottom: .2vw solid var(--line); padding: .7vw 0; }
+  .ticker .track { display: inline-block; padding-left: 100%; animation: scroll var(--dur, 60s) linear infinite; }
+  .ticker span.who { margin-right: 3vw; }
+  .ticker b { color: var(--gold); }
+  @keyframes scroll { to { transform: translateX(-100%); } }
+  @media (prefers-reduced-motion: reduce) {
+    .ticker { white-space: normal; }
+    .ticker .track { animation: none; padding-left: 0; }
+  }
+  footer { margin-top: auto; font-size: 1.4vw; color: var(--dim); display: flex; justify-content: space-between;
+           gap: 2vw; flex-wrap: wrap; }
+  footer a { color: var(--gold); }
+  #conn { color: var(--warn); font-weight: 700; }
+  @media (max-width: 800px) {
+    body { font-size: 16px; } h1 { font-size: 28px; } h2 { font-size: 22px; } #banner { font-size: 18px; }
+    .machines, .finale { grid-template-columns: 1fr; } .status { font-size: 16px; }
+    .light { width: 22px; height: 22px; } .bar { height: 16px; } .big { font-size: 48px; }
+    .pip { width: 14px; height: 14px; } footer { font-size: 14px; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>The Fortune Teahouse</h1>
+  <div id="banner">Connecting&hellip;</div>
+</header>
+
+<section class="machines" id="machines" aria-label="Machines"></section>
+
+<section class="finale" aria-label="Finale">
+  <div class="card">
+    <h2>The line: handoffs</h2>
+    <div id="handoffs"></div>
+  </div>
+  <div class="card">
+    <h2>The gnu's notes</h2>
+    <div class="big" id="notes">-</div>
+    <div id="notes-sub" class="status"></div>
+    <div class="pips" id="pips"></div>
+  </div>
+</section>
+
+<section class="ticker" aria-label="Contributors"><div class="track" id="ticker"></div></section>
+
+<footer>
+  <span>This scoreboard is free software (AGPL-3.0-or-later).
+    <a id="repo" href="{{REPO_URL}}">Source code</a></span>
+  <span><span id="conn"></span> <span id="updated"></span></span>
+</footer>
+
+<script src="bigscreen.js"></script>
+</body>
+</html>
