@@ -6,6 +6,7 @@ schema_version: 1
 machine:
   id: sample_cookie_machine
   name: Cookie Machine (DESIGN.md sample)
+  puzzle_title: Batter recipe
 domain:
   item_noun: ingredient
   position_noun: jar

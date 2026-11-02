@@ -46,6 +46,8 @@ class Machine:
     answer: dict[str, int]
     clues: list[Clue]
     errors: list[str] = field(default_factory=list)
+    puzzle_title: str = ""
+    position_noun: str = ""
 
     @property
     def domain(self) -> Domain:
@@ -93,6 +95,7 @@ def load_machine(path: Path) -> Machine:
     meta = _get(data, "machine", dict, errors, "") or {}
     mid = _get(meta, "id", str, errors, "machine") or path.stem
     name = _get(meta, "name", str, errors, "machine") or mid
+    puzzle_title = _get(meta, "puzzle_title", str, errors, "machine") or ""
     if not ID_RE.match(mid):
         errors.append("machine.id: must be lowercase letters, digits and underscores")
 
@@ -175,7 +178,18 @@ def load_machine(path: Path) -> Machine:
         )
     if len({c.id for c in clues}) != len(clues):
         errors.append("clues: ids must be unique")
-    return Machine(path, mid, name, items, positions, answer, clues, errors)
+    return Machine(
+        path,
+        mid,
+        name,
+        items,
+        positions,
+        answer,
+        clues,
+        errors,
+        puzzle_title=puzzle_title,
+        position_noun=domain.get("position_noun", "") if isinstance(domain.get("position_noun"), str) else "",
+    )
 
 
 def load_backs(path: Path) -> Backs:

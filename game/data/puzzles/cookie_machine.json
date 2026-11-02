@@ -1,0 +1,114 @@
+{
+  "answer": {
+    "butter": 1,
+    "egg": 4,
+    "flour": 2,
+    "sugar": 5,
+    "vanilla": 3
+  },
+  "clues": [
+    {
+      "approachable": true,
+      "fact": {
+        "a": "flour",
+        "b": "butter",
+        "kind": "offset",
+        "value": 1
+      },
+      "fortune_text": "Where butter is kept, look one jar to the right: there the flour sits waiting, powdery white.",
+      "id": "cookie_machine.poem",
+      "lucky_word": "SPRINKLE",
+      "nudge": "Read past the rhyme. The couplet names two ingredients and a direction: start at the first one's jar and move the way it says.",
+      "style": "poem"
+    },
+    {
+      "approachable": true,
+      "fact": {
+        "a": "egg",
+        "b": "sugar",
+        "kind": "offset",
+        "value": -1
+      },
+      "fortune_text": "Penguin dads keep the egg close all winter. So does sugar: the egg sits one jar left of sugar.",
+      "id": "cookie_machine.animal",
+      "lucky_word": "HUDDLE",
+      "nudge": "The penguin is only a picture. The second sentence is the instruction: it names two ingredients and which side of one the other is on.",
+      "style": "animal"
+    },
+    {
+      "approachable": true,
+      "fact": {
+        "a": "butter",
+        "kind": "position",
+        "value": 1
+      },
+      "fortune_text": "Which version of the GNU GPL came out in 1989? Butter goes in the jar with that number.",
+      "id": "cookie_machine.trivia",
+      "lucky_word": "TUX",
+      "nudge": "Look up when each version of the GNU General Public License was published. The version number is a jar number.",
+      "style": "trivia"
+    },
+    {
+      "approachable": true,
+      "fact": {
+        "a": "sugar",
+        "kind": "position",
+        "value": 5
+      },
+      "fortune_text": "On a jar lid, in the gnu's ROT13: Fhtne vf va wne svir.",
+      "id": "cookie_machine.security",
+      "lucky_word": "CIPHER",
+      "nudge": "ROT13 swaps every letter with the one 13 places along the alphabet: A and N swap, B and O swap, and so on. Swap each letter of the scrambled words.",
+      "style": "security"
+    },
+    {
+      "approachable": false,
+      "fact": {
+        "a": "flour",
+        "b": "vanilla",
+        "kind": "offset",
+        "value": -1
+      },
+      "fortune_text": "assert jar[\"flour\"] == jar[\"vanilla\"] - 1  # jar 1 is on the left",
+      "id": "cookie_machine.code",
+      "lucky_word": "PATCH",
+      "nudge": "jar[\"x\"] means the number of the jar that holds x. An assert is a line that must be true, so read it as plain arithmetic about two jar numbers.",
+      "style": "code"
+    },
+    {
+      "approachable": false,
+      "fact": {
+        "a": "vanilla",
+        "b": "egg",
+        "kind": "offset",
+        "value": -1
+      },
+      "fortune_text": "Wire the jars like a pin header, pin 1 on the left: vanilla's pin is just left of egg's pin.",
+      "id": "cookie_machine.hardware",
+      "lucky_word": "SOLDER",
+      "nudge": "The pins on a header sit in one row, numbered in order, so a pin's neighbours are one number lower and one higher. Here each pin number is a jar number.",
+      "style": "hardware"
+    }
+  ],
+  "domain": {
+    "items": [
+      "sugar",
+      "flour",
+      "butter",
+      "vanilla",
+      "egg"
+    ],
+    "position_noun": "jar",
+    "positions": [
+      "Jar 1",
+      "Jar 2",
+      "Jar 3",
+      "Jar 4",
+      "Jar 5"
+    ]
+  },
+  "machine": "cookie_machine",
+  "puzzle_title": "Batter recipe",
+  "schema_version": 1,
+  "title": "Cookie Machine"
+}

@@ -105,6 +105,9 @@ PYTHONPATH=tools python -m solver report puzzles/ --json report.json  # full ans
 python -m unittest discover -s tools/solver/tests -t tools            # tests
 ```
 
+After any change here, regenerate the game's copy and commit it (CI fails if it is stale):
+`PYTHONPATH=tools python -m solver export-json puzzles/ game/data/puzzles/`.
+
 ### Regenerating a machine
 
 ```sh

@@ -10,10 +10,11 @@
     "machine": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["id", "name"],
+      "required": ["id", "name", "puzzle_title"],
       "properties": {
         "id": { "$ref": "#/$defs/id", "description": "Stable machine id, e.g. cookie_machine." },
-        "name": { "type": "string", "minLength": 1, "description": "Display name, e.g. Cookie Machine." }
+        "name": { "type": "string", "minLength": 1, "description": "Display name, e.g. Cookie Machine." },
+        "puzzle_title": { "type": "string", "minLength": 1, "description": "Title of the core logic puzzle, e.g. Batter recipe." }
       }
     },
     "domain": {
