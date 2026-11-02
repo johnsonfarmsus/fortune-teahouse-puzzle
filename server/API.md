@@ -16,7 +16,7 @@ a bug in one of them; please say so.
 | Part id | `logic`, `wiring`, `sequence`, `word`, `rhythm`, `helper` |
 | Handoff id | `cookie_to_oven`, `fortune_to_oven`, `oven_to_packaging` |
 | Nudge id | `reread_the_clue`, `ask_a_crewmate`, `start_with_the_sure_thing`, `try_the_help_button`, `check_neighbours`, `look_at_the_order`, `follow_the_wires`, `listen_for_the_beat`, `take_a_short_break`, `compare_with_another_crew` (also `GET /hints/nudges`) |
-| `device_id` | A UUID the game generates once per phone and keeps in local storage. It is the only identity. Treat it as a secret: it is never returned by any list endpoint. Case-insensitive; returned in lower case. |
+| `device_id` | An opaque string of 1 to 64 printable characters (the game sends 32 hex characters), generated once per phone and kept in local storage. It is the only identity. The server stores and echoes it exactly as sent: no reformatting, and it is case-sensitive. Treat it as a secret: it is never returned by any list endpoint. |
 
 Rules the server enforces (decision D1: every player solves on their own device):
 
@@ -47,7 +47,7 @@ Every error has the same shape:
 | 404 | `device_not_registered`, `unknown_crew`, `unknown_part`, `unknown_handoff`, `not_found` | Unknown id or path |
 | 405 | `method_not_allowed` | Wrong HTTP method for the path |
 | 409 | `handoff_waiting`, `line_not_ready` | Valid request, wrong state |
-| 422 | `validation_error` | Malformed body (bad UUID, missing field, name over 24 characters). Has a `details` array of `{loc, msg}`. |
+| 422 | `validation_error` | Malformed body (bad `device_id`, missing field, name over 24 characters). Has a `details` array of `{loc, msg}`. |
 | 429 | `rate_limited` | Per-IP limit hit; retry after the `Retry-After` header (seconds) |
 | 503 | `admin_disabled` | Admin call while `ADMIN_SECRET` is unset |
 
@@ -85,18 +85,18 @@ unchanged; an explicit `null` clears `display_name` or `crew`. Switching crew is
 
 | Field | Type | Notes |
 | --- | --- | --- |
-| `device_id` | string, required | UUID |
+| `device_id` | string, required | Opaque string, 1 to 64 characters |
 | `display_name` | string or null | Whitespace is collapsed. Max 24 characters. Empty means anonymous. |
 | `crew` | crew id or null | |
 
 ```http
 POST /api/v1/devices
-{"device_id": "3f0c2a8e-6d51-4c2e-9a34-0b5f6f7e8d90", "display_name": "Ada", "crew": "cookie_machine"}
+{"device_id": "3f0c2a8e6d514c2e9a340b5f6f7e8d90", "display_name": "Ada", "crew": "cookie_machine"}
 ```
 
 ```json
 {
-  "device_id": "3f0c2a8e-6d51-4c2e-9a34-0b5f6f7e8d90",
+  "device_id": "3f0c2a8e6d514c2e9a340b5f6f7e8d90",
   "display_name": "Ada",
   "crew": "cookie_machine",
   "created_at": "2027-10-29T17:02:11Z",
@@ -104,7 +104,7 @@ POST /api/v1/devices
 }
 ```
 
-`created` is `false` when the device already existed. Errors: `422` bad UUID or name, `400 unknown_crew`.
+`created` is `false` when the device already existed. Errors: `422` bad device id or name, `400 unknown_crew`.
 
 ---
 
@@ -144,16 +144,26 @@ Errors: `404 unknown_crew`.
 
 Report that this device solved a part ("submit a patch"). The device must currently be in
 `{machine}`. Idempotent: repeating it changes nothing and returns `newly_solved: false`. Also adds
-the device to the crew's contributors on its first solve there.
+the device to the crew's contributors on its first **credited** solve there.
+
+| Field | Type | Notes |
+| --- | --- | --- |
+| `device_id` | string, required | |
+| `credited` | boolean, optional, default `true` | Send `false` when the answer was revealed through the hint ladder. The solve still counts for part progress and the machine-runs rule, but the device is not added to contributors for it. |
+
+A credited solve of a part the device earlier solved uncredited upgrades it: the device becomes a
+contributor then (`newly_solved` is `false` in that case, `credited` is `true`). Credit is never
+taken back by a later uncredited repeat.
 
 ```http
 POST /api/v1/crews/cookie_machine/parts/logic/solve
-{"device_id": "3f0c2a8e-6d51-4c2e-9a34-0b5f6f7e8d90"}
+{"device_id": "3f0c2a8e6d514c2e9a340b5f6f7e8d90", "credited": true}
 ```
 
 ```json
 {
   "newly_solved": true,
+  "credited": true,
   "crew": { "...": "same object as GET /crews/cookie_machine" }
 }
 ```
@@ -242,7 +252,7 @@ several devices solving the same index count once toward `settings_solved`.
 
 ```http
 POST /api/v1/finale/handoffs/cookie_to_oven/settings
-{"device_id": "3f0c2a8e-6d51-4c2e-9a34-0b5f6f7e8d90", "setting_index": 1}
+{"device_id": "3f0c2a8e6d514c2e9a340b5f6f7e8d90", "setting_index": 1}
 ```
 
 ```json
@@ -261,7 +271,7 @@ but `already_found`.
 
 ```http
 POST /api/v1/finale/notes
-{"device_id": "3f0c2a8e-6d51-4c2e-9a34-0b5f6f7e8d90", "code": "sticky-label"}
+{"device_id": "3f0c2a8e6d514c2e9a340b5f6f7e8d90", "code": "sticky-label"}
 ```
 
 ```json
@@ -278,7 +288,7 @@ compared ignoring punctuation, so `3.141592653` works).
 
 ```http
 POST /api/v1/finale/start
-{"device_id": "3f0c2a8e-6d51-4c2e-9a34-0b5f6f7e8d90", "code": "3.141592653"}
+{"device_id": "3f0c2a8e6d514c2e9a340b5f6f7e8d90", "code": "3.141592653"}
 ```
 
 ```json
@@ -307,7 +317,7 @@ Idempotent per (sender, target crew, nudge): repeating it returns the existing h
 
 ```http
 POST /api/v1/hints
-{"device_id": "3f0c2a8e-...", "to_crew": "cookie_machine", "nudge_id": "reread_the_clue"}
+{"device_id": "3f0c2a8e6d51...", "to_crew": "cookie_machine", "nudge_id": "reread_the_clue"}
 ```
 
 ```json
@@ -327,7 +337,8 @@ Errors: `403 not_a_maintainer` (no crew, or crew's machine not running), `400 ow
 
 Hints sent to a crew, oldest first, at most 50 per call. Without `after_id` you get the newest 50.
 With `after_id` you get the oldest 50 hints with a larger `id`, so page forward by passing the
-highest `id` you have seen and repeat while 50 come back; none are skipped.
+highest `id` you have seen and repeat while 50 come back; none are skipped. An unknown `crew` returns
+`404 unknown_crew`.
 
 ```json
 {"crew": "cookie_machine", "hints": [ {"id": 7, "to_crew": "cookie_machine", "from_crew": "oven",
