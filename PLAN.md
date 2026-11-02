@@ -84,6 +84,27 @@ Saturday in late October or early November).
 - Accessibility pass: contrast, text size, screen reader behaviour of the canvas build.
 - Layout nit: on the Lucky word screen the keypad shifts down about 3 px when the result line appears.
 
+### Phase 2 outcome
+
+**Merged to `main`:** WP9 finale design ([docs/FINALE-DESIGN.md](docs/FINALE-DESIGN.md)), WP10 and WP10b story content and its dialogue box and hooks, WP11 art direction brief ([docs/ART-BRIEF.md](docs/ART-BRIEF.md)), WP12a the finale in the game (handoff notes and words, the dials puzzle, Elephant's Archive, the start code, the README screen), WP12b the big-screen finale states and closing reveal, WP13 the scoreboard deployment kit ([docs/DEPLOY.md](docs/DEPLOY.md)) and WP14 the playtest protocol ([docs/PLAYTEST.md](docs/PLAYTEST.md)). WP15 (this pass) adds the end-to-end run, the finale section of the smoke test and these notes, and changes no game or server code.
+
+**Numbers (2 Nov, Godot 4.7.2):** 357 gdUnit4 test cases in 24 suites, 0 failures, no `ERROR` in the import, test or export logs; 45 server pytest cases. Web export: 38.35 MB uncompressed, 9.97 MB gzipped against the 12 MB budget.
+
+**Part A, finale against the real scoreboard (local server, headless Godot and Chromium at 390x844 with touch):**
+
+- `tools/dev/finale_integration.gd` plays three phones through the game's real `HttpTransport`, `FinaleClient` and `FinaleState`: handoff notes and words, the dials solved from `handoffs.json`, four gnu-note codes (one repeated), an early start code (refused as not ready), a wrong one, then the right one. 69 checks pass. The server ends with every handoff at 3 of 3, notes 4 of 6, `line_ready` true and `started` true, and `/summary` agrees.
+- In the web build against the same server, a phone joined the Cookie Machine crew with a lucky word, got its note and the "Maintainer" badge, saw "The line" open, was told it needed the Oven note, collected `GOLDENROUND`, set one dial, ran the test batch (the header read "Settings set by everyone: 1 of 3" and the server showed index 0 solved) and filed `KETTLE27` in the Archive ("1 of 6"). The browser console had no errors, only Chromium's software-WebGL "GPU stall" warnings.
+- The big screen at 1920x1080 showed the S4 README and "The line is running!", and `?replay=1` played the reveal (start code, then the four machines lighting in turn).
+- One layout nit: in the Shop, the gnu's "answering machine" marker (`game/scenes/world/shop.gd`, 250, 786) overlaps the left part of the "The line" button, so a tap there opens the voicemail instead. The right half of the button works.
+
+**Not done:**
+
+- Art, audio and story pieces still unwired (see ARCHITECTURE section 13); everything is still rectangles and labels.
+- The Hetzner deploy of the scoreboard (the kit exists; nobody has run it on the real host), and GitHub Pages confirmation.
+- A real-device finale test: the finale section of [docs/SMOKE-TEST.md](docs/SMOKE-TEST.md) has not been run on a phone, and no crowd has played the handoffs.
+- Trevor's four finale questions ([docs/FINALE-DESIGN.md](docs/FINALE-DESIGN.md) section 10): the six physical notes at the venue, who runs the big screen and the admin secret on day two, whether 18:00 on day one is the right safety net, and whether the start code is entered whenever ready or on stage.
+- The cookie order (Fortune Cookie Guy terms: different backs per pack, messages per pack, allergens, lead time).
+
 ## 3. Phase 1 schedule (credit window)
 
 Times are Pacific. Each row is one worker session. Sessions in the same block run in parallel.

@@ -2,12 +2,13 @@
 extends PlaceBase
 ## The gnu's shop. A tap on a machine hotspot opens its MachineView. Nothing
 ## here knows which machines exist: the scene's hotspots carry the ids. The
-## Gnu's notes for the shop (data `where` = "shop") sit along the bottom edge.
+## Gnu's notes for the shop (data `where` = "shop") sit along the bottom edge,
+## between the Town and "The line" buttons with at least 8 px to spare.
 
 ## Top-left corners (390x844) of the Gnu's notes, by piece id.
 const NOTE_POSITIONS := {
-	"gnu.town.shop_counter": Vector2(160, 786),
-	"gnu.town.answering_machine": Vector2(250, 786),
+	"gnu.town.shop_counter": Vector2(126, 786),
+	"gnu.town.answering_machine": Vector2(210, 786),
 }
 
 @onready var _town_button: Button = $TownButton

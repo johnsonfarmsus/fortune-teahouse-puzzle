@@ -511,6 +511,26 @@ func test_tapping_a_town_note_opens_the_box_and_marks_it_seen() -> void:
 	assert_str(marker.text).is_equal("Note")
 
 
+func test_shop_markers_keep_8_px_from_every_button_and_hotspot() -> void:
+	var shop := await _shop()
+	# Show every marker so hidden, trigger-gated ones are checked too.
+	var markers: Array[Node] = shop.find_children("*", "StoryMarker", true, false)
+	assert_int(markers.size()).is_greater(0)
+	var obstacles: Array[Rect2] = []
+	for node in shop.find_children("*", "Button", true, false):
+		if not node is StoryMarker:
+			obstacles.append((node as Button).get_global_rect())
+	for node in shop.find_children("*", "Hotspot", true, false):
+		var hotspot := node as Hotspot
+		obstacles.append(Rect2(hotspot.global_position - Vector2(48, 48), Vector2(96, 96)))
+	assert_int(obstacles.size()).is_greater(3)
+	for node in markers:
+		var marker := node as StoryMarker
+		var rect := Rect2(marker.global_position, StoryMarker.SIZE).grow(8.0)
+		for obstacle in obstacles:
+			assert_bool(rect.intersects(obstacle)).override_failure_message("%s is within 8 px of %s" % [marker.piece_id, str(obstacle)]).is_false()
+
+
 func test_notes_that_wait_for_a_trigger_stay_hidden_until_it_holds() -> void:
 	var town := await _town()
 	var shop := await _shop()
