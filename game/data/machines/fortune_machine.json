@@ -1,0 +1,212 @@
+{
+  "helper": "Seagull",
+  "machine": "fortune_machine",
+  "parts": [
+    {
+      "config": {
+        "from_puzzle_data": true
+      },
+      "part": "logic",
+      "title": "Phrase banks",
+      "type": "matching"
+    },
+    {
+      "config": {
+        "connections": {
+          "tube_black": "nozzle_k",
+          "tube_cyan": "nozzle_c",
+          "tube_gold": "nozzle_g",
+          "tube_magenta": "nozzle_m",
+          "tube_yellow": "nozzle_y"
+        },
+        "hints": [
+          "Each tube has a letter in brackets. The tube goes to the nozzle with that same letter.",
+          "Start with the cyan tube. Its letter is C."
+        ],
+        "intro": "The ink pump has five tubes, and the gnu marked each one with a letter for its ink. Wire every tube to the nozzle with the same letter.",
+        "sockets": [
+          {
+            "color": "dimgray",
+            "id": "nozzle_k",
+            "label": "Nozzle K"
+          },
+          {
+            "color": "yellow",
+            "id": "nozzle_y",
+            "label": "Nozzle Y"
+          },
+          {
+            "color": "cyan",
+            "id": "nozzle_c",
+            "label": "Nozzle C"
+          },
+          {
+            "color": "gold",
+            "id": "nozzle_g",
+            "label": "Nozzle G"
+          },
+          {
+            "color": "magenta",
+            "id": "nozzle_m",
+            "label": "Nozzle M"
+          }
+        ],
+        "terminals": [
+          {
+            "color": "magenta",
+            "id": "tube_magenta",
+            "label": "Magenta tube (M)"
+          },
+          {
+            "color": "gold",
+            "id": "tube_gold",
+            "label": "Gold tube (G)"
+          },
+          {
+            "color": "cyan",
+            "id": "tube_cyan",
+            "label": "Cyan tube (C)"
+          },
+          {
+            "color": "dimgray",
+            "id": "tube_black",
+            "label": "Black tube (K)"
+          },
+          {
+            "color": "yellow",
+            "id": "tube_yellow",
+            "label": "Yellow tube (Y)"
+          }
+        ]
+      },
+      "part": "wiring",
+      "title": "Ink pump circuit",
+      "type": "wiring"
+    },
+    {
+      "config": {
+        "hints": [
+          "Each step uses what the step before it made. Follow one fortune from its first phrase to the moment it leaves for the Oven.",
+          "The strip only travels to the Oven at the very end, once the ink is dry."
+        ],
+        "intro": "The Fortune Machine's job list fell off the wall. Put the steps back in the order the machine does them.",
+        "order": [
+          "pick",
+          "join",
+          "check",
+          "print",
+          "dry",
+          "send"
+        ],
+        "steps": [
+          {
+            "id": "print",
+            "label": "Print the checked fortune on a paper strip"
+          },
+          {
+            "id": "pick",
+            "label": "Pick one phrase from each phrase bank"
+          },
+          {
+            "id": "send",
+            "label": "Send the dry strip to the end of the Oven"
+          },
+          {
+            "id": "check",
+            "label": "Read the joined fortune back to check it"
+          },
+          {
+            "id": "dry",
+            "label": "Let the ink on the strip dry"
+          },
+          {
+            "id": "join",
+            "label": "Join the picked phrases into one fortune"
+          }
+        ]
+      },
+      "part": "sequence",
+      "title": "Compose, print and send",
+      "type": "sequence"
+    },
+    {
+      "config": {
+        "bank": [
+          "sweet",
+          "bitter",
+          "you",
+          "ink",
+          "jumbled",
+          "late"
+        ],
+        "blanks": [
+          {
+            "answer": "sweet",
+            "index": 0
+          },
+          {
+            "answer": "you",
+            "index": 1
+          }
+        ],
+        "hints": [
+          "Say each pair of lines aloud. The missing word at the end of a pair must sound like the word that ends the line above it.",
+          "Look at the word that ends the line above each blank, then pick the bank word that rhymes with it and makes sense."
+        ],
+        "intro": "A fortune in the phrase bank got jumbled, and the last word of two lines fell out. Pick the words that finish each rhyme.",
+        "lines": [
+          "A fortune folded, small and neat,",
+          "To make your cup of tea taste {0}.",
+          "Take it, read it, pass it through,",
+          "Some luck for me and some for {1}."
+        ]
+      },
+      "part": "word",
+      "title": "The jumbled fortune",
+      "type": "word"
+    },
+    {
+      "config": {
+        "bpm": 72,
+        "hints": [
+          "Watch the light. Tap Press only while it glows, and let the dim beat go by.",
+          "The beat is a little slower now. Take your time."
+        ],
+        "intro": "The printer stamps a letter on every lit beat. Watch the light and press with it.",
+        "pattern": [
+          1,
+          1,
+          0,
+          1
+        ],
+        "required": 6,
+        "tolerance_ms": 180
+      },
+      "part": "rhythm",
+      "title": "Printer rhythm",
+      "type": "rhythm"
+    },
+    {
+      "config": {
+        "choices": [
+          "In Gopher's delivery bag",
+          "In the bin by the pier",
+          "Inside the Oven"
+        ],
+        "correct": 1,
+        "lines": [
+          "Squawk! Hello, hello! I'm Seagull, and I collect lost fortunes. The ones I caught, I know word for word. The ones I missed, I haven't a feather of a clue.",
+          "Mostly they go missing at the printer. A smudged fortune gets swept off the paper strip and into the bin by the pier. I fish them out when the tide is kind.",
+          "A few blew away when the shop door was left open, and a few the gnu scribbled on napkins went out with the lunch rubbish. He was ever so sorry about that."
+        ],
+        "nudge": "Listen to what Seagull said about smudged fortunes. Where do they get swept to?",
+        "question": "Where do the smudged fortunes swept off the printer's paper strip end up?",
+        "speaker": "Seagull",
+        "success_line": "Squawk! Yes, that is it."
+      },
+      "part": "helper",
+      "title": "Seagull's lost fortunes",
+      "type": "helper"
+    }
+  ]
+}

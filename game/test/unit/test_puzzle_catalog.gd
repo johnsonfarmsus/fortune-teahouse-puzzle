@@ -50,12 +50,9 @@ func test_six_parts_per_machine_in_order() -> void:
 	var catalog := PuzzleCatalog.load_all()
 	for machine in Ids.MACHINES:
 		var parts := catalog.get_parts(machine)
-		if parts.is_empty():
-			continue  # fortune_machine and oven arrive with WP6
 		assert_int(parts.size()).is_equal(6)
 		for i in 6:
 			assert_str(parts[i]["part"]).is_equal(Ids.PARTS[i])
-	assert_int(catalog.get_parts("cookie_machine").size()).is_equal(6)
 
 
 func test_matching_config_has_only_collected_clues() -> void:

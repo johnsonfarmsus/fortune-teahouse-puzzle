@@ -2,6 +2,8 @@
 
 A collaborative, phone-first puzzle game for SeaGL 2027: attendees get custom fortune cookies, form crews by the fortune they hold, and fix a retired gnu's three fortune cookie machines together. Godot 4.7 (GDScript), web export, free software under the GNU AGPL.
 
+**Status:** all three machines (Fortune Machine, Cookie Machine and Oven) are playable, each with six parts; the finale, the scoreboard client and real art are still to come.
+
 - [DESIGN.md](DESIGN.md) is the game design.
 - [PLAN.md](PLAN.md) is the build plan and work packages.
 - [docs/DESIGN-REVIEW.md](docs/DESIGN-REVIEW.md) is the design review.

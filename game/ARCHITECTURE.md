@@ -158,7 +158,7 @@ Its config is `{machine, domain, answer, clues (collected only), total_clues: 6,
 
 **Hints:** `can_reveal()` needs 4 or more of this machine's clues collected. Level 1 marks one card "Start here", preferring a `position` fact. Level 2 states the first fact the placement breaks in plain words, trying styles security, code, hardware, trivia, poem, animal; repeats move on. Texts: "Sugar is in jar 1.", "Vanilla is in the jar right after flour's.", "Egg is 2 jars after butter." Level 3 fills the answer.
 
-**HelperPuzzle** (type `helper`, WP3): config `{speaker, lines, question, choices, correct, nudge}`; lines advance per tap, then choices; right calls `finish()`, wrong gets a retry line. Hint 1 shows `nudge`; hint 2 removes a wrong choice.
+**HelperPuzzle** (type `helper`, WP3): config `{speaker, lines, question, choices, correct, nudge, success_line?}` (`success_line` defaults to "Yes, that is it."); lines advance per tap, then choices; right calls `finish()`, wrong gets a retry line. Hint 1 shows `nudge`; hint 2 removes a wrong choice.
 
 ## 8b. WP4 puzzle types and their `config` (for authoring Fortune Machine and Oven parts)
 

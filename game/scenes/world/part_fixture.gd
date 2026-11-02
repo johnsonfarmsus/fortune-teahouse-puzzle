@@ -6,6 +6,10 @@ extends Node2D
 
 @export var machine: String = ""
 @export var part: String = ""
+## Optional labels for this machine's part, such as "Ink pump: dry". Empty
+## falls back to the generic part title ("Wiring: off").
+@export var broken_label: String = ""
+@export var fixed_label: String = ""
 
 @onready var _broken: Node2D = $Broken
 @onready var _fixed: Node2D = $Fixed
@@ -13,8 +17,8 @@ extends Node2D
 
 func _ready() -> void:
 	var title: String = str(Ids.PART_TITLES.get(part, part))
-	$Broken/Label.text = "%s: off" % title
-	$Fixed/Label.text = "%s: on" % title
+	$Broken/Label.text = broken_label if not broken_label.is_empty() else "%s: off" % title
+	$Fixed/Label.text = fixed_label if not fixed_label.is_empty() else "%s: on" % title
 	Events.part_fixed.connect(_on_part_fixed)
 	Events.progress_changed.connect(_on_progress_changed)
 	refresh()

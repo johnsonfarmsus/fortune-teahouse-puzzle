@@ -32,31 +32,43 @@ position = Vector2(170, 20)
 position = Vector2(0, 0)
 machine = "fortune_machine"
 part = "logic"
+broken_label = "Phrase banks: mixed"
+fixed_label = "Phrase banks: sorted"
 
 [node name="Wiring" parent="Machines/FortuneMachine/Fixtures" instance=ExtResource("3")]
 position = Vector2(76, 0)
 machine = "fortune_machine"
 part = "wiring"
+broken_label = "Ink pump: dry"
+fixed_label = "Ink pump: flowing"
 
 [node name="Sequence" parent="Machines/FortuneMachine/Fixtures" instance=ExtResource("3")]
 position = Vector2(152, 0)
 machine = "fortune_machine"
 part = "sequence"
+broken_label = "Print steps: jumbled"
+fixed_label = "Print steps: in order"
 
 [node name="Word" parent="Machines/FortuneMachine/Fixtures" instance=ExtResource("3")]
 position = Vector2(0, 100)
 machine = "fortune_machine"
 part = "word"
+broken_label = "Fortune: jumbled"
+fixed_label = "Fortune: fixed"
 
 [node name="Rhythm" parent="Machines/FortuneMachine/Fixtures" instance=ExtResource("3")]
 position = Vector2(76, 100)
 machine = "fortune_machine"
 part = "rhythm"
+broken_label = "Printer: off beat"
+fixed_label = "Printer: in time"
 
 [node name="Helper" parent="Machines/FortuneMachine/Fixtures" instance=ExtResource("3")]
 position = Vector2(152, 100)
 machine = "fortune_machine"
 part = "helper"
+broken_label = "Seagull: puzzled"
+fixed_label = "Seagull: helped"
 
 [node name="CookieMachine" type="Node2D" parent="Machines"]
 position = Vector2(0, 320)
@@ -114,31 +126,43 @@ position = Vector2(170, 20)
 position = Vector2(0, 0)
 machine = "oven"
 part = "logic"
+broken_label = "Heat zones: unset"
+fixed_label = "Heat zones: set"
 
 [node name="Wiring" parent="Machines/Oven/Fixtures" instance=ExtResource("3")]
 position = Vector2(76, 0)
 machine = "oven"
 part = "wiring"
+broken_label = "Thermostat: loose"
+fixed_label = "Thermostat: wired"
 
 [node name="Sequence" parent="Machines/Oven/Fixtures" instance=ExtResource("3")]
 position = Vector2(152, 0)
 machine = "oven"
 part = "sequence"
+broken_label = "Stages: jumbled"
+fixed_label = "Stages: in order"
 
 [node name="Word" parent="Machines/Oven/Fixtures" instance=ExtResource("3")]
 position = Vector2(0, 100)
 machine = "oven"
 part = "word"
+broken_label = "Label: smudged"
+fixed_label = "Label: restored"
 
 [node name="Rhythm" parent="Machines/Oven/Fixtures" instance=ExtResource("3")]
 position = Vector2(76, 100)
 machine = "oven"
 part = "rhythm"
+broken_label = "Folding arms: late"
+fixed_label = "Folding arms: timed"
 
 [node name="Helper" parent="Machines/Oven/Fixtures" instance=ExtResource("3")]
 position = Vector2(152, 100)
 machine = "oven"
 part = "helper"
+broken_label = "Gopher: stuck"
+fixed_label = "Gopher: delivering"
 
 [node name="TownButton" type="Button" parent="."]
 offset_left = 15.0

@@ -2,8 +2,10 @@
 extends PuzzleBase
 ## A friendly helper (Penguin, Seagull, Gopher) talks, then asks one
 ## multiple-choice question whose answer is in the dialogue.
-## Config: {speaker, lines, question, choices, correct, nudge}. `correct` is
-## the index of the right choice. Hint 1 shows the nudge; hint 2 crosses off a
+## Config: {speaker, lines, question, choices, correct, nudge, success_line?}.
+## `correct` is the index of the right choice; `success_line` (optional, default
+## "Yes, that is it.") is what the speaker says when it is chosen.
+## Hint 1 shows the nudge; hint 2 crosses off a
 ## wrong choice.
 
 var _speaker: String = "Helper"
@@ -12,6 +14,7 @@ var _question: String = ""
 var _choices: Array = []
 var _correct: int = 0
 var _nudge: String = ""
+var _success_line: String = "Yes, that is it."
 
 var _line_index: int = 0
 var _removed: Array[int] = []
@@ -30,6 +33,7 @@ func configure(config: Dictionary) -> void:
 	_choices = config.get("choices", [])
 	_correct = int(config.get("correct", 0))
 	_nudge = str(config.get("nudge", ""))
+	_success_line = str(config.get("success_line", "Yes, that is it."))
 
 
 func _ready() -> void:
@@ -87,7 +91,7 @@ func is_asking() -> bool:
 ## A tap on a choice. The right one finishes the puzzle.
 func answer_choice(index: int) -> void:
 	if index == _correct:
-		_feedback.text = "Squawk! Yes, that is it."
+		_feedback.text = _success_line
 		finish()
 	else:
 		_feedback.text = "Not quite. Think about what %s said, then try again." % _speaker

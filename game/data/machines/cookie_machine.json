@@ -202,7 +202,8 @@
         ],
         "nudge": "Listen to what Penguin said about the mixer. Which part tells it when to turn?",
         "question": "The batter is not being stirred. Which part tells the mixer when to turn?",
-        "speaker": "Penguin"
+        "speaker": "Penguin",
+        "success_line": "Flap flap! Yes, that is it."
       },
       "part": "helper",
       "title": "Penguin's moving parts",

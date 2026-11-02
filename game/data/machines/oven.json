@@ -1,0 +1,213 @@
+{
+  "helper": "Gopher",
+  "machine": "oven",
+  "parts": [
+    {
+      "config": {
+        "from_puzzle_data": true
+      },
+      "part": "logic",
+      "title": "Heat zones",
+      "type": "matching"
+    },
+    {
+      "config": {
+        "connections": {
+          "lead_bottom": "port_2",
+          "lead_buzzer": "port_5",
+          "lead_fan": "port_3",
+          "lead_light": "port_4",
+          "lead_top": "port_1"
+        },
+        "hints": [
+          "Each port has a sticker that names what plugs into it. Match the name on the lead to the name on the sticker.",
+          "Start with the fan lead. Port 3 is the one whose sticker says fan."
+        ],
+        "intro": "The thermostat has five ports, and each one has a sticker naming what plugs into it. Wire every lead to the port whose sticker names it.",
+        "sockets": [
+          {
+            "color": "red",
+            "id": "port_1",
+            "label": "Port 1: top heater"
+          },
+          {
+            "color": "orange",
+            "id": "port_2",
+            "label": "Port 2: bottom heater"
+          },
+          {
+            "color": "skyblue",
+            "id": "port_3",
+            "label": "Port 3: fan"
+          },
+          {
+            "color": "gold",
+            "id": "port_4",
+            "label": "Port 4: door light"
+          },
+          {
+            "color": "purple",
+            "id": "port_5",
+            "label": "Port 5: buzzer"
+          }
+        ],
+        "terminals": [
+          {
+            "color": "skyblue",
+            "id": "lead_fan",
+            "label": "Fan lead"
+          },
+          {
+            "color": "purple",
+            "id": "lead_buzzer",
+            "label": "Buzzer lead"
+          },
+          {
+            "color": "red",
+            "id": "lead_top",
+            "label": "Top heater lead"
+          },
+          {
+            "color": "gold",
+            "id": "lead_light",
+            "label": "Door light lead"
+          },
+          {
+            "color": "orange",
+            "id": "lead_bottom",
+            "label": "Bottom heater lead"
+          }
+        ]
+      },
+      "part": "wiring",
+      "title": "Thermostat wiring",
+      "type": "wiring"
+    },
+    {
+      "config": {
+        "hints": [
+          "Each stage works on what the one before it made. Follow one cookie from the moment it rides in raw to the moment it is packaged.",
+          "The fortune drops onto the round just after baking, while it is still warm, and just before the arms fold it."
+        ],
+        "intro": "The Oven's stage list got shuffled by the steam. Put the stages back in the order one cookie goes through them.",
+        "order": [
+          "enter",
+          "bake",
+          "drop",
+          "fold",
+          "cool",
+          "package"
+        ],
+        "steps": [
+          {
+            "id": "fold",
+            "label": "Fold each warm round around its fortune"
+          },
+          {
+            "id": "package",
+            "label": "Slide the cooled cookies into packages"
+          },
+          {
+            "id": "drop",
+            "label": "Drop a printed fortune on each warm round"
+          },
+          {
+            "id": "enter",
+            "label": "Raw rounds drop onto the Oven conveyor"
+          },
+          {
+            "id": "cool",
+            "label": "Let the folded cookies cool and set"
+          },
+          {
+            "id": "bake",
+            "label": "Bake the rounds until golden"
+          }
+        ]
+      },
+      "part": "sequence",
+      "title": "Bake, fold, cool, package",
+      "type": "sequence"
+    },
+    {
+      "config": {
+        "bank": [
+          "rule",
+          "lane",
+          "oven",
+          "paper",
+          "stale",
+          "loud"
+        ],
+        "blanks": [
+          {
+            "answer": "rule",
+            "index": 0
+          },
+          {
+            "answer": "lane",
+            "index": 1
+          }
+        ],
+        "hints": [
+          "Say each pair of lines aloud. The missing word at the end of a pair must sound like the word that ends the line above it.",
+          "Look at the word that ends the line above each blank, then pick the bank word that rhymes with it and makes sense."
+        ],
+        "intro": "Steam smudged the packaging label, and the last word of two lines is gone. Pick the words that finish each rhyme.",
+        "lines": [
+          "Fold it warm and let it cool,",
+          "Packing snug is the golden {0}.",
+          "Keep this side up, stay out of the rain,",
+          "Gopher will bring it down the {1}."
+        ]
+      },
+      "part": "word",
+      "title": "The smudged label",
+      "type": "word"
+    },
+    {
+      "config": {
+        "bpm": 84,
+        "hints": [
+          "Watch the light. Tap Press only while it glows, and let the dim beats go by.",
+          "The beat is a little slower now. Take your time."
+        ],
+        "intro": "A warm cookie can only be folded for a moment. Watch the light and press when the arms should fold.",
+        "pattern": [
+          1,
+          0,
+          1,
+          0
+        ],
+        "required": 6,
+        "tolerance_ms": 180
+      },
+      "part": "rhythm",
+      "title": "Folding arm timing",
+      "type": "rhythm"
+    },
+    {
+      "config": {
+        "choices": [
+          "The boxes are the wrong size",
+          "Gopher is busy on a delivery",
+          "Warm steam smudges the label"
+        ],
+        "correct": 2,
+        "lines": [
+          "Well, hello there! I'm Gopher, the courier. I run packaging and delivery at the end of the Oven, so if a cookie leaves the shop, it left in my paws.",
+          "Every cookie gets its own wrapper first, so the fortune stays dry and the cookie stays whole. Then the wrappers go into boxes.",
+          "I never pack a cookie until it has cooled. A warm one steams up its wrapper, and the steam smudges the label. Ask me how I know.",
+          "My delivery routes are paper maps the gnu drew. Wonderful mapmaker. Terrible at writing down which way is up."
+        ],
+        "nudge": "Think about what Gopher said happens when a warm cookie goes into its wrapper.",
+        "question": "Why does Gopher wait for the cookies to cool before packing them?",
+        "speaker": "Gopher",
+        "success_line": "Right you are! That is the one."
+      },
+      "part": "helper",
+      "title": "Gopher's deliveries",
+      "type": "helper"
+    }
+  ]
+}
