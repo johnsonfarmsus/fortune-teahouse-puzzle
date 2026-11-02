@@ -17,6 +17,7 @@ const FILES: Array[String] = [
 	"res://data/story/elephant.json",
 	"res://data/story/anglerfish.json",
 	"res://data/story/interface.json",
+	"res://data/story/chains.json",
 ]
 
 var _pieces: Array[Dictionary] = []  # raw pieces in load order
@@ -56,6 +57,7 @@ func add_piece(raw: Dictionary) -> bool:
 		"where": str(raw.get("where", "")),
 		"when": str(raw.get("when", "always")),
 		"group": str(raw.get("group", "")),
+		"expression": str(raw.get("expression", "neutral")),
 	}
 	_pieces.append(piece)
 	_by_id[id] = piece

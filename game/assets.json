@@ -1,0 +1,2059 @@
+{
+ "schema_version": 1,
+ "description": "Logical asset names to files (PLAN.md D11). AssetLoader loads every sprite, tile and portrait through this list; a file that has not landed yet shows a placeholder drawn in code (a block in the palette colour named by color, a 1 px outline and the glyph). Tiles are expected from the Ninja Adventure pack (CC0) under art/ninja/; origin is the tile's top-left pixel in that sheet and is a best guess until the art session lands the files and corrects it. Characters, portraits, props, machines, close-ups and effects are this game's own art, expected under art/. frame_size is [w, h] in pixels; frames are read left to right from origin, columns per row; animations name frame indices. frame_colors and frame_glyphs only shape placeholders. The palette is the game's one palette (Art and sound in DESIGN.md).",
+ "tile_size": 16,
+ "palette": {
+  "black": "#1a1423",
+  "ink": "#2b2135",
+  "dark_brown": "#4e3424",
+  "brown": "#7c5236",
+  "brown_light": "#a8774d",
+  "tan": "#c89f6a",
+  "sand": "#e3c99a",
+  "cream": "#f4e8cc",
+  "red": "#b6423a",
+  "orange": "#de7a38",
+  "yellow": "#f0c24f",
+  "green_dark": "#2f5d3a",
+  "green": "#5f9e4a",
+  "lime": "#9cc95a",
+  "teal": "#3b8a86",
+  "blue_dark": "#294a78",
+  "blue": "#4b84c4",
+  "sky": "#9ccbe8",
+  "grey_dark": "#4a4858",
+  "grey": "#8b8a99",
+  "silver": "#c4c3cf",
+  "white": "#f6f6f2",
+  "pink": "#d98aa0",
+  "purple": "#71498a",
+  "dirt": "#a3825c"
+ },
+ "assets": {
+  "tile.floor_wood": {
+   "file": "art/ninja/Backgrounds/Tilesets/TilesetInteriorFloor.png",
+   "origin": [
+    0,
+    0
+   ],
+   "frame_size": [
+    16,
+    16
+   ],
+   "frames": 1,
+   "kind": "tile",
+   "color": "tan",
+   "glyph": "-"
+  },
+  "tile.rug": {
+   "file": "art/ninja/Backgrounds/Tilesets/TilesetInteriorFloor.png",
+   "origin": [
+    16,
+    64
+   ],
+   "frame_size": [
+    16,
+    16
+   ],
+   "frames": 1,
+   "kind": "tile",
+   "color": "red",
+   "glyph": "+"
+  },
+  "tile.wall_wood": {
+   "file": "art/ninja/Backgrounds/Tilesets/TilesetInterior.png",
+   "origin": [
+    0,
+    0
+   ],
+   "frame_size": [
+    16,
+    16
+   ],
+   "frames": 1,
+   "kind": "tile",
+   "color": "brown",
+   "glyph": "|"
+  },
+  "tile.window": {
+   "file": "art/ninja/Backgrounds/Tilesets/TilesetInterior.png",
+   "origin": [
+    32,
+    0
+   ],
+   "frame_size": [
+    16,
+    16
+   ],
+   "frames": 1,
+   "kind": "tile",
+   "color": "sky",
+   "glyph": "#"
+  },
+  "tile.door": {
+   "file": "art/ninja/Backgrounds/Tilesets/TilesetInterior.png",
+   "origin": [
+    64,
+    0
+   ],
+   "frame_size": [
+    16,
+    16
+   ],
+   "frames": 1,
+   "kind": "tile",
+   "color": "dark_brown",
+   "glyph": ""
+  },
+  "tile.counter": {
+   "file": "art/ninja/Backgrounds/Tilesets/TilesetInterior.png",
+   "origin": [
+    0,
+    48
+   ],
+   "frame_size": [
+    16,
+    16
+   ],
+   "frames": 1,
+   "kind": "tile",
+   "color": "brown_light",
+   "glyph": "="
+  },
+  "tile.table": {
+   "file": "art/ninja/Backgrounds/Tilesets/TilesetInterior.png",
+   "origin": [
+    48,
+    48
+   ],
+   "frame_size": [
+    16,
+    16
+   ],
+   "frames": 1,
+   "kind": "tile",
+   "color": "brown_light",
+   "glyph": "o"
+  },
+  "tile.machine_floor": {
+   "file": "art/ninja/Backgrounds/Tilesets/TilesetInteriorFloor.png",
+   "origin": [
+    64,
+    0
+   ],
+   "frame_size": [
+    16,
+    16
+   ],
+   "frames": 1,
+   "kind": "tile",
+   "color": "grey",
+   "glyph": "."
+  },
+  "tile.grass": {
+   "file": "art/ninja/Backgrounds/Tilesets/TilesetFloor.png",
+   "origin": [
+    0,
+    0
+   ],
+   "frame_size": [
+    16,
+    16
+   ],
+   "frames": 1,
+   "kind": "tile",
+   "color": "green",
+   "glyph": "\""
+  },
+  "tile.path": {
+   "file": "art/ninja/Backgrounds/Tilesets/TilesetFloor.png",
+   "origin": [
+    96,
+    0
+   ],
+   "frame_size": [
+    16,
+    16
+   ],
+   "frames": 1,
+   "kind": "tile",
+   "color": "sand",
+   "glyph": "."
+  },
+  "tile.roof": {
+   "file": "art/ninja/Backgrounds/Tilesets/TilesetHouse.png",
+   "origin": [
+    0,
+    0
+   ],
+   "frame_size": [
+    16,
+    16
+   ],
+   "frames": 1,
+   "kind": "tile",
+   "color": "red",
+   "glyph": "^"
+  },
+  "tile.house_wall": {
+   "file": "art/ninja/Backgrounds/Tilesets/TilesetHouse.png",
+   "origin": [
+    0,
+    48
+   ],
+   "frame_size": [
+    16,
+    16
+   ],
+   "frames": 1,
+   "kind": "tile",
+   "color": "cream",
+   "glyph": "|"
+  },
+  "tile.house_window": {
+   "file": "art/ninja/Backgrounds/Tilesets/TilesetHouse.png",
+   "origin": [
+    32,
+    48
+   ],
+   "frame_size": [
+    16,
+    16
+   ],
+   "frames": 1,
+   "kind": "tile",
+   "color": "sky",
+   "glyph": "#"
+  },
+  "tile.tree": {
+   "file": "art/ninja/Backgrounds/Tilesets/TilesetNature.png",
+   "origin": [
+    0,
+    0
+   ],
+   "frame_size": [
+    16,
+    16
+   ],
+   "frames": 1,
+   "kind": "tile",
+   "color": "green_dark",
+   "glyph": "*"
+  },
+  "tile.water": {
+   "file": "art/ninja/Backgrounds/Tilesets/TilesetWater.png",
+   "origin": [
+    0,
+    0
+   ],
+   "frame_size": [
+    16,
+    16
+   ],
+   "frames": 4,
+   "kind": "tile",
+   "color": "blue",
+   "glyph": "~",
+   "columns": 4
+  },
+  "tile.sand": {
+   "file": "art/ninja/Backgrounds/Tilesets/TilesetFloor.png",
+   "origin": [
+    0,
+    96
+   ],
+   "frame_size": [
+    16,
+    16
+   ],
+   "frames": 1,
+   "kind": "tile",
+   "color": "sand",
+   "glyph": "."
+  },
+  "tile.planks": {
+   "file": "art/ninja/Backgrounds/Tilesets/TilesetFloor.png",
+   "origin": [
+    176,
+    0
+   ],
+   "frame_size": [
+    16,
+    16
+   ],
+   "frames": 1,
+   "kind": "tile",
+   "color": "brown_light",
+   "glyph": "-"
+  },
+  "tile.post": {
+   "file": "art/ninja/Backgrounds/Tilesets/TilesetElement.png",
+   "origin": [
+    0,
+    0
+   ],
+   "frame_size": [
+    16,
+    16
+   ],
+   "frames": 1,
+   "kind": "tile",
+   "color": "dark_brown",
+   "glyph": "o"
+  },
+  "tile.fence": {
+   "file": "art/ninja/Backgrounds/Tilesets/TilesetElement.png",
+   "origin": [
+    64,
+    0
+   ],
+   "frame_size": [
+    16,
+    16
+   ],
+   "frames": 1,
+   "kind": "tile",
+   "color": "brown",
+   "glyph": "#"
+  },
+  "tile.dirt": {
+   "file": "art/ninja/Backgrounds/Tilesets/TilesetFloor.png",
+   "origin": [
+    0,
+    160
+   ],
+   "frame_size": [
+    16,
+    16
+   ],
+   "frames": 1,
+   "kind": "tile",
+   "color": "dirt",
+   "glyph": "."
+  },
+  "tile.junk": {
+   "file": "art/ninja/Backgrounds/Tilesets/TilesetVillageAbandoned.png",
+   "origin": [
+    0,
+    0
+   ],
+   "frame_size": [
+    16,
+    16
+   ],
+   "frames": 1,
+   "kind": "tile",
+   "color": "grey_dark",
+   "glyph": "%"
+  },
+  "tile.crate": {
+   "file": "art/ninja/Backgrounds/Tilesets/TilesetElement.png",
+   "origin": [
+    96,
+    16
+   ],
+   "frame_size": [
+    16,
+    16
+   ],
+   "frames": 1,
+   "kind": "tile",
+   "color": "brown",
+   "glyph": "x"
+  },
+  "tile.flowers": {
+   "file": "art/ninja/Backgrounds/Tilesets/TilesetNature.png",
+   "origin": [
+    64,
+    64
+   ],
+   "frame_size": [
+    16,
+    16
+   ],
+   "frames": 1,
+   "kind": "tile",
+   "color": "green",
+   "glyph": "*",
+   "ink": "pink"
+  },
+  "char.player": {
+   "file": "art/ninja/Actor/Characters/Boy/SpriteSheet.png",
+   "frame_size": [
+    16,
+    16
+   ],
+   "frames": 16,
+   "columns": 4,
+   "kind": "character",
+   "color": "blue",
+   "glyph": "Y",
+   "animations": {
+    "walk_down": {
+     "frames": [
+      0,
+      4,
+      8,
+      12
+     ],
+     "fps": 8
+    },
+    "walk_up": {
+     "frames": [
+      1,
+      5,
+      9,
+      13
+     ],
+     "fps": 8
+    },
+    "walk_left": {
+     "frames": [
+      2,
+      6,
+      10,
+      14
+     ],
+     "fps": 8
+    },
+    "walk_right": {
+     "frames": [
+      3,
+      7,
+      11,
+      15
+     ],
+     "fps": 8
+    },
+    "idle_down": {
+     "frames": [
+      0,
+      0
+     ],
+     "fps": 2
+    },
+    "idle_up": {
+     "frames": [
+      1,
+      1
+     ],
+     "fps": 2
+    },
+    "idle_left": {
+     "frames": [
+      2,
+      2
+     ],
+     "fps": 2
+    },
+    "idle_right": {
+     "frames": [
+      3,
+      3
+     ],
+     "fps": 2
+    }
+   }
+  },
+  "char.red_panda": {
+   "file": "art/characters/red_panda_sheet.png",
+   "frame_size": [
+    16,
+    16
+   ],
+   "frames": 8,
+   "columns": 4,
+   "kind": "character",
+   "color": "orange",
+   "glyph": "R",
+   "animations": {
+    "idle_down": {
+     "frames": [
+      0,
+      4
+     ],
+     "fps": 2
+    },
+    "idle_up": {
+     "frames": [
+      1,
+      5
+     ],
+     "fps": 2
+    },
+    "idle_left": {
+     "frames": [
+      2,
+      6
+     ],
+     "fps": 2
+    },
+    "idle_right": {
+     "frames": [
+      3,
+      7
+     ],
+     "fps": 2
+    }
+   }
+  },
+  "char.penguin": {
+   "file": "art/characters/penguin_sheet.png",
+   "frame_size": [
+    16,
+    16
+   ],
+   "frames": 8,
+   "columns": 4,
+   "kind": "character",
+   "color": "blue_dark",
+   "glyph": "P",
+   "animations": {
+    "idle_down": {
+     "frames": [
+      0,
+      4
+     ],
+     "fps": 2
+    },
+    "idle_up": {
+     "frames": [
+      1,
+      5
+     ],
+     "fps": 2
+    },
+    "idle_left": {
+     "frames": [
+      2,
+      6
+     ],
+     "fps": 2
+    },
+    "idle_right": {
+     "frames": [
+      3,
+      7
+     ],
+     "fps": 2
+    }
+   }
+  },
+  "char.gopher": {
+   "file": "art/characters/gopher_sheet.png",
+   "frame_size": [
+    16,
+    16
+   ],
+   "frames": 8,
+   "columns": 4,
+   "kind": "character",
+   "color": "tan",
+   "glyph": "G",
+   "animations": {
+    "idle_down": {
+     "frames": [
+      0,
+      4
+     ],
+     "fps": 2
+    },
+    "idle_up": {
+     "frames": [
+      1,
+      5
+     ],
+     "fps": 2
+    },
+    "idle_left": {
+     "frames": [
+      2,
+      6
+     ],
+     "fps": 2
+    },
+    "idle_right": {
+     "frames": [
+      3,
+      7
+     ],
+     "fps": 2
+    }
+   }
+  },
+  "char.seagull": {
+   "file": "art/characters/seagull_sheet.png",
+   "frame_size": [
+    16,
+    16
+   ],
+   "frames": 8,
+   "columns": 4,
+   "kind": "character",
+   "color": "white",
+   "glyph": "S",
+   "animations": {
+    "idle_down": {
+     "frames": [
+      0,
+      4
+     ],
+     "fps": 2
+    },
+    "idle_up": {
+     "frames": [
+      1,
+      5
+     ],
+     "fps": 2
+    },
+    "idle_left": {
+     "frames": [
+      2,
+      6
+     ],
+     "fps": 2
+    },
+    "idle_right": {
+     "frames": [
+      3,
+      7
+     ],
+     "fps": 2
+    }
+   }
+  },
+  "char.crab": {
+   "file": "art/characters/crab_sheet.png",
+   "frame_size": [
+    16,
+    16
+   ],
+   "frames": 8,
+   "columns": 4,
+   "kind": "character",
+   "color": "red",
+   "glyph": "C",
+   "animations": {
+    "idle_down": {
+     "frames": [
+      0,
+      4
+     ],
+     "fps": 2
+    },
+    "idle_up": {
+     "frames": [
+      1,
+      5
+     ],
+     "fps": 2
+    },
+    "idle_left": {
+     "frames": [
+      2,
+      6
+     ],
+     "fps": 2
+    },
+    "idle_right": {
+     "frames": [
+      3,
+      7
+     ],
+     "fps": 2
+    }
+   }
+  },
+  "char.anglerfish": {
+   "file": "art/characters/anglerfish_sheet.png",
+   "frame_size": [
+    16,
+    16
+   ],
+   "frames": 8,
+   "columns": 4,
+   "kind": "character",
+   "color": "teal",
+   "glyph": "A",
+   "animations": {
+    "idle_down": {
+     "frames": [
+      0,
+      4
+     ],
+     "fps": 2
+    },
+    "idle_up": {
+     "frames": [
+      1,
+      5
+     ],
+     "fps": 2
+    },
+    "idle_left": {
+     "frames": [
+      2,
+      6
+     ],
+     "fps": 2
+    },
+    "idle_right": {
+     "frames": [
+      3,
+      7
+     ],
+     "fps": 2
+    }
+   }
+  },
+  "char.elephant": {
+   "file": "art/characters/elephant_sheet.png",
+   "frame_size": [
+    16,
+    16
+   ],
+   "frames": 8,
+   "columns": 4,
+   "kind": "character",
+   "color": "grey",
+   "glyph": "E",
+   "animations": {
+    "idle_down": {
+     "frames": [
+      0,
+      4
+     ],
+     "fps": 2
+    },
+    "idle_up": {
+     "frames": [
+      1,
+      5
+     ],
+     "fps": 2
+    },
+    "idle_left": {
+     "frames": [
+      2,
+      6
+     ],
+     "fps": 2
+    },
+    "idle_right": {
+     "frames": [
+      3,
+      7
+     ],
+     "fps": 2
+    }
+   }
+  },
+  "portrait.red_panda.neutral": {
+   "file": "art/portraits/red_panda_neutral.png",
+   "frame_size": [
+    32,
+    32
+   ],
+   "frames": 1,
+   "kind": "portrait",
+   "color": "orange",
+   "glyph": "R",
+   "expression": "neutral",
+   "bg": "sky"
+  },
+  "portrait.red_panda.happy": {
+   "file": "art/portraits/red_panda_happy.png",
+   "frame_size": [
+    32,
+    32
+   ],
+   "frames": 1,
+   "kind": "portrait",
+   "color": "orange",
+   "glyph": "R",
+   "expression": "happy",
+   "bg": "sky"
+  },
+  "portrait.red_panda.worried": {
+   "file": "art/portraits/red_panda_worried.png",
+   "frame_size": [
+    32,
+    32
+   ],
+   "frames": 1,
+   "kind": "portrait",
+   "color": "orange",
+   "glyph": "R",
+   "expression": "worried",
+   "bg": "sky"
+  },
+  "portrait.red_panda.surprised": {
+   "file": "art/portraits/red_panda_surprised.png",
+   "frame_size": [
+    32,
+    32
+   ],
+   "frames": 1,
+   "kind": "portrait",
+   "color": "orange",
+   "glyph": "R",
+   "expression": "surprised",
+   "bg": "sky"
+  },
+  "portrait.red_panda.sly": {
+   "file": "art/portraits/red_panda_sly.png",
+   "frame_size": [
+    32,
+    32
+   ],
+   "frames": 1,
+   "kind": "portrait",
+   "color": "orange",
+   "glyph": "R",
+   "expression": "sly",
+   "bg": "sky"
+  },
+  "portrait.penguin.neutral": {
+   "file": "art/portraits/penguin_neutral.png",
+   "frame_size": [
+    32,
+    32
+   ],
+   "frames": 1,
+   "kind": "portrait",
+   "color": "blue_dark",
+   "glyph": "P",
+   "expression": "neutral",
+   "bg": "sky"
+  },
+  "portrait.penguin.happy": {
+   "file": "art/portraits/penguin_happy.png",
+   "frame_size": [
+    32,
+    32
+   ],
+   "frames": 1,
+   "kind": "portrait",
+   "color": "blue_dark",
+   "glyph": "P",
+   "expression": "happy",
+   "bg": "sky"
+  },
+  "portrait.penguin.worried": {
+   "file": "art/portraits/penguin_worried.png",
+   "frame_size": [
+    32,
+    32
+   ],
+   "frames": 1,
+   "kind": "portrait",
+   "color": "blue_dark",
+   "glyph": "P",
+   "expression": "worried",
+   "bg": "sky"
+  },
+  "portrait.penguin.surprised": {
+   "file": "art/portraits/penguin_surprised.png",
+   "frame_size": [
+    32,
+    32
+   ],
+   "frames": 1,
+   "kind": "portrait",
+   "color": "blue_dark",
+   "glyph": "P",
+   "expression": "surprised",
+   "bg": "sky"
+  },
+  "portrait.penguin.sly": {
+   "file": "art/portraits/penguin_sly.png",
+   "frame_size": [
+    32,
+    32
+   ],
+   "frames": 1,
+   "kind": "portrait",
+   "color": "blue_dark",
+   "glyph": "P",
+   "expression": "sly",
+   "bg": "sky"
+  },
+  "portrait.gopher.neutral": {
+   "file": "art/portraits/gopher_neutral.png",
+   "frame_size": [
+    32,
+    32
+   ],
+   "frames": 1,
+   "kind": "portrait",
+   "color": "tan",
+   "glyph": "G",
+   "expression": "neutral",
+   "bg": "sky"
+  },
+  "portrait.gopher.happy": {
+   "file": "art/portraits/gopher_happy.png",
+   "frame_size": [
+    32,
+    32
+   ],
+   "frames": 1,
+   "kind": "portrait",
+   "color": "tan",
+   "glyph": "G",
+   "expression": "happy",
+   "bg": "sky"
+  },
+  "portrait.gopher.worried": {
+   "file": "art/portraits/gopher_worried.png",
+   "frame_size": [
+    32,
+    32
+   ],
+   "frames": 1,
+   "kind": "portrait",
+   "color": "tan",
+   "glyph": "G",
+   "expression": "worried",
+   "bg": "sky"
+  },
+  "portrait.gopher.surprised": {
+   "file": "art/portraits/gopher_surprised.png",
+   "frame_size": [
+    32,
+    32
+   ],
+   "frames": 1,
+   "kind": "portrait",
+   "color": "tan",
+   "glyph": "G",
+   "expression": "surprised",
+   "bg": "sky"
+  },
+  "portrait.gopher.sly": {
+   "file": "art/portraits/gopher_sly.png",
+   "frame_size": [
+    32,
+    32
+   ],
+   "frames": 1,
+   "kind": "portrait",
+   "color": "tan",
+   "glyph": "G",
+   "expression": "sly",
+   "bg": "sky"
+  },
+  "portrait.seagull.neutral": {
+   "file": "art/portraits/seagull_neutral.png",
+   "frame_size": [
+    32,
+    32
+   ],
+   "frames": 1,
+   "kind": "portrait",
+   "color": "white",
+   "glyph": "S",
+   "expression": "neutral",
+   "bg": "sky"
+  },
+  "portrait.seagull.happy": {
+   "file": "art/portraits/seagull_happy.png",
+   "frame_size": [
+    32,
+    32
+   ],
+   "frames": 1,
+   "kind": "portrait",
+   "color": "white",
+   "glyph": "S",
+   "expression": "happy",
+   "bg": "sky"
+  },
+  "portrait.seagull.worried": {
+   "file": "art/portraits/seagull_worried.png",
+   "frame_size": [
+    32,
+    32
+   ],
+   "frames": 1,
+   "kind": "portrait",
+   "color": "white",
+   "glyph": "S",
+   "expression": "worried",
+   "bg": "sky"
+  },
+  "portrait.seagull.surprised": {
+   "file": "art/portraits/seagull_surprised.png",
+   "frame_size": [
+    32,
+    32
+   ],
+   "frames": 1,
+   "kind": "portrait",
+   "color": "white",
+   "glyph": "S",
+   "expression": "surprised",
+   "bg": "sky"
+  },
+  "portrait.seagull.sly": {
+   "file": "art/portraits/seagull_sly.png",
+   "frame_size": [
+    32,
+    32
+   ],
+   "frames": 1,
+   "kind": "portrait",
+   "color": "white",
+   "glyph": "S",
+   "expression": "sly",
+   "bg": "sky"
+  },
+  "portrait.crab.neutral": {
+   "file": "art/portraits/crab_neutral.png",
+   "frame_size": [
+    32,
+    32
+   ],
+   "frames": 1,
+   "kind": "portrait",
+   "color": "red",
+   "glyph": "C",
+   "expression": "neutral",
+   "bg": "sky"
+  },
+  "portrait.crab.happy": {
+   "file": "art/portraits/crab_happy.png",
+   "frame_size": [
+    32,
+    32
+   ],
+   "frames": 1,
+   "kind": "portrait",
+   "color": "red",
+   "glyph": "C",
+   "expression": "happy",
+   "bg": "sky"
+  },
+  "portrait.crab.worried": {
+   "file": "art/portraits/crab_worried.png",
+   "frame_size": [
+    32,
+    32
+   ],
+   "frames": 1,
+   "kind": "portrait",
+   "color": "red",
+   "glyph": "C",
+   "expression": "worried",
+   "bg": "sky"
+  },
+  "portrait.crab.surprised": {
+   "file": "art/portraits/crab_surprised.png",
+   "frame_size": [
+    32,
+    32
+   ],
+   "frames": 1,
+   "kind": "portrait",
+   "color": "red",
+   "glyph": "C",
+   "expression": "surprised",
+   "bg": "sky"
+  },
+  "portrait.crab.sly": {
+   "file": "art/portraits/crab_sly.png",
+   "frame_size": [
+    32,
+    32
+   ],
+   "frames": 1,
+   "kind": "portrait",
+   "color": "red",
+   "glyph": "C",
+   "expression": "sly",
+   "bg": "sky"
+  },
+  "portrait.anglerfish.neutral": {
+   "file": "art/portraits/anglerfish_neutral.png",
+   "frame_size": [
+    32,
+    32
+   ],
+   "frames": 1,
+   "kind": "portrait",
+   "color": "teal",
+   "glyph": "A",
+   "expression": "neutral",
+   "bg": "sky"
+  },
+  "portrait.anglerfish.happy": {
+   "file": "art/portraits/anglerfish_happy.png",
+   "frame_size": [
+    32,
+    32
+   ],
+   "frames": 1,
+   "kind": "portrait",
+   "color": "teal",
+   "glyph": "A",
+   "expression": "happy",
+   "bg": "sky"
+  },
+  "portrait.anglerfish.worried": {
+   "file": "art/portraits/anglerfish_worried.png",
+   "frame_size": [
+    32,
+    32
+   ],
+   "frames": 1,
+   "kind": "portrait",
+   "color": "teal",
+   "glyph": "A",
+   "expression": "worried",
+   "bg": "sky"
+  },
+  "portrait.anglerfish.surprised": {
+   "file": "art/portraits/anglerfish_surprised.png",
+   "frame_size": [
+    32,
+    32
+   ],
+   "frames": 1,
+   "kind": "portrait",
+   "color": "teal",
+   "glyph": "A",
+   "expression": "surprised",
+   "bg": "sky"
+  },
+  "portrait.anglerfish.sly": {
+   "file": "art/portraits/anglerfish_sly.png",
+   "frame_size": [
+    32,
+    32
+   ],
+   "frames": 1,
+   "kind": "portrait",
+   "color": "teal",
+   "glyph": "A",
+   "expression": "sly",
+   "bg": "sky"
+  },
+  "portrait.elephant.neutral": {
+   "file": "art/portraits/elephant_neutral.png",
+   "frame_size": [
+    32,
+    32
+   ],
+   "frames": 1,
+   "kind": "portrait",
+   "color": "grey",
+   "glyph": "E",
+   "expression": "neutral",
+   "bg": "sky"
+  },
+  "portrait.elephant.happy": {
+   "file": "art/portraits/elephant_happy.png",
+   "frame_size": [
+    32,
+    32
+   ],
+   "frames": 1,
+   "kind": "portrait",
+   "color": "grey",
+   "glyph": "E",
+   "expression": "happy",
+   "bg": "sky"
+  },
+  "portrait.elephant.worried": {
+   "file": "art/portraits/elephant_worried.png",
+   "frame_size": [
+    32,
+    32
+   ],
+   "frames": 1,
+   "kind": "portrait",
+   "color": "grey",
+   "glyph": "E",
+   "expression": "worried",
+   "bg": "sky"
+  },
+  "portrait.elephant.surprised": {
+   "file": "art/portraits/elephant_surprised.png",
+   "frame_size": [
+    32,
+    32
+   ],
+   "frames": 1,
+   "kind": "portrait",
+   "color": "grey",
+   "glyph": "E",
+   "expression": "surprised",
+   "bg": "sky"
+  },
+  "portrait.elephant.sly": {
+   "file": "art/portraits/elephant_sly.png",
+   "frame_size": [
+    32,
+    32
+   ],
+   "frames": 1,
+   "kind": "portrait",
+   "color": "grey",
+   "glyph": "E",
+   "expression": "sly",
+   "bg": "sky"
+  },
+  "portrait.gnu.neutral": {
+   "file": "art/portraits/gnu_neutral.png",
+   "frame_size": [
+    32,
+    32
+   ],
+   "frames": 1,
+   "kind": "portrait",
+   "color": "cream",
+   "glyph": "G",
+   "expression": "neutral",
+   "bg": "tan"
+  },
+  "portrait.gnu.happy": {
+   "file": "art/portraits/gnu_happy.png",
+   "frame_size": [
+    32,
+    32
+   ],
+   "frames": 1,
+   "kind": "portrait",
+   "color": "cream",
+   "glyph": "G",
+   "expression": "happy",
+   "bg": "tan"
+  },
+  "portrait.gnu.worried": {
+   "file": "art/portraits/gnu_worried.png",
+   "frame_size": [
+    32,
+    32
+   ],
+   "frames": 1,
+   "kind": "portrait",
+   "color": "cream",
+   "glyph": "G",
+   "expression": "worried",
+   "bg": "tan"
+  },
+  "portrait.gnu.surprised": {
+   "file": "art/portraits/gnu_surprised.png",
+   "frame_size": [
+    32,
+    32
+   ],
+   "frames": 1,
+   "kind": "portrait",
+   "color": "cream",
+   "glyph": "G",
+   "expression": "surprised",
+   "bg": "tan"
+  },
+  "portrait.gnu.sly": {
+   "file": "art/portraits/gnu_sly.png",
+   "frame_size": [
+    32,
+    32
+   ],
+   "frames": 1,
+   "kind": "portrait",
+   "color": "cream",
+   "glyph": "G",
+   "expression": "sly",
+   "bg": "tan"
+  },
+  "item.spanner": {
+   "file": "art/items/item_spanner.png",
+   "frame_size": [
+    16,
+    16
+   ],
+   "frames": 1,
+   "kind": "item",
+   "color": "silver",
+   "glyph": "SP"
+  },
+  "item.die_bent": {
+   "file": "art/items/item_die_bent.png",
+   "frame_size": [
+    16,
+    16
+   ],
+   "frames": 1,
+   "kind": "item",
+   "color": "orange",
+   "glyph": "D~"
+  },
+  "item.cutter_die": {
+   "file": "art/items/item_cutter_die.png",
+   "frame_size": [
+    16,
+    16
+   ],
+   "frames": 1,
+   "kind": "item",
+   "color": "yellow",
+   "glyph": "DI"
+  },
+  "item.old_scrap": {
+   "file": "art/items/item_old_scrap.png",
+   "frame_size": [
+    16,
+    16
+   ],
+   "frames": 1,
+   "kind": "item",
+   "color": "cream",
+   "glyph": "?"
+  },
+  "item.scrap_die": {
+   "file": "art/items/item_scrap_die.png",
+   "frame_size": [
+    16,
+    16
+   ],
+   "frames": 1,
+   "kind": "item",
+   "color": "grey_dark",
+   "glyph": "D?"
+  },
+  "item.cloud_die": {
+   "file": "art/items/item_cloud_die.png",
+   "frame_size": [
+    16,
+    16
+   ],
+   "frames": 1,
+   "kind": "item",
+   "color": "teal",
+   "glyph": "FC"
+  },
+  "prop.notice_board": {
+   "file": "art/props/prop_notice_board.png",
+   "frame_size": [
+    16,
+    32
+   ],
+   "frames": 1,
+   "kind": "prop",
+   "color": "brown",
+   "glyph": "!"
+  },
+  "prop.kettle": {
+   "file": "art/props/prop_kettle.png",
+   "frame_size": [
+    16,
+    16
+   ],
+   "frames": 1,
+   "kind": "prop",
+   "color": "silver",
+   "glyph": "K"
+  },
+  "prop.lantern": {
+   "file": "art/props/prop_lantern.png",
+   "frame_size": [
+    16,
+    16
+   ],
+   "frames": 2,
+   "kind": "prop",
+   "color": "yellow",
+   "glyph": "*",
+   "frame_colors": [
+    "yellow",
+    "orange"
+   ],
+   "fps": 3
+  },
+  "prop.bench": {
+   "file": "art/props/prop_bench.png",
+   "frame_size": [
+    48,
+    16
+   ],
+   "frames": 1,
+   "kind": "prop",
+   "color": "brown",
+   "glyph": "BENCH"
+  },
+  "prop.tool_rack": {
+   "file": "art/props/prop_tool_rack.png",
+   "frame_size": [
+    48,
+    16
+   ],
+   "frames": 1,
+   "kind": "prop",
+   "color": "grey",
+   "glyph": "TOOLS"
+  },
+  "prop.lockers": {
+   "file": "art/props/prop_lockers.png",
+   "frame_size": [
+    32,
+    32
+   ],
+   "frames": 1,
+   "kind": "prop",
+   "color": "grey",
+   "glyph": "LK"
+  },
+  "prop.locker_gnu": {
+   "file": "art/props/prop_locker_gnu.png",
+   "frame_size": [
+    16,
+    32
+   ],
+   "frames": 1,
+   "kind": "prop",
+   "color": "yellow",
+   "glyph": "3"
+  },
+  "prop.parcels": {
+   "file": "art/props/prop_parcels.png",
+   "frame_size": [
+    32,
+    16
+   ],
+   "frames": 1,
+   "kind": "prop",
+   "color": "tan",
+   "glyph": "PKG"
+  },
+  "prop.nest": {
+   "file": "art/props/prop_nest.png",
+   "frame_size": [
+    16,
+    16
+   ],
+   "frames": 1,
+   "kind": "prop",
+   "color": "brown",
+   "glyph": "N"
+  },
+  "prop.contrib_board": {
+   "file": "art/props/prop_contrib_board.png",
+   "frame_size": [
+    16,
+    32
+   ],
+   "frames": 1,
+   "kind": "prop",
+   "color": "cream",
+   "glyph": "+"
+  },
+  "prop.scrap_pile": {
+   "file": "art/props/prop_scrap_pile.png",
+   "frame_size": [
+    32,
+    16
+   ],
+   "frames": 1,
+   "kind": "prop",
+   "color": "grey_dark",
+   "glyph": "JUNK"
+  },
+  "prop.sign": {
+   "file": "art/props/prop_sign.png",
+   "frame_size": [
+    16,
+    16
+   ],
+   "frames": 1,
+   "kind": "prop",
+   "color": "tan",
+   "glyph": "!"
+  },
+  "prop.well": {
+   "file": "art/props/prop_well.png",
+   "frame_size": [
+    16,
+    16
+   ],
+   "frames": 1,
+   "kind": "prop",
+   "color": "grey",
+   "glyph": "W"
+  },
+  "prop.bottle": {
+   "file": "art/props/prop_bottle.png",
+   "frame_size": [
+    16,
+    16
+   ],
+   "frames": 1,
+   "kind": "prop",
+   "color": "sky",
+   "glyph": "B"
+  },
+  "prop.booth": {
+   "file": "art/props/prop_booth.png",
+   "frame_size": [
+    32,
+    16
+   ],
+   "frames": 1,
+   "kind": "prop",
+   "color": "teal",
+   "glyph": "FC"
+  },
+  "prop.slip": {
+   "file": "art/props/prop_slip.png",
+   "frame_size": [
+    16,
+    16
+   ],
+   "frames": 1,
+   "kind": "prop",
+   "color": "cream",
+   "glyph": "S"
+  },
+  "prop.boat": {
+   "file": "art/props/prop_boat.png",
+   "frame_size": [
+    48,
+    32
+   ],
+   "frames": 1,
+   "kind": "prop",
+   "color": "brown",
+   "glyph": "BOAT"
+  },
+  "prop.fortune_machine": {
+   "file": "art/props/prop_fortune_machine.png",
+   "frame_size": [
+    64,
+    48
+   ],
+   "frames": 1,
+   "kind": "prop",
+   "color": "purple",
+   "glyph": "FORTUNE"
+  },
+  "prop.oven": {
+   "file": "art/props/prop_oven.png",
+   "frame_size": [
+    64,
+    48
+   ],
+   "frames": 1,
+   "kind": "prop",
+   "color": "red",
+   "glyph": "OVEN"
+  },
+  "prop.sticky": {
+   "file": "art/props/prop_sticky.png",
+   "frame_size": [
+    16,
+    16
+   ],
+   "frames": 1,
+   "kind": "prop",
+   "color": "yellow",
+   "glyph": "!"
+  },
+  "machine.cookie.body": {
+   "file": "art/machines/machine_cookie_body.png",
+   "frame_size": [
+    144,
+    64
+   ],
+   "frames": 1,
+   "kind": "prop",
+   "color": "grey",
+   "glyph": ""
+  },
+  "machine.cookie.shelf": {
+   "file": "art/machines/machine_cookie_shelf.png",
+   "frame_size": [
+    48,
+    8
+   ],
+   "frames": 1,
+   "kind": "prop",
+   "color": "brown",
+   "glyph": ""
+  },
+  "machine.cookie.jar.sugar": {
+   "file": "art/machines/machine_cookie_jar_sugar.png",
+   "frame_size": [
+    8,
+    12
+   ],
+   "frames": 1,
+   "kind": "prop",
+   "color": "white",
+   "glyph": "S"
+  },
+  "closeup.jar.sugar": {
+   "file": "art/closeups/closeup_jar_sugar.png",
+   "frame_size": [
+    24,
+    32
+   ],
+   "frames": 1,
+   "kind": "prop",
+   "color": "white",
+   "glyph": "S"
+  },
+  "machine.cookie.jar.flour": {
+   "file": "art/machines/machine_cookie_jar_flour.png",
+   "frame_size": [
+    8,
+    12
+   ],
+   "frames": 1,
+   "kind": "prop",
+   "color": "cream",
+   "glyph": "F"
+  },
+  "closeup.jar.flour": {
+   "file": "art/closeups/closeup_jar_flour.png",
+   "frame_size": [
+    24,
+    32
+   ],
+   "frames": 1,
+   "kind": "prop",
+   "color": "cream",
+   "glyph": "F"
+  },
+  "machine.cookie.jar.butter": {
+   "file": "art/machines/machine_cookie_jar_butter.png",
+   "frame_size": [
+    8,
+    12
+   ],
+   "frames": 1,
+   "kind": "prop",
+   "color": "yellow",
+   "glyph": "B"
+  },
+  "closeup.jar.butter": {
+   "file": "art/closeups/closeup_jar_butter.png",
+   "frame_size": [
+    24,
+    32
+   ],
+   "frames": 1,
+   "kind": "prop",
+   "color": "yellow",
+   "glyph": "B"
+  },
+  "machine.cookie.jar.vanilla": {
+   "file": "art/machines/machine_cookie_jar_vanilla.png",
+   "frame_size": [
+    8,
+    12
+   ],
+   "frames": 1,
+   "kind": "prop",
+   "color": "brown_light",
+   "glyph": "V"
+  },
+  "closeup.jar.vanilla": {
+   "file": "art/closeups/closeup_jar_vanilla.png",
+   "frame_size": [
+    24,
+    32
+   ],
+   "frames": 1,
+   "kind": "prop",
+   "color": "brown_light",
+   "glyph": "V"
+  },
+  "machine.cookie.jar.egg": {
+   "file": "art/machines/machine_cookie_jar_egg.png",
+   "frame_size": [
+    8,
+    12
+   ],
+   "frames": 1,
+   "kind": "prop",
+   "color": "orange",
+   "glyph": "E"
+  },
+  "closeup.jar.egg": {
+   "file": "art/closeups/closeup_jar_egg.png",
+   "frame_size": [
+    24,
+    32
+   ],
+   "frames": 1,
+   "kind": "prop",
+   "color": "orange",
+   "glyph": "E"
+  },
+  "machine.cookie.bowl": {
+   "file": "art/machines/machine_cookie_bowl.png",
+   "frame_size": [
+    32,
+    24
+   ],
+   "frames": 1,
+   "kind": "prop",
+   "color": "silver",
+   "glyph": ""
+  },
+  "machine.cookie.paddle": {
+   "file": "art/machines/machine_cookie_paddle.png",
+   "frame_size": [
+    16,
+    16
+   ],
+   "frames": 1,
+   "kind": "glyph",
+   "color": "dark_brown",
+   "glyph": "+"
+  },
+  "machine.cookie.press": {
+   "file": "art/machines/machine_cookie_press.png",
+   "frame_size": [
+    32,
+    12
+   ],
+   "frames": 1,
+   "kind": "prop",
+   "color": "grey_dark",
+   "glyph": ""
+  },
+  "machine.cookie.die_slot": {
+   "file": "art/machines/machine_cookie_die_slot.png",
+   "frame_size": [
+    32,
+    6
+   ],
+   "frames": 1,
+   "kind": "prop",
+   "color": "black",
+   "glyph": ""
+  },
+  "machine.cookie.belt": {
+   "file": "art/machines/machine_cookie_belt.png",
+   "frame_size": [
+    16,
+    8
+   ],
+   "frames": 2,
+   "kind": "tile",
+   "color": "grey_dark",
+   "glyph": "="
+  },
+  "machine.cookie.round": {
+   "file": "art/machines/machine_cookie_round.png",
+   "frame_size": [
+    8,
+    8
+   ],
+   "frames": 1,
+   "kind": "prop",
+   "color": "sand",
+   "glyph": ""
+  },
+  "machine.cookie.cookie": {
+   "file": "art/machines/machine_cookie_cookie.png",
+   "frame_size": [
+    8,
+    8
+   ],
+   "frames": 1,
+   "kind": "prop",
+   "color": "orange",
+   "glyph": ""
+  },
+  "machine.cookie.lamp": {
+   "file": "art/machines/machine_cookie_lamp.png",
+   "frame_size": [
+    16,
+    16
+   ],
+   "frames": 2,
+   "kind": "prop",
+   "color": "grey_dark",
+   "glyph": "",
+   "frame_colors": [
+    "grey_dark",
+    "yellow"
+   ]
+  },
+  "machine.cookie.panel": {
+   "file": "art/machines/machine_cookie_panel.png",
+   "frame_size": [
+    32,
+    16
+   ],
+   "frames": 2,
+   "kind": "prop",
+   "color": "grey_dark",
+   "glyph": "",
+   "frame_colors": [
+    "grey_dark",
+    "lime"
+   ]
+  },
+  "machine.cookie.note": {
+   "file": "art/machines/machine_cookie_note.png",
+   "frame_size": [
+    16,
+    16
+   ],
+   "frames": 2,
+   "kind": "prop",
+   "color": "cream",
+   "glyph": "~",
+   "frame_colors": [
+    "grey",
+    "cream"
+   ]
+  },
+  "closeup.locker": {
+   "file": "art/closeups/closeup_locker.png",
+   "frame_size": [
+    128,
+    160
+   ],
+   "frames": 1,
+   "kind": "prop",
+   "color": "grey",
+   "glyph": ""
+  },
+  "closeup.dial": {
+   "file": "art/closeups/closeup_dial.png",
+   "frame_size": [
+    16,
+    24
+   ],
+   "frames": 5,
+   "kind": "prop",
+   "color": "silver",
+   "glyph": "1",
+   "frame_glyphs": [
+    "1",
+    "2",
+    "3",
+    "4",
+    "5"
+   ]
+  },
+  "closeup.handle": {
+   "file": "art/closeups/closeup_handle.png",
+   "frame_size": [
+    64,
+    16
+   ],
+   "frames": 1,
+   "kind": "prop",
+   "color": "yellow",
+   "glyph": "PULL"
+  },
+  "closeup.bench": {
+   "file": "art/closeups/closeup_bench.png",
+   "frame_size": [
+    160,
+    48
+   ],
+   "frames": 1,
+   "kind": "prop",
+   "color": "brown",
+   "glyph": ""
+  },
+  "closeup.die_bent": {
+   "file": "art/closeups/closeup_die_bent.png",
+   "frame_size": [
+    96,
+    32
+   ],
+   "frames": 1,
+   "kind": "prop",
+   "color": "orange",
+   "glyph": ""
+  },
+  "closeup.die": {
+   "file": "art/closeups/closeup_die.png",
+   "frame_size": [
+    96,
+    32
+   ],
+   "frames": 1,
+   "kind": "prop",
+   "color": "yellow",
+   "glyph": ""
+  },
+  "closeup.dent": {
+   "file": "art/closeups/closeup_dent.png",
+   "frame_size": [
+    16,
+    16
+   ],
+   "frames": 1,
+   "kind": "prop",
+   "color": "red",
+   "glyph": "!"
+  },
+  "closeup.mallet": {
+   "file": "art/closeups/closeup_mallet.png",
+   "frame_size": [
+    32,
+    32
+   ],
+   "frames": 1,
+   "kind": "prop",
+   "color": "silver",
+   "glyph": "M"
+  },
+  "closeup.bolt": {
+   "file": "art/closeups/closeup_bolt.png",
+   "frame_size": [
+    16,
+    16
+   ],
+   "frames": 4,
+   "kind": "prop",
+   "color": "silver",
+   "glyph": "+",
+   "frame_glyphs": [
+    "+",
+    "x",
+    "+",
+    "x"
+   ]
+  },
+  "closeup.spanner": {
+   "file": "art/closeups/closeup_spanner.png",
+   "frame_size": [
+    48,
+    16
+   ],
+   "frames": 1,
+   "kind": "prop",
+   "color": "silver",
+   "glyph": "SPANNER"
+  },
+  "closeup.shelf": {
+   "file": "art/closeups/closeup_shelf.png",
+   "frame_size": [
+    160,
+    12
+   ],
+   "frames": 1,
+   "kind": "prop",
+   "color": "brown",
+   "glyph": ""
+  },
+  "closeup.counter": {
+   "file": "art/closeups/closeup_counter.png",
+   "frame_size": [
+    176,
+    40
+   ],
+   "frames": 1,
+   "kind": "prop",
+   "color": "tan",
+   "glyph": ""
+  },
+  "closeup.cutter": {
+   "file": "art/closeups/closeup_cutter.png",
+   "frame_size": [
+    128,
+    64
+   ],
+   "frames": 1,
+   "kind": "prop",
+   "color": "grey_dark",
+   "glyph": ""
+  },
+  "fx.tap": {
+   "file": "art/fx/fx_tap.png",
+   "frame_size": [
+    8,
+    8
+   ],
+   "frames": 3,
+   "kind": "fx",
+   "color": "white",
+   "glyph": ""
+  },
+  "fx.spark": {
+   "file": "art/fx/fx_spark.png",
+   "frame_size": [
+    8,
+    8
+   ],
+   "frames": 3,
+   "kind": "fx",
+   "color": "yellow",
+   "glyph": ""
+  },
+  "fx.sparkle": {
+   "file": "art/fx/fx_sparkle.png",
+   "frame_size": [
+    8,
+    8
+   ],
+   "frames": 2,
+   "kind": "glyph",
+   "color": "white",
+   "glyph": "*",
+   "frame_colors": [
+    "white",
+    "sky"
+   ]
+  },
+  "fx.steam": {
+   "file": "art/fx/fx_steam.png",
+   "frame_size": [
+    8,
+    8
+   ],
+   "frames": 1,
+   "kind": "glyph",
+   "color": "white",
+   "glyph": "o"
+  },
+  "fx.gull": {
+   "file": "art/fx/fx_gull.png",
+   "frame_size": [
+    8,
+    8
+   ],
+   "frames": 2,
+   "kind": "glyph",
+   "color": "white",
+   "glyph": "^",
+   "frame_glyphs": [
+    "^",
+    "-"
+   ]
+  },
+  "fx.bubble": {
+   "file": "art/fx/fx_bubble.png",
+   "frame_size": [
+    8,
+    8
+   ],
+   "frames": 1,
+   "kind": "glyph",
+   "color": "sky",
+   "glyph": "o"
+  },
+  "ui.slot": {
+   "file": "art/ui/ui_slot.png",
+   "frame_size": [
+    20,
+    20
+   ],
+   "frames": 1,
+   "kind": "prop",
+   "color": "ink",
+   "glyph": ""
+  }
+ }
+}

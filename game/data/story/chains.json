@@ -1,0 +1,988 @@
+{
+  "schema_version": 1,
+  "description": "The adventure layer (WP16): what rooms, characters and items say, the cutter-die chain in the Cookie Machine's chain data (data/chains/cookie_machine.json names these ids), Red Panda's hint per chain step, and a caption for each Cookie Machine part as it starts working. expression picks the portrait. where room:<id> is the room it belongs to; when interaction means a tap or drop names it by id; hint means Red Panda's help.",
+  "pieces": [
+    {
+      "id": "red_panda.room.teahouse.1",
+      "speaker": "Red Panda",
+      "kind": "dialogue",
+      "lines": [
+        "Tea? Sit, rest, then go and find each other.",
+        "Everyone here is missing a piece. That's how you find each other."
+      ],
+      "where": "room:teahouse",
+      "when": "always",
+      "expression": "happy"
+    },
+    {
+      "id": "red_panda.room.teahouse.2",
+      "speaker": "Red Panda",
+      "kind": "dialogue",
+      "lines": [
+        "Stuck? Come and talk to me. I always have a hint and a cushion."
+      ],
+      "where": "room:teahouse",
+      "when": "always",
+      "expression": "neutral"
+    },
+    {
+      "id": "red_panda.room.board",
+      "speaker": "Red Panda",
+      "kind": "dialogue",
+      "lines": [
+        "The lucky word board. Tell me the word on your fortune."
+      ],
+      "where": "room:teahouse",
+      "when": "always",
+      "expression": "happy"
+    },
+    {
+      "id": "red_panda.room.kettle",
+      "speaker": "Red Panda",
+      "kind": "dialogue",
+      "lines": [
+        "The kettle sings when it is happy. It is nearly always happy."
+      ],
+      "where": "room:teahouse",
+      "when": "always",
+      "expression": "happy"
+    },
+    {
+      "id": "red_panda.hint.done",
+      "speaker": "Red Panda",
+      "kind": "dialogue",
+      "lines": [
+        "The cutter is cutting! Ask your crew what else is still broken."
+      ],
+      "where": "room:teahouse",
+      "when": "hint",
+      "expression": "happy"
+    },
+    {
+      "id": "narrator.room.lantern",
+      "speaker": "Narrator",
+      "kind": "dialogue",
+      "lines": [
+        "A paper lantern sways. Warm light, no wires."
+      ],
+      "where": "room:teahouse",
+      "when": "always"
+    },
+    {
+      "id": "narrator.sign.teahouse",
+      "speaker": "Narrator",
+      "kind": "sign",
+      "lines": [
+        "THE TEAHOUSE",
+        "Tea, cushions and lucky words."
+      ],
+      "where": "room:square",
+      "when": "always"
+    },
+    {
+      "id": "narrator.sign.workshop",
+      "speaker": "Narrator",
+      "kind": "sign",
+      "lines": [
+        "PENGUIN'S WORKSHOP",
+        "Knock. Flap. Enter."
+      ],
+      "where": "room:square",
+      "when": "always"
+    },
+    {
+      "id": "narrator.sign.depot",
+      "speaker": "Narrator",
+      "kind": "sign",
+      "lines": [
+        "PARCEL DEPOT",
+        "Everything gets there. Eventually."
+      ],
+      "where": "room:square",
+      "when": "always"
+    },
+    {
+      "id": "narrator.sign.scrapyard",
+      "speaker": "Narrator",
+      "kind": "sign",
+      "lines": [
+        "SCRAPYARD",
+        "Look-alike parts. No returns. (Returns welcome.)"
+      ],
+      "where": "room:scrapyard",
+      "when": "always"
+    },
+    {
+      "id": "narrator.room.well",
+      "speaker": "Narrator",
+      "kind": "dialogue",
+      "lines": [
+        "A wishing well. Somebody has wished for documentation."
+      ],
+      "where": "room:square",
+      "when": "always"
+    },
+    {
+      "id": "narrator.room.boat",
+      "speaker": "Narrator",
+      "kind": "dialogue",
+      "lines": [
+        "A little boat called Pull Request. It is waiting for review."
+      ],
+      "where": "room:harbour",
+      "when": "always"
+    },
+    {
+      "id": "narrator.room.fortune_machine",
+      "speaker": "Narrator",
+      "kind": "dialogue",
+      "lines": [
+        "The Fortune Machine, waiting for its crew."
+      ],
+      "where": "room:shop",
+      "when": "always"
+    },
+    {
+      "id": "narrator.room.oven",
+      "speaker": "Narrator",
+      "kind": "dialogue",
+      "lines": [
+        "The Oven, cold and quiet, waiting for its crew."
+      ],
+      "where": "room:shop",
+      "when": "always"
+    },
+    {
+      "id": "narrator.use.nothing",
+      "speaker": "Narrator",
+      "kind": "dialogue",
+      "lines": [
+        "Nothing happens. That does not go there."
+      ],
+      "where": "inventory",
+      "when": "interaction"
+    },
+    {
+      "id": "penguin.room.1",
+      "speaker": "Penguin",
+      "kind": "dialogue",
+      "lines": [
+        "Flap flap. Workshop. Tools. Bench. Mind the oil."
+      ],
+      "where": "room:workshop",
+      "when": "always",
+      "expression": "neutral"
+    },
+    {
+      "id": "penguin.room.2",
+      "speaker": "Penguin",
+      "kind": "dialogue",
+      "lines": [
+        "The press should go thump. If it goes thunk, something's wrong."
+      ],
+      "where": "room:workshop",
+      "when": "always",
+      "expression": "neutral"
+    },
+    {
+      "id": "penguin.room.bench",
+      "speaker": "Penguin",
+      "kind": "dialogue",
+      "lines": [
+        "My bench. Good for straightening bent things. Tap tap."
+      ],
+      "where": "room:workshop",
+      "when": "always",
+      "expression": "happy"
+    },
+    {
+      "id": "penguin.room.rack",
+      "speaker": "Penguin",
+      "kind": "dialogue",
+      "lines": [
+        "Spanners, mallets, one lonely sock. Don't ask about the sock."
+      ],
+      "where": "room:workshop",
+      "when": "always",
+      "expression": "sly"
+    },
+    {
+      "id": "gopher.room.1",
+      "speaker": "Gopher",
+      "kind": "dialogue",
+      "lines": [
+        "Well, hello there! Parcels in, parcels out."
+      ],
+      "where": "room:depot",
+      "when": "always",
+      "expression": "happy"
+    },
+    {
+      "id": "gopher.room.2",
+      "speaker": "Gopher",
+      "kind": "dialogue",
+      "lines": [
+        "Every cookie gets a wrapper and a ride. That's my promise."
+      ],
+      "where": "room:depot",
+      "when": "always",
+      "expression": "neutral"
+    },
+    {
+      "id": "gopher.room.lockers",
+      "speaker": "Gopher",
+      "kind": "dialogue",
+      "lines": [
+        "Rows of lockers. The gnu's is the yellow one, number 3."
+      ],
+      "where": "room:depot",
+      "when": "always",
+      "expression": "neutral"
+    },
+    {
+      "id": "gopher.room.parcels",
+      "speaker": "Gopher",
+      "kind": "dialogue",
+      "lines": [
+        "Misdelivered parcels. One is addressed to The Cloud. Ask me how I know."
+      ],
+      "where": "room:depot",
+      "when": "always",
+      "expression": "sly"
+    },
+    {
+      "id": "seagull.room.1",
+      "speaker": "Seagull",
+      "kind": "dialogue",
+      "lines": [
+        "Squawk! Fortunes, scraps, lost bits. I keep them all!"
+      ],
+      "where": "room:pier",
+      "when": "always",
+      "expression": "happy"
+    },
+    {
+      "id": "seagull.room.nest",
+      "speaker": "Seagull",
+      "kind": "dialogue",
+      "lines": [
+        "My nest! Paper scraps, string, half a fortune. Don't touch. Okay, touch."
+      ],
+      "where": "room:pier",
+      "when": "always",
+      "expression": "surprised"
+    },
+    {
+      "id": "crab.room.1",
+      "speaker": "Crab",
+      "kind": "dialogue",
+      "lines": [
+        "Hi! I merge every fix. Sideways, but I merge it."
+      ],
+      "where": "room:pier",
+      "when": "always",
+      "expression": "happy"
+    },
+    {
+      "id": "crab.room.2",
+      "speaker": "Crab",
+      "kind": "dialogue",
+      "lines": [
+        "Each fix is a patch. Patches make the machines everyone's, not one gnu's."
+      ],
+      "where": "room:pier",
+      "when": "always",
+      "expression": "happy"
+    },
+    {
+      "id": "crab.room.board",
+      "speaker": "Crab",
+      "kind": "dialogue",
+      "lines": [
+        "The contributors board! Every fixer's name goes up here."
+      ],
+      "where": "room:pier",
+      "when": "always",
+      "expression": "happy"
+    },
+    {
+      "id": "anglerfish.room.1",
+      "speaker": "Anglerfish",
+      "kind": "dialogue",
+      "lines": [
+        "Welcome to the harbour, home of FortuneCloud!"
+      ],
+      "where": "room:harbour",
+      "when": "always",
+      "expression": "sly"
+    },
+    {
+      "id": "anglerfish.room.2",
+      "speaker": "Anglerfish",
+      "kind": "dialogue",
+      "lines": [
+        "My briefcase holds the future. It is stuck, but it holds it."
+      ],
+      "where": "room:harbour",
+      "when": "always",
+      "expression": "sly"
+    },
+    {
+      "id": "anglerfish.room.booth",
+      "speaker": "Anglerfish",
+      "kind": "dialogue",
+      "lines": [
+        "FREE TRIAL, says the lure. The small print says a lot more."
+      ],
+      "where": "room:harbour",
+      "when": "always",
+      "expression": "sly"
+    },
+    {
+      "id": "penguin.item.spanner",
+      "speaker": "Penguin",
+      "kind": "dialogue",
+      "lines": [
+        "My spanner. For tightening things that wobble."
+      ],
+      "where": "inventory",
+      "when": "interaction",
+      "expression": "neutral"
+    },
+    {
+      "id": "penguin.item.die_bent",
+      "speaker": "Penguin",
+      "kind": "dialogue",
+      "lines": [
+        "The cutter die, bent in the post. My bench can fix that."
+      ],
+      "where": "inventory",
+      "when": "interaction",
+      "expression": "worried"
+    },
+    {
+      "id": "penguin.item.cutter_die",
+      "speaker": "Penguin",
+      "kind": "dialogue",
+      "lines": [
+        "The cutter die, straight again. Twelve good teeth."
+      ],
+      "where": "inventory",
+      "when": "interaction",
+      "expression": "happy"
+    },
+    {
+      "id": "seagull.item.old_scrap",
+      "speaker": "Seagull",
+      "kind": "note",
+      "lines": [
+        "A scrap in the gnu's writing: LOCKER 2 4 1.",
+        "Seagull found it in the spring. It is dated March 3."
+      ],
+      "where": "inventory",
+      "when": "interaction",
+      "expression": "happy"
+    },
+    {
+      "id": "narrator.item.scrap_die",
+      "speaker": "Narrator",
+      "kind": "dialogue",
+      "lines": [
+        "A look-alike die from the scrapyard. It has 10 teeth."
+      ],
+      "where": "inventory",
+      "when": "interaction"
+    },
+    {
+      "id": "anglerfish.item.cloud_die",
+      "speaker": "Anglerfish",
+      "kind": "dialogue",
+      "lines": [
+        "The FortuneCloud die! Its connector is a shape you have never seen."
+      ],
+      "where": "inventory",
+      "when": "interaction",
+      "expression": "sly"
+    },
+    {
+      "id": "gnu.sticky.cutter",
+      "speaker": "Gnu",
+      "kind": "sticky",
+      "lines": [
+        "Die out for sharpening. - G.",
+        "(Back Tuesday. Which Tuesday? Good question.)"
+      ],
+      "where": "room:shop",
+      "when": "interaction",
+      "expression": "worried"
+    },
+    {
+      "id": "narrator.cutter.die_seated",
+      "speaker": "Narrator",
+      "kind": "dialogue",
+      "lines": [
+        "The die drops into the cutter. Now tighten its bolts."
+      ],
+      "where": "room:shop",
+      "when": "interaction"
+    },
+    {
+      "id": "narrator.cutter.needs_spanner",
+      "speaker": "Narrator",
+      "kind": "dialogue",
+      "lines": [
+        "The die wobbles in the cutter. It needs tightening, and you have no spanner."
+      ],
+      "where": "room:shop",
+      "when": "interaction"
+    },
+    {
+      "id": "narrator.cutter.nothing_to_tighten",
+      "speaker": "Narrator",
+      "kind": "dialogue",
+      "lines": [
+        "Nothing to tighten. The cutter has no die."
+      ],
+      "where": "room:shop",
+      "when": "interaction"
+    },
+    {
+      "id": "narrator.cutter.bent_wont_fit",
+      "speaker": "Narrator",
+      "kind": "dialogue",
+      "lines": [
+        "The bent die will not sit flat. It would jam. Straighten it first."
+      ],
+      "where": "room:shop",
+      "when": "interaction"
+    },
+    {
+      "id": "narrator.cutter.scrap_die_tell",
+      "speaker": "Narrator",
+      "kind": "dialogue",
+      "lines": [
+        "This die has 10 teeth. The plate on the cutter says 12.",
+        "Close, but no cookie."
+      ],
+      "where": "room:shop",
+      "when": "interaction"
+    },
+    {
+      "id": "narrator.cutter.cloud_die_tell",
+      "speaker": "Narrator",
+      "kind": "dialogue",
+      "lines": [
+        "The FortuneCloud die's shiny connector fits nothing in the cutter.",
+        "(On the back: SUBSCRIPTION REQUIRED.)"
+      ],
+      "where": "room:shop",
+      "when": "interaction"
+    },
+    {
+      "id": "penguin.cutter.installed",
+      "speaker": "Penguin",
+      "kind": "dialogue",
+      "lines": [
+        "Thump. Thump. Thump. Hear that? The cutter is cutting!"
+      ],
+      "where": "room:shop",
+      "when": "interaction",
+      "expression": "happy"
+    },
+    {
+      "id": "penguin.cutter.running",
+      "speaker": "Penguin",
+      "kind": "dialogue",
+      "lines": [
+        "Rounds, rounds, rounds. Good cutter."
+      ],
+      "where": "room:shop",
+      "when": "interaction",
+      "expression": "happy"
+    },
+    {
+      "id": "penguin.cutter.mailed",
+      "speaker": "Penguin",
+      "kind": "dialogue",
+      "lines": [
+        "Sharpening? Flap. The gnu never sharpened anything here.",
+        "Try the depot. He mailed everything. Gopher keeps the lockers.",
+        "Take my spanner. You'll need it to tighten the die."
+      ],
+      "where": "room:workshop",
+      "when": "interaction",
+      "expression": "surprised"
+    },
+    {
+      "id": "penguin.cutter.spanner_again",
+      "speaker": "Penguin",
+      "kind": "dialogue",
+      "lines": [
+        "Lost the spanner? Here. I have another. I always have another."
+      ],
+      "where": "room:workshop",
+      "when": "interaction",
+      "expression": "neutral"
+    },
+    {
+      "id": "penguin.cutter.go_depot",
+      "speaker": "Penguin",
+      "kind": "dialogue",
+      "lines": [
+        "The depot. Gopher. Lockers. Go go."
+      ],
+      "where": "room:workshop",
+      "when": "interaction",
+      "expression": "neutral"
+    },
+    {
+      "id": "penguin.cutter.bench_tip",
+      "speaker": "Penguin",
+      "kind": "dialogue",
+      "lines": [
+        "Bent? Put it on my bench. Then tap the bent teeth flat. Tap tap."
+      ],
+      "where": "room:workshop",
+      "when": "interaction",
+      "expression": "neutral"
+    },
+    {
+      "id": "penguin.cutter.go_install",
+      "speaker": "Penguin",
+      "kind": "dialogue",
+      "lines": [
+        "Straight as a herring. Into the cutter with it, then tighten."
+      ],
+      "where": "room:workshop",
+      "when": "interaction",
+      "expression": "happy"
+    },
+    {
+      "id": "penguin.cutter.scrap_die",
+      "speaker": "Penguin",
+      "kind": "dialogue",
+      "lines": [
+        "Count the teeth. Ten. The cutter wants twelve. Scrapyard special."
+      ],
+      "where": "room:workshop",
+      "when": "interaction",
+      "expression": "sly"
+    },
+    {
+      "id": "penguin.cutter.cloud_die",
+      "speaker": "Penguin",
+      "kind": "dialogue",
+      "lines": [
+        "Shiny. Fits nothing. Anglerfish special. Give it back to him."
+      ],
+      "where": "room:workshop",
+      "when": "interaction",
+      "expression": "sly"
+    },
+    {
+      "id": "penguin.cutter.on_bench",
+      "speaker": "Penguin",
+      "kind": "dialogue",
+      "lines": [
+        "On the bench. Now the mallet: tap each bent tooth."
+      ],
+      "where": "room:workshop",
+      "when": "interaction",
+      "expression": "neutral"
+    },
+    {
+      "id": "penguin.cutter.straightened",
+      "speaker": "Penguin",
+      "kind": "dialogue",
+      "lines": [
+        "Flap flap! Straight as a fish. Now it can cut."
+      ],
+      "where": "room:workshop",
+      "when": "interaction",
+      "expression": "happy"
+    },
+    {
+      "id": "gnu.sticky.locker",
+      "speaker": "Gnu",
+      "kind": "sticky",
+      "lines": [
+        "Locker code: my batter, read off the jars.",
+        "Egg's jar, then vanilla's, then sugar's. One digit each.",
+        "(Changed it this summer. New code, new me.) - G."
+      ],
+      "where": "room:depot",
+      "when": "interaction",
+      "expression": "happy"
+    },
+    {
+      "id": "gopher.cutter.locker",
+      "speaker": "Gopher",
+      "kind": "dialogue",
+      "lines": [
+        "The gnu's locker? Number 3, yellow, with a code lock.",
+        "He changed the code a while back. Ask me how I know."
+      ],
+      "where": "room:depot",
+      "when": "interaction",
+      "expression": "neutral"
+    },
+    {
+      "id": "gopher.cutter.locker_empty",
+      "speaker": "Gopher",
+      "kind": "dialogue",
+      "lines": [
+        "Empty now. Just a smell of vanilla. Ask me how I know."
+      ],
+      "where": "room:depot",
+      "when": "interaction",
+      "expression": "happy"
+    },
+    {
+      "id": "gopher.cutter.scrap",
+      "speaker": "Gopher",
+      "kind": "dialogue",
+      "lines": [
+        "That scrap? Old as my hat. The gnu changed his code since."
+      ],
+      "where": "room:depot",
+      "when": "interaction",
+      "expression": "sly"
+    },
+    {
+      "id": "narrator.cutter.parcel",
+      "speaker": "Narrator",
+      "kind": "dialogue",
+      "lines": [
+        "Click! The locker opens. A parcel for the gnu.",
+        "Inside: the cutter die. It is bent."
+      ],
+      "where": "room:depot",
+      "when": "interaction"
+    },
+    {
+      "id": "narrator.cutter.locker_forwarded",
+      "speaker": "Narrator",
+      "kind": "sign",
+      "lines": [
+        "The locker screen flashes: CODE CHANGED.",
+        "PARCEL FORWARDED: HARBOUR."
+      ],
+      "where": "room:depot",
+      "when": "interaction"
+    },
+    {
+      "id": "narrator.cutter.locker_wrong",
+      "speaker": "Narrator",
+      "kind": "sign",
+      "lines": [
+        "The locker beeps. Not that code."
+      ],
+      "where": "room:depot",
+      "when": "interaction"
+    },
+    {
+      "id": "seagull.cutter.scrap",
+      "speaker": "Seagull",
+      "kind": "dialogue",
+      "lines": [
+        "Squawk! The gnu's locker code? Got it right here!",
+        "Found it in the spring. Take it, take it."
+      ],
+      "where": "room:pier",
+      "when": "interaction",
+      "expression": "happy"
+    },
+    {
+      "id": "seagull.cutter.old_scrap",
+      "speaker": "Seagull",
+      "kind": "dialogue",
+      "lines": [
+        "Old? Squawk. It WAS a spring scrap.",
+        "Some things I know word for word. Dates, not so much."
+      ],
+      "where": "room:pier",
+      "when": "interaction",
+      "expression": "worried"
+    },
+    {
+      "id": "seagull.cutter.scrap_back",
+      "speaker": "Seagull",
+      "kind": "dialogue",
+      "lines": [
+        "Back in the nest it goes. Squawk."
+      ],
+      "where": "room:pier",
+      "when": "interaction",
+      "expression": "happy"
+    },
+    {
+      "id": "narrator.cutter.scrap_die_found",
+      "speaker": "Narrator",
+      "kind": "dialogue",
+      "lines": [
+        "A cutter die in the junk! It looks right... mostly."
+      ],
+      "where": "room:scrapyard",
+      "when": "interaction"
+    },
+    {
+      "id": "narrator.cutter.scrap_pile",
+      "speaker": "Narrator",
+      "kind": "dialogue",
+      "lines": [
+        "Springs, cogs, a teapot lid. Nothing else that fits."
+      ],
+      "where": "room:scrapyard",
+      "when": "interaction"
+    },
+    {
+      "id": "narrator.cutter.scrap_die_back",
+      "speaker": "Narrator",
+      "kind": "dialogue",
+      "lines": [
+        "Back on the pile it goes. No harm done."
+      ],
+      "where": "room:scrapyard",
+      "when": "interaction"
+    },
+    {
+      "id": "anglerfish.cutter.harbour_pitch",
+      "speaker": "Anglerfish",
+      "kind": "dialogue",
+      "lines": [
+        "Forwarded here? Wonderful! FortuneCloud forwards every old code.",
+        "Fancy a FortuneCloud die? Compatible with all your old codes!"
+      ],
+      "where": "room:harbour",
+      "when": "interaction",
+      "expression": "sly"
+    },
+    {
+      "id": "narrator.cutter.harbour_slip",
+      "speaker": "Narrator",
+      "kind": "note",
+      "lines": [
+        "FortuneCloud slip: old locker codes come here. Dated September 12.",
+        "Seagull's scrap is from March, before the gnu changed his code.",
+        "The new code is in the batter. Your crew's fortunes know it."
+      ],
+      "where": "room:harbour",
+      "when": "interaction"
+    },
+    {
+      "id": "anglerfish.cutter.offer",
+      "speaker": "Anglerfish",
+      "kind": "dialogue",
+      "lines": [
+        "A FortuneCloud cutter die! Gleaming, modern, yours on a free trial."
+      ],
+      "where": "room:harbour",
+      "when": "interaction",
+      "expression": "sly"
+    },
+    {
+      "id": "anglerfish.cutter.refund",
+      "speaker": "Anglerfish",
+      "kind": "dialogue",
+      "lines": [
+        "No refunds! Kidding. Here, I'll take it back."
+      ],
+      "where": "room:harbour",
+      "when": "interaction",
+      "expression": "happy"
+    },
+    {
+      "id": "anglerfish.cutter.old_codes",
+      "speaker": "Anglerfish",
+      "kind": "dialogue",
+      "lines": [
+        "Old codes? We love old codes. We forward them all here."
+      ],
+      "where": "room:harbour",
+      "when": "interaction",
+      "expression": "sly"
+    },
+    {
+      "id": "red_panda.hint.cutter.find.1",
+      "speaker": "Red Panda",
+      "kind": "dialogue",
+      "lines": [
+        "The Cookie Machine's cutter is missing something. Have a look in the shop."
+      ],
+      "where": "room:teahouse",
+      "when": "hint",
+      "expression": "neutral"
+    },
+    {
+      "id": "red_panda.hint.cutter.find.2",
+      "speaker": "Red Panda",
+      "kind": "dialogue",
+      "lines": [
+        "Tap the cutter on the Cookie Machine. The gnu left a sticky label on it."
+      ],
+      "where": "room:teahouse",
+      "when": "hint",
+      "expression": "happy"
+    },
+    {
+      "id": "red_panda.hint.cutter.ask.1",
+      "speaker": "Red Panda",
+      "kind": "dialogue",
+      "lines": [
+        "Who knows the Cookie Machine's moving parts? Penguin, in the workshop."
+      ],
+      "where": "room:teahouse",
+      "when": "hint",
+      "expression": "neutral"
+    },
+    {
+      "id": "red_panda.hint.cutter.ask.2",
+      "speaker": "Red Panda",
+      "kind": "dialogue",
+      "lines": [
+        "Tell Penguin about the sticky label. The workshop faces the shop on the square."
+      ],
+      "where": "room:teahouse",
+      "when": "hint",
+      "expression": "happy"
+    },
+    {
+      "id": "red_panda.hint.cutter.decode.1",
+      "speaker": "Red Panda",
+      "kind": "dialogue",
+      "lines": [
+        "The die went to the depot. The gnu's locker has a code lock.",
+        "Gopher says the gnu changed the code a while back."
+      ],
+      "where": "room:teahouse",
+      "when": "hint",
+      "expression": "neutral"
+    },
+    {
+      "id": "red_panda.hint.cutter.decode.2",
+      "speaker": "Red Panda",
+      "kind": "dialogue",
+      "lines": [
+        "The code is in the batter: fix the jar shelf with your crew's fortunes.",
+        "If the locker sent you to the harbour, compare the dates."
+      ],
+      "where": "room:teahouse",
+      "when": "hint",
+      "expression": "happy"
+    },
+    {
+      "id": "red_panda.hint.cutter.repair.1",
+      "speaker": "Red Panda",
+      "kind": "dialogue",
+      "lines": [
+        "A bent die? Penguin has a bench for that."
+      ],
+      "where": "room:teahouse",
+      "when": "hint",
+      "expression": "neutral"
+    },
+    {
+      "id": "red_panda.hint.cutter.repair.2",
+      "speaker": "Red Panda",
+      "kind": "dialogue",
+      "lines": [
+        "Drag the bent die onto Penguin's bench, then tap the bent teeth flat."
+      ],
+      "where": "room:teahouse",
+      "when": "hint",
+      "expression": "happy"
+    },
+    {
+      "id": "red_panda.hint.cutter.install.1",
+      "speaker": "Red Panda",
+      "kind": "dialogue",
+      "lines": [
+        "Take the straight die back to the Cookie Machine in the shop."
+      ],
+      "where": "room:teahouse",
+      "when": "hint",
+      "expression": "neutral"
+    },
+    {
+      "id": "red_panda.hint.cutter.install.2",
+      "speaker": "Red Panda",
+      "kind": "dialogue",
+      "lines": [
+        "Drag the die onto the cutter, then turn its bolts with Penguin's spanner."
+      ],
+      "where": "room:teahouse",
+      "when": "hint",
+      "expression": "happy"
+    },
+    {
+      "id": "narrator.fixed.cookie_machine.logic",
+      "speaker": "Narrator",
+      "kind": "dialogue",
+      "lines": [
+        "The batter hopper fills. Five jars stand in a row."
+      ],
+      "where": "room:shop",
+      "when": "part_fixed:cookie_machine/logic"
+    },
+    {
+      "id": "narrator.fixed.cookie_machine.wiring",
+      "speaker": "Narrator",
+      "kind": "dialogue",
+      "lines": [
+        "The mixer paddle starts to turn."
+      ],
+      "where": "room:shop",
+      "when": "part_fixed:cookie_machine/wiring"
+    },
+    {
+      "id": "narrator.fixed.cookie_machine.sequence",
+      "speaker": "Narrator",
+      "kind": "dialogue",
+      "lines": [
+        "The control panel blinks through its steps."
+      ],
+      "where": "room:shop",
+      "when": "part_fixed:cookie_machine/sequence"
+    },
+    {
+      "id": "narrator.fixed.cookie_machine.word",
+      "speaker": "Narrator",
+      "kind": "dialogue",
+      "lines": [
+        "The gnu's note glows. The mixer hums along."
+      ],
+      "where": "room:shop",
+      "when": "part_fixed:cookie_machine/word"
+    },
+    {
+      "id": "narrator.fixed.cookie_machine.rhythm",
+      "speaker": "Narrator",
+      "kind": "dialogue",
+      "lines": [
+        "The cutter stamps out rounds onto the belt."
+      ],
+      "where": "room:shop",
+      "when": "part_fixed:cookie_machine/rhythm"
+    },
+    {
+      "id": "narrator.fixed.cookie_machine.helper",
+      "speaker": "Narrator",
+      "kind": "dialogue",
+      "lines": [
+        "Penguin's lamp lights up. Flap flap!"
+      ],
+      "where": "room:shop",
+      "when": "part_fixed:cookie_machine/helper"
+    },
+    {
+      "id": "narrator.fixed.cookie_machine.all",
+      "speaker": "Narrator",
+      "kind": "dialogue",
+      "lines": [
+        "The whole Cookie Machine runs! Rounds roll along toward the Oven."
+      ],
+      "where": "room:shop",
+      "when": "machine_running:cookie_machine"
+    }
+  ]
+}

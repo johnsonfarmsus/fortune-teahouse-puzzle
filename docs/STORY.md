@@ -50,6 +50,7 @@ rest on one person. His last fortune: "You figured out what I never wrote down. 
 | `anglerfish.json` | 6 timed town bits, farewell | Town |
 | `interface.json` | Start tagline, 3 loading tips, Settings about | StartScreen, loading, Settings |
 | `side_puzzles.json` | 6 side puzzle concepts (not shown in game) | For a later package |
+| `chains.json` (WP16) | What rooms, characters and items say in the adventure layer, the cutter-die chain, Red Panda's hint per chain step, a caption per Cookie Machine part. `expression` picks the portrait | Rooms, inventory, close-ups (`where` is `room:<id>` or `inventory`; `when` is `interaction` or `hint`) |
 
 ## Content plan: still unwritten
 

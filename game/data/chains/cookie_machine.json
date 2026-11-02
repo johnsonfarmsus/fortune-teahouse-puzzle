@@ -1,0 +1,95 @@
+{
+  "schema_version": 1,
+  "machine": "cookie_machine",
+  "description": "Chains for the Cookie Machine (PLAN.md D13; WP16 ships the cutter chain). items: everything the inventory can hold. shared items sync to the crew through the scoreboard; unshared ones (misdirects, Seagull's scrap) stay on this phone and can be put back where they came from (home). replaced_by hides an item once its replacement is found (the bent die becomes the straight one). interactions are tried in order; the first whose requires all hold fires. verb tap = tap the target, use = drop item on it, code = a code tried on a lock (result right, wrong or decoy:<id>), done = a close-up finished, enter = walking into the room. requires keys: facts, not_facts, have (found or held, not installed or replaced), not_have, installed, not_installed, decoys_seen, not_decoys_seen, crew_solved. effects: learn (a fact), find (shared item), hold / release (an unshared item), install (an item, found first if needed), solve_part (credit a machine part), see_decoy, open (a close-up). say is a story piece id (or a list of them, shown in turn); sfx is an id in data/sfx.json. Lock codes: code_from takes the digits from the crew's logic puzzle answer (the jar of each listed item), so no code is written here; decoy codes are written out because they are the outdated ones.",
+  "items": {
+    "spanner": {"kind": "tool", "name": "Spanner", "asset": "item.spanner", "shared": true, "about": "penguin.item.spanner"},
+    "die_bent": {"kind": "part", "name": "Bent cutter die", "asset": "item.die_bent", "shared": true, "replaced_by": "cutter_die", "about": "penguin.item.die_bent"},
+    "cutter_die": {"kind": "part", "name": "Cutter die", "asset": "item.cutter_die", "shared": true, "about": "penguin.item.cutter_die"},
+    "old_scrap": {"kind": "knowledge", "name": "Seagull's scrap", "asset": "item.old_scrap", "shared": false, "home": {"room": "pier", "target": "seagull"}, "about": "seagull.item.old_scrap"},
+    "scrap_die": {"kind": "part", "name": "Look-alike die", "asset": "item.scrap_die", "shared": false, "home": {"room": "scrapyard", "target": "scrap_pile"}, "about": "narrator.item.scrap_die"},
+    "cloud_die": {"kind": "part", "name": "FortuneCloud die", "asset": "item.cloud_die", "shared": false, "home": {"room": "harbour", "target": "anglerfish"}, "about": "anglerfish.item.cloud_die"}
+  },
+  "chains": [
+    {
+      "id": "cutter",
+      "title": "The cutter die",
+      "part": "rhythm",
+      "goal": {"installed": ["cutter_die"]},
+      "places": ["shop", "workshop", "depot", "pier", "scrapyard", "harbour"],
+      "steps": [
+        {"id": "find", "kind": "find", "room": "shop", "done_when": {"facts": ["die_out"]}, "hints": ["red_panda.hint.cutter.find.1", "red_panda.hint.cutter.find.2"]},
+        {"id": "ask", "kind": "find", "room": "workshop", "done_when": {"facts": ["die_mailed"]}, "hints": ["red_panda.hint.cutter.ask.1", "red_panda.hint.cutter.ask.2"]},
+        {"id": "decode", "kind": "decode", "room": "depot", "done_when": {"found": ["die_bent"]}, "hints": ["red_panda.hint.cutter.decode.1", "red_panda.hint.cutter.decode.2"]},
+        {"id": "repair", "kind": "repair", "room": "workshop", "done_when": {"found": ["cutter_die"]}, "hints": ["red_panda.hint.cutter.repair.1", "red_panda.hint.cutter.repair.2"]},
+        {"id": "install", "kind": "install", "room": "shop", "done_when": {"installed": ["cutter_die"]}, "hints": ["red_panda.hint.cutter.install.1", "red_panda.hint.cutter.install.2"]}
+      ],
+      "locks": {
+        "gnu_locker": {"room": "depot", "digits": 3, "symbols": ["1", "2", "3", "4", "5"], "label": "gnu.sticky.locker", "code_from": {"puzzle": "cookie_machine", "items": ["egg", "vanilla", "sugar"]}}
+      },
+      "misdirects": [
+        {"id": "scrapyard_die", "item": "scrap_die", "room": "scrapyard", "looks_like": "cutter_die", "tell": "wrong tooth count", "tell_piece": "narrator.cutter.scrap_die_tell"},
+        {"id": "fortunecloud_die", "item": "cloud_die", "room": "harbour", "looks_like": "cutter_die", "tell": "a connector that fits nothing", "tell_piece": "narrator.cutter.cloud_die_tell"}
+      ],
+      "decoys": [
+        {
+          "id": "old_locker_code",
+          "lock": "gnu_locker",
+          "code": "241",
+          "mistake": "trusting Seagull's outdated scrap",
+          "source_item": "old_scrap",
+          "destination": "harbour",
+          "flash": "narrator.cutter.locker_forwarded",
+          "wrong_place_says": ["anglerfish.cutter.harbour_pitch", "narrator.cutter.harbour_slip"],
+          "tell": "the forwarding slip is dated after Seagull's scrap"
+        }
+      ],
+      "interactions": [
+        {"id": "read_sticky", "room": "shop", "target": "cutter", "verb": "tap", "requires": {"not_installed": ["cutter_die"], "not_facts": ["die_out"]}, "effects": [{"learn": "die_out"}], "say": "gnu.sticky.cutter", "sfx": "paper"},
+        {"id": "reread_sticky", "room": "shop", "target": "cutter", "verb": "tap", "requires": {"not_installed": ["cutter_die"]}, "say": "gnu.sticky.cutter", "sfx": "paper"},
+        {"id": "cutter_running", "room": "shop", "target": "cutter", "verb": "tap", "requires": {"installed": ["cutter_die"]}, "say": "penguin.cutter.running", "sfx": "stamp"},
+        {"id": "install_die", "room": "shop", "target": "cutter", "verb": "use", "item": "cutter_die", "requires": {"have": ["spanner"], "not_installed": ["cutter_die"]}, "effects": [{"open": "tighten"}], "say": "narrator.cutter.die_seated", "sfx": "clunk"},
+        {"id": "install_die_no_spanner", "room": "shop", "target": "cutter", "verb": "use", "item": "cutter_die", "requires": {"not_have": ["spanner"]}, "say": "narrator.cutter.needs_spanner", "sfx": "wobble"},
+        {"id": "tightened", "room": "shop", "target": "tighten", "verb": "done", "requires": {"have": ["cutter_die", "spanner"]}, "effects": [{"install": "cutter_die"}, {"solve_part": "rhythm"}], "say": "penguin.cutter.installed", "sfx": "success"},
+        {"id": "spanner_no_die", "room": "shop", "target": "cutter", "verb": "use", "item": "spanner", "requires": {"not_installed": ["cutter_die"]}, "say": "narrator.cutter.nothing_to_tighten", "sfx": "deny"},
+        {"id": "bent_on_cutter", "room": "shop", "target": "cutter", "verb": "use", "item": "die_bent", "say": "narrator.cutter.bent_wont_fit", "sfx": "deny"},
+        {"id": "scrap_on_cutter", "room": "shop", "target": "cutter", "verb": "use", "item": "scrap_die", "say": "narrator.cutter.scrap_die_tell", "sfx": "deny", "misdirect": "scrapyard_die"},
+        {"id": "cloud_on_cutter", "room": "shop", "target": "cutter", "verb": "use", "item": "cloud_die", "say": "narrator.cutter.cloud_die_tell", "sfx": "deny", "misdirect": "fortunecloud_die"},
+
+        {"id": "penguin_mailed", "room": "workshop", "target": "penguin", "verb": "tap", "requires": {"facts": ["die_out"], "not_facts": ["die_mailed"]}, "effects": [{"learn": "die_mailed"}, {"find": "spanner"}], "say": "penguin.cutter.mailed", "sfx": "pickup"},
+        {"id": "penguin_spanner_again", "room": "workshop", "target": "penguin", "verb": "tap", "requires": {"facts": ["die_mailed"], "not_have": ["spanner"], "not_installed": ["cutter_die"]}, "effects": [{"find": "spanner"}], "say": "penguin.cutter.spanner_again", "sfx": "pickup"},
+        {"id": "penguin_go_depot", "room": "workshop", "target": "penguin", "verb": "tap", "requires": {"facts": ["die_mailed"], "not_have": ["die_bent", "cutter_die"], "not_installed": ["cutter_die"]}, "say": "penguin.cutter.go_depot", "sfx": "talk"},
+        {"id": "penguin_bench_tip", "room": "workshop", "target": "penguin", "verb": "tap", "requires": {"have": ["die_bent"]}, "say": "penguin.cutter.bench_tip", "sfx": "talk"},
+        {"id": "penguin_go_install", "room": "workshop", "target": "penguin", "verb": "tap", "requires": {"have": ["cutter_die"]}, "say": "penguin.cutter.go_install", "sfx": "talk"},
+        {"id": "bent_to_penguin", "room": "workshop", "target": "penguin", "verb": "use", "item": "die_bent", "say": "penguin.cutter.bench_tip", "sfx": "talk"},
+        {"id": "scrap_to_penguin", "room": "workshop", "target": "penguin", "verb": "use", "item": "scrap_die", "say": "penguin.cutter.scrap_die", "sfx": "talk", "misdirect": "scrapyard_die"},
+        {"id": "cloud_to_penguin", "room": "workshop", "target": "penguin", "verb": "use", "item": "cloud_die", "say": "penguin.cutter.cloud_die", "sfx": "talk", "misdirect": "fortunecloud_die"},
+        {"id": "bent_on_bench", "room": "workshop", "target": "bench", "verb": "use", "item": "die_bent", "effects": [{"open": "straighten"}], "say": "penguin.cutter.on_bench", "sfx": "clunk"},
+        {"id": "straightened", "room": "workshop", "target": "straighten", "verb": "done", "requires": {"have": ["die_bent"]}, "effects": [{"find": "cutter_die"}], "say": "penguin.cutter.straightened", "sfx": "success"},
+        {"id": "scrap_on_bench", "room": "workshop", "target": "bench", "verb": "use", "item": "scrap_die", "say": "narrator.cutter.scrap_die_tell", "sfx": "deny", "misdirect": "scrapyard_die"},
+
+        {"id": "gopher_locker", "room": "depot", "target": "gopher", "verb": "tap", "requires": {"facts": ["die_mailed"], "not_have": ["die_bent", "cutter_die"], "not_installed": ["cutter_die"]}, "say": "gopher.cutter.locker", "sfx": "talk"},
+        {"id": "locker_open", "room": "depot", "target": "gnu_locker", "verb": "tap", "requires": {"not_have": ["die_bent", "cutter_die"], "not_installed": ["cutter_die"]}, "effects": [{"open": "lock:gnu_locker"}], "say": "gnu.sticky.locker", "sfx": "click"},
+        {"id": "locker_empty", "room": "depot", "target": "gnu_locker", "verb": "tap", "say": "gopher.cutter.locker_empty", "sfx": "click"},
+        {"id": "locker_right", "room": "depot", "target": "gnu_locker", "verb": "code", "result": "right", "requires": {"not_have": ["die_bent", "cutter_die"], "not_installed": ["cutter_die"]}, "effects": [{"find": "die_bent"}], "say": "narrator.cutter.parcel", "sfx": "unlock"},
+        {"id": "locker_decoy", "room": "depot", "target": "gnu_locker", "verb": "code", "result": "decoy:old_locker_code", "effects": [{"see_decoy": "old_locker_code"}], "say": "narrator.cutter.locker_forwarded", "sfx": "buzz", "decoy": "old_locker_code"},
+        {"id": "locker_wrong", "room": "depot", "target": "gnu_locker", "verb": "code", "result": "wrong", "say": "narrator.cutter.locker_wrong", "sfx": "deny"},
+        {"id": "scrap_to_gopher", "room": "depot", "target": "gopher", "verb": "use", "item": "old_scrap", "say": "gopher.cutter.scrap", "sfx": "talk"},
+
+        {"id": "seagull_scrap", "room": "pier", "target": "seagull", "verb": "tap", "requires": {"not_have": ["old_scrap"], "not_decoys_seen": ["old_locker_code"], "not_installed": ["cutter_die"]}, "effects": [{"hold": "old_scrap"}], "say": "seagull.cutter.scrap", "sfx": "pickup", "decoy": "old_locker_code"},
+        {"id": "seagull_after_decoy", "room": "pier", "target": "seagull", "verb": "tap", "requires": {"decoys_seen": ["old_locker_code"]}, "say": "seagull.cutter.old_scrap", "sfx": "talk"},
+        {"id": "scrap_back_to_seagull", "room": "pier", "target": "seagull", "verb": "use", "item": "old_scrap", "effects": [{"release": "old_scrap"}], "say": "seagull.cutter.scrap_back", "sfx": "drop"},
+
+        {"id": "scrap_pile_take", "room": "scrapyard", "target": "scrap_pile", "verb": "tap", "requires": {"not_have": ["scrap_die"], "not_installed": ["cutter_die"]}, "effects": [{"hold": "scrap_die"}], "say": "narrator.cutter.scrap_die_found", "sfx": "pickup", "misdirect": "scrapyard_die"},
+        {"id": "scrap_pile_more", "room": "scrapyard", "target": "scrap_pile", "verb": "tap", "say": "narrator.cutter.scrap_pile", "sfx": "rattle"},
+        {"id": "scrap_pile_back", "room": "scrapyard", "target": "scrap_pile", "verb": "use", "item": "scrap_die", "effects": [{"release": "scrap_die"}], "say": "narrator.cutter.scrap_die_back", "sfx": "drop"},
+
+        {"id": "harbour_explains", "room": "harbour", "target": "harbour", "verb": "enter", "requires": {"decoys_seen": ["old_locker_code"], "not_facts": ["harbour_explained"]}, "effects": [{"learn": "harbour_explained"}], "say": ["anglerfish.cutter.harbour_pitch", "narrator.cutter.harbour_slip"], "sfx": "lure", "decoy": "old_locker_code"},
+        {"id": "slip_read", "room": "harbour", "target": "forwarding_slip", "verb": "tap", "effects": [{"learn": "slip_read"}], "say": "narrator.cutter.harbour_slip", "sfx": "paper"},
+        {"id": "anglerfish_offer", "room": "harbour", "target": "anglerfish", "verb": "tap", "requires": {"not_have": ["cloud_die"], "not_installed": ["cutter_die"]}, "effects": [{"hold": "cloud_die"}], "say": "anglerfish.cutter.offer", "sfx": "lure", "misdirect": "fortunecloud_die"},
+        {"id": "anglerfish_back", "room": "harbour", "target": "anglerfish", "verb": "use", "item": "cloud_die", "effects": [{"release": "cloud_die"}], "say": "anglerfish.cutter.refund", "sfx": "drop"},
+        {"id": "anglerfish_scrap", "room": "harbour", "target": "anglerfish", "verb": "use", "item": "old_scrap", "say": "anglerfish.cutter.old_codes", "sfx": "lure"}
+      ]
+    }
+  ]
+}

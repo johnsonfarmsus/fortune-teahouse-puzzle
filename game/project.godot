@@ -21,6 +21,7 @@ Story="*res://autoload/story.gd"
 Audio="*res://autoload/audio.gd"
 Router="*res://autoload/router.gd"
 Finale="*res://autoload/finale.gd"
+Adventure="*res://autoload/adventure.gd"
 
 [display]
 
@@ -33,6 +34,7 @@ window/handheld/orientation=1
 [fortune]
 
 scoreboard_url=""
+debug_legacy_screens=false
 
 [gui]
 
@@ -50,3 +52,4 @@ enabled=PackedStringArray()
 
 renderer/rendering_method="gl_compatibility"
 renderer/rendering_method.mobile="gl_compatibility"
+textures/canvas_textures/default_texture_filter=0

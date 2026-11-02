@@ -16,10 +16,14 @@ func before_test() -> void:
 	GameState.player.ensure_device_id()
 	Progress.set_store(LocalProgressStore.new(PROGRESS_PATH))
 	Router.clear()
+	# These tests cover the old screens, behind the debug setting since WP16.
+	DebugSettings.forced = 1
+	Audio.unlocked = false
 
 
 func after_test() -> void:
 	Router.clear()
+	DebugSettings.forced = -1
 	_cleanup()
 
 
