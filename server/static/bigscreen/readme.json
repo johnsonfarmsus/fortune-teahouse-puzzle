@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "title": "The gnu's shop: README",
+  "subtitle": "Written by everyone who fixed it, because I never did. – G.",
+  "sections": [
+    {
+      "id": "fortune_machine",
+      "heading": "Fortune Machine",
+      "trigger": {"machine_runs": "fortune_machine"},
+      "body": "Five phrase banks feed the printer, one line each. Each ink tube goes to the nozzle with its letter. Print, dry, send down the chute."
+    },
+    {
+      "id": "cookie_machine",
+      "heading": "Cookie Machine",
+      "trigger": {"machine_runs": "cookie_machine"},
+      "body": "Dry first, then wet, then mix and rest. The motor controller turns the mixer. The press thumps with the conveyor's beat."
+    },
+    {
+      "id": "oven",
+      "heading": "Oven",
+      "trigger": {"machine_runs": "oven"},
+      "body": "Five heat zones bake the rounds through the tunnel. Each thermostat lead goes to the port its sticker names. Bake, drop the fortune, fold warm, cool, package."
+    },
+    {
+      "id": "cookie_to_oven",
+      "heading": "Cookie Machine to Oven",
+      "trigger": {"handoff_connected": "cookie_to_oven"},
+      "body": "Belt at 3 cm a second. One round every 5 seconds. A fresh bowl every 2 minutes. Every round comes out golden."
+    },
+    {
+      "id": "fortune_to_oven",
+      "heading": "Fortune Machine to Oven",
+      "trigger": {"handoff_connected": "fortune_to_oven"},
+      "body": "Print every 4 ticks, dry for 1, start at tick 0. With the 2-tick chute, every fortune lands as the arms fold."
+    },
+    {
+      "id": "oven_to_packaging",
+      "heading": "Oven to packaging",
+      "trigger": {"handoff_connected": "oven_to_packaging"},
+      "body": "Chute 1, extra crisp, to Seagull's rooftop basket. Chute 2, golden, to the teahouse tins. Chute 3, soft, to Crab's pier crate. Gopher takes it from there."
+    }
+  ],
+  "closing": {
+    "heading": "Maintainers",
+    "line": "Not one gnu. All of you:",
+    "fortune": "You figured out what I never wrote down. It's yours now. – G."
+  }
+}
