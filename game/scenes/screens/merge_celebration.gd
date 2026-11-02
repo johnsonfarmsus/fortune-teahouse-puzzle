@@ -1,9 +1,13 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 extends ScreenBase
 ## "Patch submitted": Crab slides in and merges the fix. A tap skips the
-## animation. The first credited solve asks for a display name.
+## animation. The first credited solve asks for a display name. Crab's words
+## come from data/story/crab.json (triggers merged, first_credit, uncredited).
 
 const SLIDE_SECONDS := 1.2
+## The two pieces of the `first_credit` trigger: shown in a box, then asked in the screen.
+const FIRST_CONTRIBUTION := "crab.first_contribution"
+const NAME_PROMPT := "crab.name_prompt"
 
 var machine: String = ""
 var part: String = ""
@@ -15,6 +19,7 @@ var _merged: Label
 var _result: VBoxContainer
 var _tween: Tween
 var _shown: bool = false
+var _context: Dictionary = {}
 
 
 func setup(p_args: Dictionary) -> void:
@@ -33,9 +38,10 @@ func _build(box: VBoxContainer) -> void:
 	back_button.visible = false
 	var def := PuzzleData.get_part(machine, part)
 	var part_title := str(def.get("title", Ids.PART_TITLES.get(part, part)))
+	_context = {"part": part_title, "machine": Ids.machine_title(machine)}
 	title_label.text = "Patch submitted: %s" % part_title
 	var stage := Control.new()
-	stage.custom_minimum_size = Vector2(0, 150)
+	stage.custom_minimum_size = Vector2(0, 160)
 	stage.clip_contents = true
 	stage.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	box.add_child(stage)
@@ -47,8 +53,12 @@ func _build(box: VBoxContainer) -> void:
 	crab_label.position = Vector2(34, 30)
 	_crab.add_child(crab_label)
 	stage.add_child(_crab)
-	_merged = UiKit.label("Merged!", 28)
-	_merged.position = Vector2(150, 30)
+	# A credited merge gets one of Crab's merged lines; a revealed solve gets its words below.
+	var merged_line := Story.pick("merge_celebration", "merged", _context) if credited else {}
+	_merged = UiKit.label(str(merged_line.get("text", "")), UiKit.CLUE_SIZE)
+	_merged.position = Vector2(150, 10)
+	_merged.custom_minimum_size = Vector2(210, 0)  # 150 + 210 stays inside the 366 px stage
+	_merged.size = Vector2(210, 140)
 	_merged.modulate.a = 0.0
 	stage.add_child(_merged)
 	_result = VBoxContainer.new()
@@ -82,8 +92,12 @@ func _show_result() -> void:
 		return
 	_shown = true
 	_result.visible = true
+	if credited and not Story.is_seen(FIRST_CONTRIBUTION):
+		# Crab explains a pull request, once, on the first credited merge.
+		Story.play(self, [Story.get_piece(FIRST_CONTRIBUTION, _context)])
 	if not credited:
-		_result.add_child(UiKit.label("Crab merged the fix. Solve one yourself to get on the list.", 20))
+		var line := Story.pick("merge_celebration", "uncredited", _context)
+		_result.add_child(UiKit.label(str(line.get("text", "")), 20))
 		_add_list_and_continue()
 	elif not GameState.name_asked:
 		_ask_name()
@@ -92,7 +106,8 @@ func _show_result() -> void:
 
 
 func _ask_name() -> void:
-	_result.add_child(UiKit.label("Put your name on the contributors list?", 20))
+	var prompt := Story.get_piece(NAME_PROMPT, _context)
+	_result.add_child(UiKit.label(str(prompt.get("text", "")), 20))
 	var keypad: LetterKeypad = load(Paths.LETTER_KEYPAD).instantiate()
 	keypad.max_length = 20
 	_result.add_child(keypad)

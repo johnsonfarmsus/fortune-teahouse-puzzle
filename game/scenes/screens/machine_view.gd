@@ -1,15 +1,18 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 extends ScreenBase
 ## The six parts of one machine. Each row is a light plus text: Broken (grey),
-## Fixed by your crew (amber) or Fixed by you (green).
+## Fixed by your crew (amber) or Fixed by you (green). The machine's helper
+## speaks when the screen is first opened and after IDLE_SECONDS without input.
 
 const GREY := Color(0.5, 0.5, 0.5)
 const AMBER := Color(0.95, 0.72, 0.2)
 const GREEN := Color(0.35, 0.8, 0.4)
+const IDLE_SECONDS := 20.0
 
 var machine: String = ""
 var _summary: Label
 var _rows: Dictionary = {}  # part -> {button, light, label}
+var _idle_timer: Timer
 
 
 func setup(p_args: Dictionary) -> void:
@@ -50,6 +53,45 @@ func _build(box: VBoxContainer) -> void:
 	box.add_child(crew)
 	Events.progress_changed.connect(_on_progress_changed)
 	refresh()
+	_idle_timer = Timer.new()
+	_idle_timer.name = "IdleTimer"
+	_idle_timer.one_shot = true
+	_idle_timer.wait_time = IDLE_SECONDS
+	_idle_timer.timeout.connect(_on_idle)
+	add_child(_idle_timer)
+	if Story.visit("machine_view:" + machine):
+		_helper_speaks()
+	else:
+		_idle_timer.start()
+
+
+## Any press or key restarts the wait; a pushed screen on top never gets the line.
+func _input(event: InputEvent) -> void:
+	if _idle_timer != null and not _idle_timer.is_stopped() and (event is InputEventMouseButton or event is InputEventKey):
+		_idle_timer.start()
+
+
+## Stops the idle line for good (the screen is closing or the player is busy).
+func cancel_idle() -> void:
+	if _idle_timer != null:
+		_idle_timer.stop()
+
+
+func _on_idle() -> void:
+	if Router.top() == self:
+		_helper_speaks()
+	else:
+		_idle_timer.start()
+
+
+## One of the helper's idle lines in a dialogue box; the wait starts again when it closes.
+func _helper_speaks() -> void:
+	var line := Story.pick("machine_view:" + machine, "idle")
+	if line.is_empty():
+		_idle_timer.start()
+		return
+	var box := Story.play(self, [line], false)
+	box.finished.connect(_idle_timer.start)
 
 
 func refresh() -> void:

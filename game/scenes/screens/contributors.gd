@@ -14,6 +14,7 @@ func _build(box: VBoxContainer) -> void:
 	Progress.refresh_contributors()  # one look at the scoreboard when it is on
 	Events.progress_changed.connect(_on_progress_changed)
 	_fill()
+	Story.play(self, Story.unseen("contributors", "first_visit"))  # Crab on the Pier, once
 
 
 func _on_progress_changed(_machine: String) -> void:

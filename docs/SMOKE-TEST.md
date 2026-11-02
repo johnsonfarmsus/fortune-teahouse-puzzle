@@ -99,11 +99,11 @@ Use a second part or reset first if you already solved the batter puzzle.
 
 ## 7. Merge celebration and display name
 
-- [ ] After a real solve, "Patch submitted: ..." plays and the Crab "Merged!" appears.
+- [ ] After a real solve, "Patch submitted: ..." plays and Crab says one of his merged lines (for example "Merged! Your fix is in. Clack clack!").
   Note: ______________________
-- [ ] The first merge asks "Put your name on the contributors list?"; type a name on the in-game keys (up to 20 characters) and tap "Add my name". "Stay anonymous" works too, and it is not asked again.
+- [ ] The first merge shows Crab explaining a pull request, then asks "Want your name on the contributors list?"; type a name on the in-game keys (up to 20 characters) and tap "Add my name". "Stay anonymous" works too, and it is not asked again.
   Note: ______________________
-- [ ] The name appears in the Contributors list at the Pier. After a revealed solve, you are not listed ("Solve one yourself to get on the list.").
+- [ ] The name appears in the Contributors list at the Pier. After a revealed solve, you are not listed (Crab says "Solve one yourself next time, and I'll add your name to the list.").
   Note: ______________________
 
 ## 8. All six Cookie Machine parts
