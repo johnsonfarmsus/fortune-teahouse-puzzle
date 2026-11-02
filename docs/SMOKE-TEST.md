@@ -20,18 +20,67 @@ Mark each item `[x]` for pass or `[!]` for fail, and write what you saw on the n
 - Note the browser and version: ______________________
 - Note the network (venue Wi-Fi, home Wi-Fi, mobile data): ______________________
 
+## 0. The adventure slice (WP16)
+
+Since WP16 the game opens in the adventure layer: a walkable pixel-art town. Sections 2, 5 and 8 below describe the old menu screens; to reach them, open **Menu > Old screens (debug)** (the game restarts into the old town; switch it off the same way). Everything here is played with placeholder art (labelled blocks) until the art session lands real files. For a quick jump while testing, add `?room=<id>` to the address (`teahouse`, `square`, `shop`, `workshop`, `depot`, `pier`, `scrapyard`, `harbour`).
+
+**Look and feel**
+
+- [ ] After "Tap to start" (and the Lucky word screen, Back), you are in the **Teahouse**: a pixel room with sharp, unblurred pixels, letterboxed, the inventory bar above (Clues, Menu) and the dialogue bar below. Nothing is cut off by the notch or the browser bar.
+  Note: ______________________
+- [ ] Every tap answers at once with a blip and a small ring where you tapped. With sound on, taps, steps, doors, pickups and dialogue all make sounds; with Menu > Sound off, nothing does.
+  Note: ______________________
+- [ ] Tapping the floor walks the player there (4 directions, legs moving); tapping again redirects. Red Panda, the lanterns and the kettle's steam move on their own.
+  Note: ______________________
+- [ ] Tapping **Red Panda** walks to her and she speaks in the dialogue bar with a portrait, typed out with beeps. A tap finishes the line, the next tap moves on. Her line is a hint for the next step of the cutter chain.
+  Note: ______________________
+- [ ] Walking out of the door at the bottom fades to the **Town square**; the camera follows as you walk down it. Walking off the left or right edge slides the screen to the **Scrapyard** or the **Pier**; the pier's bottom edge leads to the **Harbour**. Every way out leads back.
+  Note: ______________________
+- [ ] It feels smooth (no stutter while walking or sliding). Rough guess of smoothness: ______
+  Note: ______________________
+
+**The cutter-die chain** (Cookie Machine crew; enter four Cookie Machine lucky words first so the batter can be solved)
+
+- [ ] **Shop.** The Cookie Machine is a contraption with a jar shelf, mixer, panel, the gnu's note, a cutter and a lamp; the parts not yet fixed look dull. Tapping the **cutter** shows the gnu's sticky label ("Die out for sharpening").
+  Note: ______________________
+- [ ] **Batter shelf.** Tapping the jar shelf zooms into a close-up. Drag each jar from the counter onto a shelf place; it tumbles and bounces into place with a clink. A jar dropped on a full place swaps it back to the counter. Five jars up checks itself: wrong wobbles and says "Not quite"; right glows and Crab's merge screen follows. Back in the shop the jars now stand on the machine's shelf, with a burst of sparks, a shake and a caption.
+  Note: ______________________
+- [ ] **Workshop.** Penguin says the gnu mailed everything and hands over a **spanner**; it appears in the inventory bar with a little pop. Tapping it says what it is and "Found by you".
+  Note: ______________________
+- [ ] **Misdirect: scrapyard.** Tapping the junk pile gives a look-alike die. Dragging it onto the cutter says it has 10 teeth, not 12. Dragging it back onto the junk pile puts it back.
+  Note: ______________________
+- [ ] **Decoy: Seagull's scrap.** On the pier, Seagull hands over an old scrap with a locker code. In the **Depot**, tapping the yellow locker opens its dials (tap the top or bottom of a dial, or drag it; then pull the handle). Seagull's code flashes "CODE CHANGED / FORWARDED: HARBOUR".
+  Note: ______________________
+- [ ] **Harbour.** Arriving after the decoy, Anglerfish pitches FortuneCloud and the forwarding slip explains that the scrap is from March, before the code changed, and that the code is in the batter. Anglerfish's shiny die, dragged onto the cutter, has a connector that fits nothing; dragging it back onto Anglerfish returns it.
+  Note: ______________________
+- [ ] **Locker, for real.** The gnu's label on the locker says the code is the jars of egg, vanilla and sugar. With the batter solved, that code opens the locker: a bent die.
+  Note: ______________________
+- [ ] **Bench.** Dragging the bent die onto Penguin's bench opens a close-up; tapping each marked tooth brings the mallet down (clang, sparks); when all are flat the die is straight and replaces the bent one in the bar.
+  Note: ______________________
+- [ ] **Install.** Dragging the die onto the cutter opens the bolts close-up; tap or drag the spanner over each bolt to turn it until all four are tight. Penguin cheers, Crab merges it, and back in the shop the cutter stamps rounds onto the belt.
+  Note: ______________________
+- [ ] Tapping an item, then tapping something in the room, uses it too (no dragging needed).
+  Note: ______________________
+
+**Shared inventory (with `?scoreboard=`)**
+
+- [ ] On two phones in the same crew, an item one finds (the spanner, the bent die) shows up on the other within about 15 seconds, and tapping it there says "Found by a crewmate". Seagull's scrap and the look-alike dies stay on the phone that took them.
+  Note: ______________________
+- [ ] Offline, finds still work on the phone and reach the crew after reconnecting (Menu > Sync now).
+  Note: ______________________
+
 ## 1. Loading and start
 
 - [ ] Page loads on venue-like Wi-Fi (not your fastest connection). Time from tapping the link to "Tap to start": ______ seconds. Over 20 seconds is a fail; the build downloads about 10 MB.
   Note: ______________________
 - [ ] The title screen fits the phone with nothing cut off, in portrait. Rotating the phone does not break it.
   Note: ______________________
-- [ ] Tap to start works on the first tap, and the Lucky word screen appears.
+- [ ] Tap to start works on the first tap, and the Lucky word screen appears (over the adventure layer; Back shows the Teahouse).
   Note: ______________________
 
-## 2. Walking around
+## 2. Walking around (old screens)
 
-Tap "Back" on the Lucky word screen to see the town.
+Switch on Menu > Old screens (debug) first. Tap "Back" on the Lucky word screen to see the town.
 
 - [ ] Tapping empty ground walks the yellow "You" square there; tapping again redirects it.
   Note: ______________________

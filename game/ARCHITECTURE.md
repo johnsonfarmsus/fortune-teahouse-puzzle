@@ -1,4 +1,4 @@
-# Game architecture (WP3 build spec)
+# Game architecture (WP3 build spec; section 15 is the WP16 adventure layer)
 
 This spec binds WP3, WP4, WP6 and WP7. Anything it does not cover is a question for the integrator.
 
@@ -267,3 +267,114 @@ The spec is `docs/FINALE-DESIGN.md`; this section is the game's side. The big-sc
 **Screens:** `DialsPuzzle` (`scenes/puzzles/dials_puzzle.tscn`, a `PuzzleBase` with `setting_set(index)`, `locked_indices` in its config and the test API `step`, `set_value`, `values`, `locked`, `test_run`; `DialPreview` draws the belt, beats and routes shapes). `HandoffHost` (args `handoff` or `twin`) shows the gate message or the puzzle, the header "Settings set by everyone: N of 3. On this phone: M of 3." and Continue. `FinaleView` (Shop's "The line" button), `Archive` (Town hotspot `Hotspots/Archive`), `ReadmeScreen`. `ClueBoard` shows "Handoff notes" first and "The gnu's last fortune" once started; `LuckyWordEntry` falls back to `Finale.collect_word`. Elephant's story lines play in the `DialogueBox`. A twin puzzle files its gnu note only on a credited solve; a hint-3 reveal shows "Elephant smiles. Find the real note, or solve it yourself." and files nothing. While FinaleView, HandoffHost or Archive is on top, `Progress` watches all three machines so crew progress (the pre-open rows, note grants, README triggers) keeps refreshing.
 
 **Tests:** `test_dial_rules`, `test_finale_data`, `test_finale_state`, `test_finale_client` (with `FakeScoreboard` and `test/fixtures/finale_fixtures.gd`), and `test/scene/test_finale_screens.gd`.
+
+## 15. Adventure layer (WP16)
+
+The player-facing layer since WP16 (PLAN.md section 9, decisions D9 to D14). It sits on top of everything above: PuzzleData, GameState, Progress and the scoreboard client, Story, Hints, Router and Finale are unchanged in role. The old Town, Shop and Hud stay reachable behind `fortune/debug_legacy_screens` (section 15.10).
+
+```
+game/assets.json                     logical art names -> files (15.4)
+game/data/rooms.json                 the town (15.2)
+game/data/sfx.json                   sounds, synthesised at run time (15.5)
+game/data/chains/<machine>.json      chains (15.7); WP16 ships cookie_machine.json with the cutter chain
+game/data/story/chains.json          what rooms, items and the chain say
+autoload/adventure.gd                Adventure: rooms, assets, chain states, crew inventory, interact()
+scripts/core/                        AssetLoader, PixelGlyphs, SfxSynth, SfxBank, RoomGraph, ChainRules,
+                                     ChainState, InventoryStore, LocalInventoryStore, RemoteInventoryStore,
+                                     DebugSettings
+scenes/adventure/                    adventure_view, room, cookie_machine_rig, portrait_dialogue,
+                                     inventory_bar, close_up_base, lock_dials, straighten_bench, tighten_bolts
+scenes/puzzles/batter_shelf_puzzle   the batter jars as a PuzzleBase (15.8)
+```
+
+`Adventure` is registered after `Finale`. Main starts `AdventureView` (on a CanvasLayer 1) after the start tap unless the legacy setting is on; a new player still gets LuckyWordEntry pushed first.
+
+### 15.1 View, scale and input (D9)
+
+`AdventureView` renders the room in a `SubViewport` of 176x320 (11 by 20 tiles), drawn by a `SubViewportContainer` with nearest filtering and `snap_2d_transforms_to_pixel`. The container is scaled (Control `scale`), not stretched, so the scale can be a whole number of **device** pixels: `device = root.get_final_transform().x.x` (at least 1), `k = floor(min(width * device / 176, (height - 52 - 96) * device / 320))`, `pixel_scale = k / device`. On a 390x844 phone that is 2 layout pixels per art pixel (6 device pixels at DPR 3). Left and right are letterboxed; the inventory bar takes the space above (at least 52), the dialogue bar the space below (at least 96, growing upward over the room for a long line). If a screen is too short, the bars overlay the room. `screen_to_room()` and `room_to_screen()` convert through the frame and the room camera.
+
+Taps reach the room through the container (`Room._unhandled_input`, room position from `get_canvas_transform().affine_inverse()`); hit tests use the data rects (`RoomGraph.thing_at`), never physics picking. While dialogue is open a transparent catcher over the room turns any tap into "next line"; while a close-up or a Router screen is open the room ignores taps. Menus are Router screens on CanvasLayer 10 above everything: Clues and Menu in the inventory bar, LuckyWordEntry (Red Panda's board), Contributors (Crab's board), MergeCelebration after a solve. The mentor `HintBanner` is added on CanvasLayer 30 by the view.
+
+### 15.2 Rooms, walking, camera, transitions
+
+`data/rooms.json` holds a shared `legend` (map character -> `tile` asset, `solid`) and `rooms`. A room has `title`, `kind`, `sound` (its ambient loop), `map` (rows of 11 characters), `spawns` ({name: [x, y]}), `exits` ([{tiles, to, arrive, kind: door|edge, dir}]), `npcs` and `props` (things: `id`, `asset`, `at`/`size` or `rect_px`, `stand`, `solid`, `facing`, `say` (piece ids, shown in turn), `open` (a menu or close-up), `hint` (Red Panda)), `rigs` (the Cookie Machine) and `ambient` (steam, gulls, sparkle, bubbles). WP16's rooms: teahouse (start), square (the connecting street; not in the design's list but needed to join four doors and two edges), shop, workshop, depot, pier, scrapyard and harbour. Thing ids are the targets chain data names.
+
+`RoomGraph` is the pure side: walkability (legend plus solid things; exit tiles always open), `path()` (AStarGrid2D, 4-way), `thing_at`, `stand_cell`, `nearest_walkable`, `targets()` for chain validation, and `validate()` (11 wide, every exit to an existing room and spawn and back, no blocked spawns or exits, somewhere to stand by every thing).
+
+`Room` (scenes/adventure/room.tscn) builds itself from that data: a `TileLayer` that draws static tiles once and another that redraws animated tiles (water) at about 2 Hz, props and characters as `AnimatedSprite2D` in a y-sorted layer (characters play `idle_<facing>`), the rig, ambient motion, the player and a `Camera2D` limited to the room with position smoothing, so rooms taller than 320 (square, pier, scrapyard, harbour) scroll as you walk. A tap plays `tap` or `select` and a ring at once, flashes the thing hit, walks to its stand cell (96 px/s; distance left at a cell carries on, so slow frames never slow the walk) and then emits `thing_activated` or, with an item picked or dropped, `item_used`. Stepping onto an exit tile emits `exit_reached`; the view fades through black for doors and, for edges, slides a snapshot of the old room out while the new one slides in (flip-screen), falling back to the fade where the viewport cannot be read. The view saves the room and cell in `user://adventure.json` after each walk, so a reload resumes there. On the web build `?room=<id>` starts in that room (playtests and screenshots).
+
+### 15.3 Characters and dialogue
+
+Characters are `char.<id>` sheets (4 columns for down, up, left, right; idle and walk animations listed in assets.json). The player walks with 4-frame walk cycles (placeholders alternate feet) and idles facing where it last moved. `PortraitDialogue` is the bottom bar: portrait `portrait.<speaker>.<expression>` (falls back to neutral; none for the Narrator), speaker and kind ("Gnu (sticky label)"), and one line at a time typed out at 70 characters a second with `babble.<speaker>` beeps every 3 characters. A tap finishes the line, the next moves on; pieces queue. Story pieces gained an optional `expression` (neutral, happy, worried, surprised, sly), kept by `StoryCatalog`. With nothing to say the bar shows the room, crew and online state, and a one-line how-to.
+
+### 15.4 AssetLoader (D11)
+
+`game/assets.json`: `tile_size`, the game's one `palette` and `assets` {name: {file, frame_size, frames, kind, origin?, columns?, animations?, color, glyph, ...}}. `AssetLoader.shared()` loads by logical name: `texture(name, frame)` and `frames(name)` (SpriteFrames). If `res://<file>` exists as an imported resource it is used (an AtlasTexture for one frame of a sheet); otherwise a placeholder is drawn in code: a block in the palette colour with a 1 px outline and a 3x5 pixel glyph (`PixelGlyphs`), shaped by kind (tiles fill and their glyph drifts per frame, characters face the animation's direction and step, portraits draw a mouth per expression, `fx` and `glyph` kinds are transparent). `frame_colors` and `frame_glyphs` give placeholders states (a lamp off and on, dial digits). No art is committed: the Ninja Adventure tiles are listed under `art/ninja/Backgrounds/Tilesets/...` with a best-guess `origin`, characters under `art/characters/`, portraits under `art/portraits/`, props, machines, close-ups and effects under their own folders. When the art session lands a file at its path (and fixes `origin` or `frame_size` if needed), the game picks it up with no code change. Static textures are released when Adventure leaves the tree.
+
+### 15.5 Sound (D12)
+
+`data/sfx.json` maps interaction ids to `{wave: square|triangle|saw|sine|noise, freq, freq_end, notes, note_len, duration, attack, decay, volume, duty, vibrato, loop, lfo}` or `{alias}`. `SfxSynth` builds a 16-bit mono `AudioStreamWAV` at 22050 Hz in code (no audio files); `SfxBank` caches them. `Audio.play(id)` uses six voices in turn (taps overlap), records every id in `played` even while muted (tests), and stays silent until the start tap (`unlock()`) and while Menu > Sound is off. `Audio.play_ambient(id)` loops the room's `sound` (`ambient.indoor`, `town`, `sea`, `wind`, `machines`) quietly. The ids a scene plays itself are `SfxBank.CORE_IDS`; with one babble per speaker and every id in chain and room data, `test_sfx.gd` checks each has a sound.
+
+### 15.6 Crew inventory (D10)
+
+`InventoryStore` entries are `{item_id, state: found|installed, found_by (device id), found_at, place}`; state only moves forward and a repeat changes nothing. `LocalInventoryStore` (`user://inventory.json`, per machine) is the whole inventory offline. `RemoteInventoryStore` wraps it, like `RemoteProgressStore`: writes apply locally and queue (`user://inventory_queue.json`) as `POST /crews/{m}/inventory/{item_id}` `{device_id, state, place}`, sent in order with backoff 2 to 60 s (or Retry-After); a write already queued is not queued again; `403 not_in_crew` drops it (it stays on the phone); other 4xx are dropped after five refusals. `GET /crews/{m}/inventory` merges rows into the local store (the server's `found_by` wins: first writer). `backfill()` sends this phone's offline finds once a scoreboard appears. Adventure builds the remote store when `Progress.scoreboard_active()` (same address and toggle), using `Progress.network()` (the shared HttpTransport, or the tests' fake), polls the player's crew every 15 s from a 1 s Timer, and "Sync now" flushes it. The bar shows "Found by you" or "Found by a crewmate" (device ids are not names). `place` is `<room>:<target>`. Checked against the real WP5c server (find, crewmate repeat keeps the first finder, install, 403 drop) besides the fake-transport tests.
+
+Only **shared** items sync. Unshared items (`shared: false`: misdirects and Seagull's scrap) live in `ChainState.held` on the phone, each with a `home` to be put back, so a crewmate's look-alike never clutters everyone's bar and nothing needs a "returned" state on the server.
+
+### 15.7 Chains (D13)
+
+`data/chains/<machine>.json` has `items` (kind tool, part or knowledge; `asset`, `about` piece, `shared`, `replaced_by`, `home`) and `chains`, each with `part` (the machine part its goal credits), `goal`, `places`, `steps` (find, decode, repair, install: `room`, `done_when`, two Red Panda `hints`), `locks`, `misdirects` (item, room, `tell`, `tell_piece`), `decoys` (lock, outdated `code`, named `mistake`, `source_item`, `destination`, `flash`, `wrong_place_says`, `tell`) and `interactions`.
+
+An interaction is `{id, room, target, verb, item?, result?, requires, effects, say, sfx, misdirect?, decoy?}`. Verbs: `tap`, `use` (an item in hand dropped or tapped onto the target), `code` (a lock; `result` is right, wrong or decoy:<id>), `done` (a close-up finished; the target is the close-up's name) and `enter` (arriving in the room; the target is the room). `requires` keys: facts, not_facts, have, not_have, found, installed, not_installed, decoys_seen, not_decoys_seen. Effects: `learn`, `hold`, `release`, `see_decoy` (ChainState, this phone) and `find`, `install`, `solve_part`, `open` (handed back). The first interaction in data order whose requirements hold wins.
+
+`ChainRules` is static and pure: `resolve`, `apply`, `apply_to_inventory`, `has_item` (found, not installed, not replaced; unshared: held), `visible_items`, `current_step` (the step after the furthest one done, so a crewmate's find skips ahead), `lock_code` and `code_result`, `validate`, `sfx_ids`, `piece_ids`. Lock codes are never written in data: `code_from` names the logic puzzle and items, and the digits are those items' positions in `PuzzleData.get_answer` (the fortunes point around town, as the design says). `ChainState` saves facts, held items and decoys seen to `user://chain_<machine>.json`. `Adventure.interact(room, target, verb, item, code)` resolves across every machine's chains, applies the effects (finds and installs through the inventory, `solve_part` through `Adventure.record_solve`, which does what PuzzleHost does) and returns `{say, sfx, open, solved_part, now_running, misdirect, decoy, result}` for the view to present; a part solve ends in MergeCelebration. Red Panda's help is `Adventure.next_hint()`: the current step's nudge, then its stronger nudge.
+
+**How a step maps to a room interaction (the cutter chain):**
+
+| Step | Room, target, verb | Effect |
+| --- | --- | --- |
+| find | shop, `cutter`, tap | the gnu's sticky label; learn `die_out` |
+| (ask) | workshop, `penguin`, tap (needs `die_out`) | learn `die_mailed`; find `spanner` |
+| decode | depot, `gnu_locker`, tap | open the dials close-up (`lock:gnu_locker`) |
+| decode | depot, `gnu_locker`, code right (egg, vanilla, sugar jars) | find `die_bent` |
+| decoy | pier, `seagull`, tap; depot, `gnu_locker`, code 241 | hold `old_scrap`; see decoy; "Code changed. Parcel forwarded: HARBOUR." |
+| decoy | harbour, `harbour`, enter (decoy seen) | Anglerfish's pitch and the dated slip, pointing back to the fortunes |
+| misdirects | scrapyard `scrap_pile` tap; harbour `anglerfish` tap; their dies used on `cutter` | hold a look-alike; its tell (10 teeth; a connector that fits nothing); give it back to its home |
+| repair | workshop, `bench`, use `die_bent`; `straighten` done | find `cutter_die` (replaces the bent one) |
+| install | shop, `cutter`, use `cutter_die` (with the spanner); `tighten` done | install `cutter_die`; solve part `rhythm` |
+
+The cutter is the press's die, so WP16 credits the Cookie Machine's **rhythm** part ("Press and conveyor beat") when the die is installed; the old beat puzzle stays on the old screens. WP19 may move the beat into this chain as its last step.
+
+`test_chain_rules.gd` plays the chain in step order, checks prerequisites, misdirect tells, the decoy's route, message and tell, crew finds skipping steps, and "nothing lost for good": a breadth-first search over every reachable state (taps, every item on every target, right, decoy and wrong codes, close-ups finished or abandoned) finds the goal still reachable from each.
+
+### 15.8 Close-ups and the batter shelf
+
+Repairs zoom in: `CloseUpBase` covers the room view and draws pixel art on the same 176x320 grid at the view's scale, with a header (title, Hint for puzzles, X). `LockDials` (tap a dial's top or bottom, or drag it; pull the handle; `code_entered`, then `show_result` swings the door, flashes the forwarding notice with the decoy's destination from data, or buzzes), `StraightenBench` (tap each dent; two mallet blows each, sparks; `done`) and `TightenBolts` (tap or drag the spanner over each bolt three quarter turns; `done`). They emit, the view calls `Adventure.interact`.
+
+`batter_shelf_puzzle.tscn` is a `PuzzleBase` with MatchingPuzzle's config and `MatchingRules`: drag jars from the counter onto five shelf places; a dropped jar falls with gravity and bounces (a little physics, done by hand: no physics bodies), a displaced jar tumbles home, a tap on a shelved jar takes it down, five jars check themselves (glow and solve, or wobble and "Not quite"). Hints and reveal follow MatchingPuzzle's rules. Test API: `place`, `clear_slot`, `placement`, `check`, `drop_jar`, `simulate`, `settle`, `is_settled`. The view hosts it like PuzzleHost does (hint ladder, reveal confirmation, the gnu's first-visit note, credit through `Adventure.record_solve`, MergeCelebration). The Cookie Machine's other four parts and the Fortune Machine and Oven still open their old PuzzleHost or MachineView from the shop until their chains land.
+
+### 15.9 The Cookie Machine rig
+
+`CookieMachineRig` draws the machine in the shop from `machine.cookie.*` assets and reads the crew's progress: jars fill the shelf (logic), the paddle turns (wiring), the panel blinks (sequence), the note glows (word), the cutter stamps a round onto the moving belt every 0.9 s (rhythm), the lamp lights (helper); all six send finished cookies along. A part fixed since this phone last saw it gets its moment once (sparks, a shake, `part_fixed`, a caption `narrator.fixed.cookie_machine.<part>`), held back while a close-up or a screen is open; seen parts are remembered in `GameState.story_state`.
+
+### 15.10 Legacy screens
+
+`DebugSettings.legacy_screens()`: a phone override saved by Menu > Old screens (debug) in `user://debug.json`, else the project setting `fortune/debug_legacy_screens` (false). On, Main shows the old Town with the Hud instead of the adventure layer; toggling restarts the main scene without asking for the start tap again. The old screens' tests force it on (`DebugSettings.forced`).
+
+### 15.11 Tests
+
+`test/unit/`: `test_chain_rules`, `test_inventory_store` (local; remote with `FakeScoreboard` in the server's row shape: body, idempotence, 403 drop, offline queue and backoff, five refusals, first writer, polling, backfill, retire), `test_room_graph`, `test_asset_loader` (well-formed list, every placeholder draws at its size, outline and glyph, animations, portraits, a real file replaces the placeholder), `test_sfx` (data, every interaction id, babble, synthesis). `test/scene/test_adventure.gd`: main into the teahouse, the legacy switch and its toggle, integer scaling and bars, feedback on every tap, walking frames, doors and edges both ways, idle characters and portraits, the whole cutter chain through the view including both misdirects and the decoy, putting misdirects back, wrong drops, tap-to-use, the batter shelf (solve, tumble, swap, hints, reveal, from the shop), the rig coming alive, the dialogue bar, `?room=`.
+
+**Known limits.** On the web build, files saved just before a page reload can be lost if the browser's storage sync has not run yet (seconds); the next save syncs everything. The text-assist mode (D14) is WP23.
+
+### 15.12 What later packages may add
+
+| Package | May add | May edit |
+| --- | --- | --- |
+| WP17 (chain design) | the other chains in `data/chains/*.json`, their story pieces, `docs/CHAINS.md`, new rooms in `rooms.json` (archive, cottage) | room things and exits, Red Panda's hints |
+| WP18 (checks) | CI checks for the asset list (files exist or are placeholders), the decoy rule against the solver, chain validation in Python | none |
+| WP19 to WP21 (chains) | close-ups extending `CloseUpBase` (or puzzles extending `PuzzleBase`) for each part, rigs for the Fortune Machine and Oven, new verbs or requirement keys in `ChainRules` with tests | `open_target`/`open_closeup` in AdventureView, `CHAIN_FILES` in Adventure |
+| WP22 (finale) | the line as a rig in the shop, Archive as Elephant's room | the finale screens' entry points |
+| Art session | files at the paths in `assets.json`; corrected `origin`, `frame_size`, `animations` | `assets.json` paths only |
+
+Must not change without the integrator: the inventory and chain data formats above, `Adventure.interact()`'s result, ProgressStore and PuzzleBase.
