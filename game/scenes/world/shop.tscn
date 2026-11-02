@@ -172,3 +172,13 @@ offset_bottom = 832.0
 custom_minimum_size = Vector2(120, 48)
 focus_mode = 0
 text = "Town"
+
+[node name="LineButton" type="Button" parent="."]
+offset_left = 298.0
+offset_top = 784.0
+offset_right = 380.0
+offset_bottom = 832.0
+custom_minimum_size = Vector2(82, 48)
+focus_mode = 0
+theme_override_font_sizes/font_size = 18
+text = "The line"

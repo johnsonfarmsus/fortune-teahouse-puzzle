@@ -75,6 +75,8 @@ func activate(hotspot: Hotspot) -> void:
 		Router.push(Paths.LUCKY_WORD_ENTRY)
 	elif hotspot.place_id == "pier":
 		Router.push(Paths.CONTRIBUTORS)
+	elif hotspot.place_id == "archive":
+		Router.push(Paths.ARCHIVE)
 
 
 # --- Anglerfish -----------------------------------------------------------------

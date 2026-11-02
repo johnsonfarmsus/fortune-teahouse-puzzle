@@ -46,6 +46,7 @@ var _watching := false
 var _in_flight := false
 var _fetching := false
 var _online := false
+var _failed := false
 var _retired := false
 var _generation := 0
 var _backoff_msec := 0
@@ -80,6 +81,11 @@ func set_identity(device_id: String, crew: String, display_name: String) -> void
 
 func is_online() -> bool:
 	return _online
+
+
+## True when the last request got no answer (or a 5xx): the cached finale is all there is.
+func unreachable() -> bool:
+	return _failed
 
 
 func queue_size() -> int:
@@ -370,6 +376,7 @@ func _note_status(status: int) -> bool:
 
 
 func _set_online(value: bool) -> void:
+	_failed = not value
 	if _online != value:
 		_online = value
 		status_changed.emit()

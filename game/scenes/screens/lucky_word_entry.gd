@@ -55,7 +55,7 @@ func _on_submitted(word: String) -> void:
 	var result := GameState.enter_lucky_word(word)
 	match result:
 		PlayerState.UNKNOWN:
-			_result.text = "That word is not on any cookie we know. Check the spelling."
+			_on_unknown_word(word)
 		PlayerState.ALREADY_HAVE:
 			_result.text = "You already have that clue."
 			_keypad.clear()
@@ -65,6 +65,19 @@ func _on_submitted(word: String) -> void:
 		PlayerState.COLLECTED_JOINED:
 			_result.text = "Clue collected! You joined the %s crew." % Ids.machine_title(GameState.crew)
 			_keypad.clear()
+
+
+## Not a lucky word: it may be a handoff word from a crew's note, or from the gnu's notes.
+func _on_unknown_word(word: String) -> void:
+	var found := Finale.collect_word(word)
+	if found == Finale.WORD_COLLECTED:
+		_result.text = "Handoff note collected! See it under Clues."
+		_keypad.clear()
+	elif found == Finale.WORD_HAVE:
+		_result.text = "You already have that note."
+		_keypad.clear()
+	else:
+		_result.text = "That word is not on any cookie we know. Check the spelling. If it's from one of the gnu's notes, take it to Elephant at the Archive."
 
 
 func _on_crew_chosen(machine: String) -> void:
