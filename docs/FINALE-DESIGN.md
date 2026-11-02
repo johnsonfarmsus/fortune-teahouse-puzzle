@@ -1,5 +1,7 @@
 # Finale design (WP9)
 
+Status: approved by the integrator on 2 Nov 2026 with two amendments (start_tick range 0 to 3 so the only valid start is tick 0; code normalisation stated). Trevor's four questions in section 10 are open and do not block implementation.
+
 Binds WP12 and WP16. Every point is decided; quoted strings are exact.
 
 ## 1. Timeline and gating
@@ -50,7 +52,7 @@ intro: "Penguin's rounds drop onto the Oven belt. Set the belt, the press and th
 
 0. Print a fortune every, ticks (`print_every`): 2–6, answer **4**. Low "Too often: fortunes pile up." High "Too slow: some rounds get no fortune." Hint "How often does a round reach the arms?"
 1. Let the ink dry, ticks (`dry`): 0–3, answer **1**. Low "Too short: the ink smudges." High "Too long: the strip misses its round." Hint "How long does fresh ink need?"
-2. Start printing at tick (`start_tick`): 0–5, answer **0**. Low "Too early: the fortune lands on a bare belt." High "Too late: the round has cooled and cracks." Hint "Work back from tick 3: take away drying and chute time."
+2. Start printing at tick (`start_tick`): 0–3, answer **0**. Low "Too early: the fortune lands on a bare belt." High "Too late: the round has cooled and cracks." Hint "Work back from tick 3: take away drying and chute time."
 
 ### Oven to packaging (routing, with Gopher), preview `routes`
 
@@ -64,7 +66,7 @@ Gate messages: "You need <note title>. Find someone from the <crew> crew and ask
 
 ## 4. The gnu's notes and Elephant's Archive
 
-**N = 6, k = 4.** A code is a word plus two digits, printed with a space ("KETTLE 27"), typed on the Archive's LetterKeypad. Codes ship in game data (leaks are fine) and are checked locally, so they work offline and early; valid ones queue to `POST /finale/notes`.
+**N = 6, k = 4.** A code is a word plus two digits, printed with a space ("KETTLE 27"), typed on the Archive's LetterKeypad. Codes are normalised before comparing and before posting: uppercase, spaces removed ("KETTLE27"), which is also the form in the server's `GNU_NOTE_CODES`. Codes ship in game data (leaks are fine) and are checked locally, so they work offline and early; valid ones queue to `POST /finale/notes`.
 
 Each note has an **in-game twin** for remote and no-venue players: a `helper` puzzle started from its Archive slot once the finale is open. Solving it files the note.
 
