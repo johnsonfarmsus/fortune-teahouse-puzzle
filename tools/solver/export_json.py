@@ -64,6 +64,8 @@ def machine_to_json(machine: Machine) -> dict[str, Any]:
             "items": [item_id for item_id, _ in machine.items],
             "positions": [label for _, label in machine.positions],
             "position_noun": machine.position_noun,
+            "item_names": {item_id: name for item_id, name in machine.items},
+            "item_noun": machine.item_noun,
         },
         "answer": dict(machine.answer),
         "clues": clues,

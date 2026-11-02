@@ -48,6 +48,7 @@ class Machine:
     errors: list[str] = field(default_factory=list)
     puzzle_title: str = ""
     position_noun: str = ""
+    item_noun: str = ""
 
     @property
     def domain(self) -> Domain:
@@ -189,6 +190,7 @@ def load_machine(path: Path) -> Machine:
         errors,
         puzzle_title=puzzle_title,
         position_noun=domain.get("position_noun", "") if isinstance(domain.get("position_noun"), str) else "",
+        item_noun=domain.get("item_noun", "") if isinstance(domain.get("item_noun"), str) else "",
     )
 
 
