@@ -36,6 +36,14 @@ static func shared() -> AssetLoader:
 	return _shared
 
 
+## Drops the shared loader and its cached textures (Adventure does this on exit).
+static func release_shared() -> void:
+	if _shared != null:
+		_shared._textures.clear()
+		_shared._frames.clear()
+	_shared = null
+
+
 ## Reads `list_path`, or uses `data` when given (tests).
 func _init(list_path: String = LIST_PATH, data: Dictionary = {}) -> void:
 	var source := data if not data.is_empty() else JsonFile.read(list_path)

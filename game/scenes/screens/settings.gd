@@ -59,6 +59,16 @@ func _build(box: VBoxContainer) -> void:
 
 	_build_scoreboard(list)
 
+	var legacy := CheckButton.new()
+	legacy.name = "LegacyScreens"
+	legacy.text = "Old screens (debug)"
+	legacy.custom_minimum_size = Vector2(200, 48)
+	legacy.focus_mode = Control.FOCUS_NONE
+	legacy.button_pressed = DebugSettings.legacy_screens()
+	legacy.toggled.connect(_on_legacy_toggled)
+	list.add_child(legacy)
+	list.add_child(UiKit.label("The old menu-style town and machine screens, kept until the adventure replaces them.", UiKit.CLUE_SIZE))
+
 	var about := Story.pick("settings", "always")
 	if not about.is_empty():
 		list.add_child(UiKit.label("About", 20))
@@ -166,3 +176,13 @@ func _on_reset() -> void:
 	GameState.reset_device()
 	Router.clear()
 	Router.go_to_place("town")
+
+
+## Switches between the adventure layer and the old screens, then restarts the
+## main scene (the start tap is not asked for again).
+func _on_legacy_toggled(on: bool) -> void:
+	DebugSettings.set_legacy_screens(on)
+	if not is_inside_tree() or get_tree().current_scene == null or get_tree().current_scene.scene_file_path != Paths.MAIN:
+		return
+	Router.clear()
+	get_tree().reload_current_scene()

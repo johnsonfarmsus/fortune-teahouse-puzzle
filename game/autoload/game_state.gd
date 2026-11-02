@@ -97,6 +97,7 @@ func set_story_state(key: String, value: String) -> bool:
 func set_sound_on(value: bool) -> void:
 	player.sound_on = value
 	save()
+	Audio.sound_setting_changed()
 
 
 ## Forgets this device: name, clues, crew, solves and local progress.
@@ -106,5 +107,6 @@ func reset_device() -> void:
 	save()
 	Progress.reset()
 	Finale.reset()
+	Adventure.reset()
 	Events.crew_changed.emit("")
 	Events.display_name_changed.emit("")

@@ -106,11 +106,24 @@ func use_scoreboard(on: bool) -> void:
 		_build_store()
 
 
+## The network the stores share: the injected fake in tests, else one
+## HttpTransport. The crew inventory (Adventure) sends through it too.
+func network() -> Callable:
+	if transport_override.is_valid():
+		return transport_override
+	if _transport == null:
+		_transport = HttpTransport.new()
+		_transport.name = "HttpTransport"
+		add_child(_transport)
+	return Callable(_transport, "request")
+
+
 ## "Sync now": tries the queue at once and looks at the scoreboard. Returns
 ## the number of writes still waiting.
 func sync_now() -> int:
 	if not scoreboard_active():
 		return 0
+	Adventure.sync_now()
 	var remote := store as RemoteProgressStore
 	var waiting := remote.flush()
 	remote.refresh()
@@ -143,13 +156,7 @@ func _build_store() -> void:
 		return
 	if store is RemoteProgressStore and (store as RemoteProgressStore).base_url == scoreboard_url:
 		return
-	var send := transport_override
-	if not send.is_valid():
-		if _transport == null:
-			_transport = HttpTransport.new()
-			_transport.name = "HttpTransport"
-			add_child(_transport)
-		send = Callable(_transport, "request")
+	var send := network()
 	var remote := RemoteProgressStore.new(scoreboard_url, _local, send, queue_path)
 	set_store(remote)
 	remote.set_identity(GameState.device_id, GameState.crew, GameState.display_name)

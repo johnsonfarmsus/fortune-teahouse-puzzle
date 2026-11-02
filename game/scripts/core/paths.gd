@@ -5,6 +5,8 @@ extends RefCounted
 ## and load(), never preload(), so scripts do not form load cycles.
 
 const MAIN := "res://scenes/main/main.tscn"
+const ADVENTURE_VIEW := "res://scenes/adventure/adventure_view.tscn"
+const BATTER_SHELF := "res://scenes/puzzles/batter_shelf_puzzle.tscn"
 const PLACES := {
 	"town": "res://scenes/world/town.tscn",
 	"shop": "res://scenes/world/shop.tscn",

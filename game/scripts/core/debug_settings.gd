@@ -11,6 +11,8 @@ const PATH := "user://debug.json"
 
 ## Tests set this to avoid touching the real file ("" means no file).
 static var path: String = PATH
+## Tests force the answer: -1 reads the file and setting, 0 is off, 1 is on.
+static var forced: int = -1
 
 
 static func project_default() -> bool:
@@ -18,6 +20,8 @@ static func project_default() -> bool:
 
 
 static func legacy_screens() -> bool:
+	if forced >= 0:
+		return forced == 1
 	var saved := JsonFile.read(path) if path != "" else {}
 	if saved.has("legacy_screens"):
 		return bool(saved["legacy_screens"])
@@ -25,5 +29,7 @@ static func legacy_screens() -> bool:
 
 
 static func set_legacy_screens(on: bool) -> void:
+	if forced >= 0:
+		forced = 1 if on else 0
 	if path != "":
 		JsonFile.write(path, {"legacy_screens": on})
