@@ -1,0 +1,113 @@
+# SPDX-License-Identifier: AGPL-3.0-or-later
+# Cookie Machine core puzzle: which jar holds which ingredient.
+# Spoiler warning: this file contains the answer. See puzzles/README.md.
+schema_version: 1
+machine:
+  id: cookie_machine
+  name: Cookie Machine
+domain:
+  item_noun: ingredient
+  position_noun: jar
+  order: "jars 1 to 5, left to right"
+  items:
+    - id: sugar
+      name: Sugar
+    - id: flour
+      name: Flour
+    - id: butter
+      name: Butter
+    - id: vanilla
+      name: Vanilla
+    - id: egg
+      name: Egg
+  positions:
+    - index: 1
+      label: Jar 1
+    - index: 2
+      label: Jar 2
+    - index: 3
+      label: Jar 3
+    - index: 4
+      label: Jar 4
+    - index: 5
+      label: Jar 5
+generator:
+  seed: 2
+  structure: two_anchors_four_link_chain
+answer:
+  sugar: 5
+  flour: 2
+  butter: 1
+  vanilla: 3
+  egg: 4
+clues:
+  - id: cookie_poem
+    style: poem
+    approachable: true
+    lucky_word: SPRINKLE
+    fortune_text: "Where butter is kept, look one jar to the right: there the flour sits waiting, powdery white. Lucky word: SPRINKLE"
+    char_count: 114
+    fact:
+      kind: offset
+      item: flour
+      relative_to: butter
+      offset: 1
+    nudge: "Read past the rhyme. The couplet names two ingredients and a direction: start at the first one's jar and move the way it says."
+  - id: cookie_animal
+    style: animal
+    approachable: true
+    lucky_word: HUDDLE
+    fortune_text: "Penguin dads keep the egg close all winter. So does sugar: the egg sits one jar left of sugar. Lucky word: HUDDLE"
+    char_count: 113
+    fact:
+      kind: offset
+      item: egg
+      relative_to: sugar
+      offset: -1
+    nudge: "The penguin is only a picture. The second sentence is the instruction: it names two ingredients and which side of one the other is on."
+  - id: cookie_trivia
+    style: trivia
+    approachable: true
+    lucky_word: TUX
+    fortune_text: "Which version of the GNU GPL came out in 1989? Butter goes in the jar with that number. Lucky word: TUX"
+    char_count: 103
+    fact:
+      kind: position
+      item: butter
+      position: 1
+    nudge: "Look up when each version of the GNU General Public License was published. The version number is a jar number."
+  - id: cookie_security
+    style: security
+    approachable: true
+    lucky_word: CIPHER
+    fortune_text: "On a jar lid, in the gnu's ROT13: Fhtne vf va wne svir. Lucky word: CIPHER"
+    char_count: 74
+    fact:
+      kind: position
+      item: sugar
+      position: 5
+    nudge: "ROT13 swaps every letter with the one 13 places along the alphabet: A and N swap, B and O swap, and so on. Swap each letter of the scrambled words."
+  - id: cookie_code
+    style: code
+    approachable: false
+    lucky_word: PATCH
+    fortune_text: 'assert jar["flour"] == jar["vanilla"] - 1  # jar 1 is on the left Lucky word: PATCH'
+    char_count: 83
+    fact:
+      kind: offset
+      item: flour
+      relative_to: vanilla
+      offset: -1
+    nudge: "jar[\"x\"] means the number of the jar that holds x. An assert is a line that must be true, so read it as plain arithmetic about two jar numbers."
+  - id: cookie_hardware
+    style: hardware
+    approachable: false
+    lucky_word: SOLDER
+    fortune_text: "Wire the jars like a pin header, pin 1 on the left: vanilla's pin is just left of egg's pin. Lucky word: SOLDER"
+    char_count: 111
+    fact:
+      kind: offset
+      item: vanilla
+      relative_to: egg
+      offset: -1
+    nudge: "The pins on a header sit in one row, numbered in order, so a pin's neighbours are one number lower and one higher. Here each pin number is a jar number."
