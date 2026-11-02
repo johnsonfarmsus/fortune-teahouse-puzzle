@@ -228,3 +228,28 @@ was not reachable from the sandbox, so the mobile points rest on secondary sourc
 - Fix all three core logic puzzles at a 5-to-5 matching.
 - Replace "Pattern / sound" with "Pattern / rhythm" and note visual-first.
 - Add "display name, anonymous allowed" to the contributors list.
+
+## 7. Addendum: review of design revision 2 (2 Nov 2026)
+
+The revision (the world, game feel, art and sound) is a clear direction and a better game than
+the menu-style layer Phase 1 produced. Points for the plan:
+
+- **Shared crew inventory needs a server change.** The current API has no inventory. PLAN.md D10
+  adds idempotent crew-inventory endpoints; everything must still be findable alone offline.
+- **The decoy CI check needs a data definition before it can exist.** "Every decoy answer follows
+  from its named mistake and matches no valid set of clues" is checkable once decoys are data
+  with a named mistake (which outdated scrap, which misread cipher) and a destination. PLAN.md
+  D13 defines that; the solver gains the check in WP18.
+- **Accessibility moves from default to option.** The text-assist mode is the right shape for a
+  pixel adventure, but it must exist before playtest round 1, or round 1 excludes people.
+- **Pixel viewport arithmetic.** 11 tiles of 16 px is 176 px wide; a 390 px phone gives an
+  integer scale of 2 (352 px) with 19 px bars each side, and a 430 px phone the same. Integer
+  scaling is the right call; PLAN.md D9 fixes the base at 176 by 320.
+- **60 frames per second on web Godot** is a target, not a guarantee, on mid-range Android.
+  The pixel viewport helps enormously; physics and shader use should be profiled on the slice
+  before being used everywhere.
+- **Licensing is in order.** Ninja Adventure and Kenney are CC0; the image models are Apache
+  2.0 with a stated rule against research-only upgrades; Stable Audio 3's community licence is
+  acceptable for a free conference game and should be recorded per asset in `ASSETS.md`.
+- **Working model changes.** Player-facing code is now one session at a time with Trevor's phone
+  test as the gate; the parallel-worker model continues only for data, server, docs and tests.
