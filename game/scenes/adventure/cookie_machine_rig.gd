@@ -141,16 +141,17 @@ func refresh() -> void:
 				_press.modulate = dim
 
 
-## One stroke of the press: down, a fresh round on the belt, up.
+## One stroke of the press: a fresh round lands on the belt at once (state
+## never waits on an animation or the frame rate), and the press head comes
+## down and up over it.
 func stamp() -> void:
+	var r := _sprite("machine.cookie.cookie" if is_running() else "machine.cookie.round", Vector2(108, 52))
+	r.z_index = 2
+	rounds.append(r)
+	if Router.depth() == 0 and is_visible_in_tree():
+		Audio.play("stamp")
 	var tween := create_tween()
 	tween.tween_property(_press, "position:y", 16.0, 0.08)
-	tween.tween_callback(func() -> void:
-		var r := _sprite("machine.cookie.cookie" if is_running() else "machine.cookie.round", Vector2(108, 52))
-		r.z_index = 2
-		rounds.append(r)
-		if Router.depth() == 0 and is_visible_in_tree():
-			Audio.play("stamp"))
 	tween.tween_property(_press, "position:y", 4.0, 0.2)
 
 

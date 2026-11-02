@@ -289,9 +289,9 @@ func test_the_cutter_chain_end_to_end_with_misdirects_and_the_decoy() -> void:
 	# The cutter now stamps rounds.
 	var rig := view.room.rig
 	assert_bool(rig.is_fixed("rhythm")).is_true()
+	var before_stamp := rig.rounds.size()
 	rig.stamp()
-	await get_tree().create_timer(0.15).timeout
-	assert_int(rig.rounds.size()).is_greater_equal(1)
+	assert_int(rig.rounds.size()).is_equal(before_stamp + 1)
 
 
 func test_misdirects_can_be_put_back_where_they_came_from() -> void:
