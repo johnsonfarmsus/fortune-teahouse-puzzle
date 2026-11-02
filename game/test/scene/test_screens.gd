@@ -375,12 +375,12 @@ func test_host_turns_a_solve_into_progress_and_a_celebration() -> void:
 
 func test_unbuilt_parts_open_coming_soon() -> void:
 	assert_str(Paths.puzzle_scene("not_a_type")).is_equal(Paths.COMING_SOON)
-	var host := Router.push(Paths.PUZZLE_HOST, {"machine": MACHINE, "part": "wiring"})
-	await get_tree().process_frame
-	assert_bool(host.puzzle is PuzzleBase).is_true()
-	assert_bool(host.puzzle.can_reveal()).is_false()
+	# Every Cookie Machine part has a scene now, so open the fallback directly.
+	var puzzle: PuzzleBase = auto_free(load(Paths.COMING_SOON).instantiate())
+	add_child(puzzle)
+	assert_bool(puzzle.can_reveal()).is_false()
 	var found := false
-	for node in host.puzzle.find_children("*", "Label", true, false):
+	for node in puzzle.find_children("*", "Label", true, false):
 		if (node as Label).text == "This part is still being built":
 			found = true
 	assert_bool(found).is_true()
