@@ -159,6 +159,19 @@ Its config is `{machine, domain, answer, clues (collected only), total_clues: 6,
 
 **HelperPuzzle** (type `helper`, WP3): config `{speaker, lines, question, choices, correct, nudge}`; lines advance per tap, then choices; right calls `finish()`, wrong gets a retry line. Hint 1 shows `nudge`; hint 2 removes a wrong choice.
 
+## 8b. WP4 puzzle types and their `config` (for authoring Fortune Machine and Oven parts)
+
+Each type is `scenes/puzzles/<type>_puzzle.tscn`, found by `Paths.puzzle_scene(type)`. Answers live in `config`. Every config may also carry an optional `intro` string shown above the puzzle, and `hints`: `hints[0]` is the level 1 text, `hints[1]` the level 2 fallback (level 2 is normally computed from the player's current state, such as the first wrong wire, step or blank; `hints[1]` is used when nothing is wrong yet). Level 3 is `reveal()`. Pure logic lives in `scripts/core/`: `WiringRules`, `SequenceRules`, `WordRules`, `RhythmClock`.
+
+| Type | Config | Notes |
+| --- | --- | --- |
+| `wiring` | `{terminals: [{id, label, color}], sockets: [{id, label, color}], connections: {terminal_id: socket_id}, hints}` | Tap a terminal then a socket (either order); tap a wire, or its row in the list, to remove it. `color` is any `Color.from_string` value (a name such as `"red"` or `"#c0392b"`). Colour is decoration only: write labels a colour-blind player can solve from, such as `"Red band (2)"`. Test API: `tap_terminal`, `tap_socket`, `connect_wire`, `remove_wire`, `wires()`, `check()` |
+| `sequence` | `{steps: [{id, label}], order: [step_ids], hints}` | Tap a step chip to append it; Undo; tap a placed step to take it out; Check once `order.size()` steps are placed. Steps missing from `order` are decoys. Drag a chip or row onto a row (`_get_drag_data`, `_can_drop_data`, `_drop_data`). Test API: `append`, `insert`, `move`, `remove_at`, `undo`, `sequence()`, `check()` |
+| `word` | `{lines: ["The mixer hums when the {0} is tight", ...], blanks: [{index, answer}], bank: [words, decoys included], hints}` | `{n}` marks blank n. Tap a blank then a bank word; tap a filled blank to clear it. Answers compare case-insensitively. A word listed once in `bank` fills one blank. Test API: `tap_blank`, `choose_word`, `fill`, `clear_blank`, `filled()`, `check()` |
+| `rhythm` | `{bpm, pattern: [1,0,1,1], tolerance_ms: 180, required: 6, hints}` | No fail state: an off-beat tap resets the streak with a gentle message. `pattern` has one entry per beat over a bar; 1 is lit. Hint 2 slows the tempo by 25 percent; `reveal()` lights the whole row. `Audio.play("tick")` on each beat; `Input.vibrate_handheld(30)` on on-beat taps, only on web and mobile. Test API: set `manual_clock = true` before `add_child`, then `advance(seconds)`, `press()`, `clock.seconds_to_next_lit_beat()` |
+
+For all four, `check()` (or the last on-beat press) calls `finish()`, which emits `solved(true)`; `reveal()` only fills in the answer, and `request_hint()` then emits `solved(false)`.
+
 ## 9. Phone and accessibility rules
 
 - 390x844 portrait base, `canvas_items` stretch, `expand` aspect; anchored layouts so larger screens only add margin.
