@@ -1,0 +1,22 @@
+# Dev defaults. For the event, export real values (or use an env file via `docker compose --env-file`).
+services:
+  scoreboard:
+    build: .
+    image: fortune-teahouse-scoreboard
+    restart: unless-stopped
+    ports:
+      - "${PORT:-8000}:8000"
+    volumes:
+      - scoreboard-data:/data
+    environment:
+      ADMIN_SECRET: ${ADMIN_SECRET:-dev-secret-change-me}
+      CORS_ORIGINS: ${CORS_ORIGINS:-*}
+      FINALE_SAFETY_NET_AT: ${FINALE_SAFETY_NET_AT:-}
+      GNU_NOTE_CODES: ${GNU_NOTE_CODES:-NOTE-ONE,NOTE-TWO,NOTE-THREE,NOTE-FOUR,NOTE-FIVE}
+      GNU_NOTES_K: ${GNU_NOTES_K:-3}
+      START_CODE: ${START_CODE:-3141592653}
+      REPO_URL: ${REPO_URL:-https://github.com/johnsonfarmsus/fortune-teahouse-puzzle}
+      TRUST_PROXY: ${TRUST_PROXY:-false}
+
+volumes:
+  scoreboard-data:
