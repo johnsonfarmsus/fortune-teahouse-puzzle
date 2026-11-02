@@ -79,6 +79,21 @@ func mark_solved(machine: String, part: String, credited: bool) -> void:
 	save()
 
 
+func mark_story_seen(id: String) -> void:
+	if not player.has_seen_story(id):
+		player.mark_story_seen(id)
+		save()
+
+
+## True when `value` differs from the last state stored under `key`; stores it.
+func set_story_state(key: String, value: String) -> bool:
+	if str(player.story_state.get(key, "")) == value:
+		return false
+	player.story_state[key] = value
+	save()
+	return true
+
+
 func set_sound_on(value: bool) -> void:
 	player.sound_on = value
 	save()

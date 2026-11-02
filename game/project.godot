@@ -17,6 +17,7 @@ PuzzleData="*res://autoload/puzzle_data.gd"
 GameState="*res://autoload/game_state.gd"
 Progress="*res://autoload/progress.gd"
 Hints="*res://autoload/hints.gd"
+Story="*res://autoload/story.gd"
 Audio="*res://autoload/audio.gd"
 Router="*res://autoload/router.gd"
 
