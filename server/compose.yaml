@@ -1,0 +1,24 @@
+# SPDX-License-Identifier: AGPL-3.0-or-later
+# No secrets or note codes are defaulted here. With ADMIN_SECRET unset the admin API is disabled,
+# and with GNU_NOTE_CODES unset there are no notes (N = 0). Export real values for the event.
+services:
+  scoreboard:
+    build: .
+    image: fortune-teahouse-scoreboard
+    restart: unless-stopped
+    ports:
+      - "${PORT:-8000}:8000"
+    volumes:
+      - scoreboard-data:/data
+    environment:
+      ADMIN_SECRET: ${ADMIN_SECRET:-}
+      CORS_ORIGINS: ${CORS_ORIGINS:-*}
+      FINALE_SAFETY_NET_AT: ${FINALE_SAFETY_NET_AT:-}
+      GNU_NOTE_CODES: ${GNU_NOTE_CODES:-}
+      GNU_NOTES_K: ${GNU_NOTES_K:-3}
+      START_CODE: ${START_CODE:-3141592653}
+      REPO_URL: ${REPO_URL:-https://github.com/johnsonfarmsus/fortune-teahouse-puzzle}
+      TRUST_PROXY: ${TRUST_PROXY:-false}
+
+volumes:
+  scoreboard-data:

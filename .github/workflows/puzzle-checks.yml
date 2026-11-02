@@ -1,0 +1,62 @@
+# SPDX-License-Identifier: AGPL-3.0-or-later
+# Puzzle checks: for each machine, any 4 of its 6 clues give exactly one
+# answer and no 3 do; the four approachable styles alone are enough; fronts
+# and backs fit the character limit; lucky words are unique across all 18.
+# The solver's output names clue ids and subset ids only, never answers or
+# facts. Do not add `python -m solver generate` here: it prints answers.
+name: puzzle-checks
+
+on:
+  pull_request:
+    paths:
+      - "puzzles/**"
+      - "tools/solver/**"
+      - ".github/workflows/puzzle-checks.yml"
+  push:
+    branches: [main]
+    paths:
+      - "puzzles/**"
+      - "tools/solver/**"
+      - ".github/workflows/puzzle-checks.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  puzzle-checks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      PYTHONPATH: tools
+      PYTHONDONTWRITEBYTECODE: "1"
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      # The solver is standard library only. These two enable the tests that
+      # cross-check the YAML subset loader and validate files against schema.json.
+      - name: Install cross-check tools
+        run: python -m pip install --disable-pip-version-check pyyaml==6.0.2 jsonschema==4.23.0
+
+      - name: Unit tests
+        run: python -m unittest discover -s tools/solver/tests -t tools -v
+
+      - name: Check puzzles (vendor-140 profile)
+        run: python -m solver check puzzles/
+
+      - name: Write JSON report
+        if: always()
+        # Same checks again; the summary was already printed above.
+        run: python -m solver report puzzles/ --json "$RUNNER_TEMP/puzzle-report/puzzle-report.json" > /dev/null || true
+
+      - name: Upload JSON report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: puzzle-report
+          path: ${{ runner.temp }}/puzzle-report/puzzle-report.json
+          if-no-files-found: warn
+          retention-days: 30

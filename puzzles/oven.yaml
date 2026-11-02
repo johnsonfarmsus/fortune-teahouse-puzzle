@@ -1,0 +1,114 @@
+# SPDX-License-Identifier: AGPL-3.0-or-later
+# Oven core puzzle: which heat zone on the conveyor is set to which temperature.
+# The item is the temperature; the position is the zone.
+# Spoiler warning: this file contains the answer. See puzzles/README.md.
+schema_version: 1
+machine:
+  id: oven
+  name: Oven
+domain:
+  item_noun: temperature
+  position_noun: heat zone
+  order: "zones 1 to 5 along the conveyor, zone 1 first"
+  items:
+    - id: c120
+      name: 120 C
+    - id: c140
+      name: 140 C
+    - id: c160
+      name: 160 C
+    - id: c180
+      name: 180 C
+    - id: c200
+      name: 200 C
+  positions:
+    - index: 1
+      label: Zone 1
+    - index: 2
+      label: Zone 2
+    - index: 3
+      label: Zone 3
+    - index: 4
+      label: Zone 4
+    - index: 5
+      label: Zone 5
+generator:
+  seed: 2
+  structure: two_anchors_four_link_chain
+answer:
+  c120: 5
+  c140: 2
+  c160: 1
+  c180: 3
+  c200: 4
+clues:
+  - id: oven_poem
+    style: poem
+    approachable: true
+    lucky_word: TOASTY
+    fortune_text: "After the 200 C zone the heat settles down: the next zone along is 120 C, golden and brown. Lucky word: TOASTY"
+    char_count: 110
+    fact:
+      kind: offset
+      item: c120
+      relative_to: c200
+      offset: 1
+    nudge: "Read past the rhyme. The couplet names two temperatures and which one comes later along the belt. The belt runs from zone 1 to zone 5."
+  - id: oven_animal
+    style: animal
+    approachable: true
+    lucky_word: MIGRATE
+    fortune_text: "A newborn gnu calf trots at its mother's heels. 140 C follows 160 C just so, one zone after. Lucky word: MIGRATE"
+    char_count: 112
+    fact:
+      kind: offset
+      item: c140
+      relative_to: c160
+      offset: 1
+    nudge: "The calf is a picture of following closely. The belt runs from zone 1 to zone 5, so after means further along the belt."
+  - id: oven_trivia
+    style: trivia
+    approachable: true
+    lucky_word: TARBALL
+    fortune_text: "Count the letters in vi's old rival from the editor wars. Set the zone with that number to 120 C. Lucky word: TARBALL"
+    char_count: 117
+    fact:
+      kind: position
+      item: c120
+      position: 5
+    nudge: "The editor wars are a decades-old friendly argument between fans of two text editors. One of them is vi: find the other and count its letters."
+  - id: oven_security
+    style: security
+    approachable: true
+    lucky_word: HEXDUMP
+    fortune_text: "The gnu wrote zone 1's heat in hex: 0xA0 degrees C. Lucky word: HEXDUMP"
+    char_count: 71
+    fact:
+      kind: position
+      item: c160
+      position: 1
+    nudge: "0x marks a hexadecimal number. The first digit counts sixteens and the second counts ones; A means 10, B means 11, up to F for 15."
+  - id: oven_code
+    style: code
+    approachable: false
+    lucky_word: LAMBDA
+    fortune_text: "assert zone[180] == zone[140] + 1  # zone 1 comes first, +1 is one zone after Lucky word: LAMBDA"
+    char_count: 96
+    fact:
+      kind: offset
+      item: c180
+      relative_to: c140
+      offset: 1
+    nudge: "zone[t] means the number of the zone set to t degrees. An assert must be true, so read the line as plain arithmetic about two zone numbers."
+  - id: oven_hardware
+    style: hardware
+    approachable: false
+    lucky_word: FUSEBOX
+    fortune_text: "Thermostat pins: pin n reads zone n. The 200 C probe is wired one pin after the 180 C probe. Lucky word: FUSEBOX"
+    char_count: 112
+    fact:
+      kind: offset
+      item: c200
+      relative_to: c180
+      offset: 1
+    nudge: "Each temperature probe reads one zone and plugs into the matching pin, so pin numbers are zone numbers and neighbouring pins differ by one."

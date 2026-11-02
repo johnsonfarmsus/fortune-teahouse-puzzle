@@ -1,0 +1,165 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Fortune Teahouse machine file",
+  "description": "One machine's core logic puzzle: a 5-to-5 matching of items to ordered positions, the answer, and six styled fortune-cookie clues. SPDX-License-Identifier: AGPL-3.0-or-later. Files are written as YAML in the restricted subset described in puzzles/README.md. The rules that need a solver (any 4 of 6 unique, no 3 enough, approachable four unique, unique lucky words across machines) are checked by tools/solver, not by this schema.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "machine", "domain", "answer", "clues"],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "machine": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "name"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id", "description": "Stable machine id, e.g. cookie_machine." },
+        "name": { "type": "string", "minLength": 1, "description": "Display name, e.g. Cookie Machine." }
+      }
+    },
+    "domain": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["item_noun", "position_noun", "order", "items", "positions"],
+      "properties": {
+        "item_noun": { "type": "string", "minLength": 1, "description": "What an item is, e.g. ingredient." },
+        "position_noun": { "type": "string", "minLength": 1, "description": "What a position is, e.g. jar." },
+        "order": { "type": "string", "minLength": 1, "description": "How positions run, e.g. jars 1 to 5, left to right. Offset +1 means one position further in this order." },
+        "items": {
+          "type": "array",
+          "minItems": 5,
+          "maxItems": 5,
+          "items": { "$ref": "#/$defs/item" }
+        },
+        "positions": {
+          "type": "array",
+          "minItems": 5,
+          "maxItems": 5,
+          "items": { "$ref": "#/$defs/position" }
+        }
+      }
+    },
+    "generator": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "How the answer was produced, so it can be regenerated: python -m solver generate --items <ids in listed order> --seed <seed>.",
+      "properties": {
+        "seed": { "type": "integer" },
+        "structure": { "const": "two_anchors_four_link_chain" }
+      }
+    },
+    "answer": {
+      "type": "object",
+      "description": "The solution: item id -> position index. Shuffled, not the listed item order.",
+      "minProperties": 5,
+      "maxProperties": 5,
+      "propertyNames": { "$ref": "#/$defs/id" },
+      "additionalProperties": { "$ref": "#/$defs/position_index" }
+    },
+    "clues": {
+      "type": "array",
+      "minItems": 6,
+      "maxItems": 6,
+      "items": { "$ref": "#/$defs/clue" }
+    }
+  },
+  "$defs": {
+    "id": { "type": "string", "pattern": "^[a-z][a-z0-9_]*$" },
+    "position_index": { "type": "integer", "minimum": 1, "maximum": 5 },
+    "item": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "name"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "name": { "type": "string", "minLength": 1 }
+      }
+    },
+    "position": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["index", "label"],
+      "properties": {
+        "index": { "$ref": "#/$defs/position_index" },
+        "label": { "type": "string", "minLength": 1 }
+      }
+    },
+    "fact": {
+      "description": "Machine-readable meaning of a clue.",
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "item", "position"],
+          "properties": {
+            "kind": { "const": "position" },
+            "item": { "$ref": "#/$defs/id" },
+            "position": { "$ref": "#/$defs/position_index" }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "item", "relative_to", "offset"],
+          "description": "pos(item) = pos(relative_to) + offset. +1: item is immediately right of / after / below relative_to. -1: immediately left of / before / above.",
+          "properties": {
+            "kind": { "const": "offset" },
+            "item": { "$ref": "#/$defs/id" },
+            "relative_to": { "$ref": "#/$defs/id" },
+            "offset": { "enum": [1, -1] }
+          }
+        }
+      ]
+    },
+    "clue": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "style", "approachable", "lucky_word", "fortune_text", "char_count", "fact", "nudge"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "style": { "enum": ["poem", "animal", "trivia", "security", "code", "hardware"] },
+        "approachable": { "type": "boolean", "description": "True for poem, animal, trivia and security: the four a non-coder crew can always finish with." },
+        "lucky_word": { "type": "string", "pattern": "^[A-Z]{3,8}$", "description": "Typed into the game to collect the clue; unique across all 18 fortunes." },
+        "fortune_text": {
+          "type": "string",
+          "pattern": "^[ -~]+ Lucky word: [A-Z]{3,8}$",
+          "maxLength": 140,
+          "description": "Exact printed front, printable ASCII, ending in ' Lucky word: WORD'. The solver also checks the shorter alt-99 profile."
+        },
+        "char_count": { "type": "integer", "minimum": 1, "maximum": 140, "description": "Length of fortune_text, kept for reviewers; the solver checks it." },
+        "fact": { "$ref": "#/$defs/fact" },
+        "nudge": { "type": "string", "minLength": 1, "description": "Optional in-app 'help me read this' hint: how to read the style, never the fact itself." }
+      },
+      "if": {
+        "properties": { "style": { "enum": ["poem", "animal", "trivia", "security"] } }
+      },
+      "then": { "properties": { "approachable": { "const": true } } },
+      "else": { "properties": { "approachable": { "const": false } } }
+    },
+    "backs": {
+      "description": "Schema for puzzles/backs.yaml: one back message per pack and the finale start code.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schema_version", "packs", "start_code"],
+      "properties": {
+        "schema_version": { "const": 1 },
+        "packs": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 2,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["id", "text", "lucky_numbers", "char_count"],
+            "properties": {
+              "id": { "type": "string", "pattern": "^[A-Z]$" },
+              "text": { "type": "string", "maxLength": 140 },
+              "lucky_numbers": { "type": "string", "pattern": "^[0-9]( [0-9])*$" },
+              "char_count": { "type": "integer", "minimum": 1, "maximum": 140 }
+            }
+          }
+        },
+        "start_code": { "type": "string", "pattern": "^[0-9]+$" }
+      }
+    }
+  }
+}
