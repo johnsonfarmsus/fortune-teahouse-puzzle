@@ -1,112 +1,160 @@
-# Art direction brief (WP11)
+# Art brief: NES-style pixel art (WP27)
 
-For a human artist or a later image-generation pass. Read `DESIGN.md` (story, characters) and `game/ARCHITECTURE.md` sections 1, 4 and 9 first. Today the game is coloured rectangles and labels; this brief says what replaces them.
+For the art session on Trevor's Mac and anyone adding art. Read `DESIGN.md` "Art and sound" and the character table first, and `game/ARCHITECTURE.md` section 15 for how the game loads art. This replaces the WP11 brief's flat sticker style (revision 2).
 
-## 1. Visual direction
+## 1. The look
 
-A seaside pier town at dusk: a warm teahouse with paper lanterns, a plank pier with gulls, and the gnu's workshop of hand-built machines held together with brass, rope and sticky labels. Cosy and a little messy.
+An NES-era top-down adventure: a seaside town of one-screen rooms on a 16×16 grid, chunky and readable, with one strict palette. Warm teahouse, plank pier, a scrapyard, and the gnu's hand-built machines held together with brass, rope and sticky labels. Cosy and a little messy. Inspired by, not copied from, classic top-down games: no Link, Triforce, Zelda item sprites, fonts or map layouts.
 
-**Style.** Flat colour shapes, no gradients, textures or soft shadows. Every sprite has a thick dark outline (4 px at 2x) plus a thin Steam Cream rim outside it, like a die-cut sticker, so dark characters read on the dark UI. Detail must survive a 2x downscale: no line under 3 px at 2x, eyes at least 8 px at 2x, and no text baked into art (words stay live `Label` text).
+- **Grid:** 16×16 tiles. The play area is 176×320 base pixels (11×20 tiles), scaled up by whole numbers with no smoothing (`D9` in PLAN.md).
+- **Characters:** 16×16 sprite sheets; portraits 32×32.
+- **Colours per sprite:** at most 3 colours plus transparency for 16×16 sprites and items (the outline counts as one). Portraits, close-ups and machines use the palette freely but stay flat: no gradients, no dithering beyond a 2-colour checker.
+- **Outline:** 1 px in `black` around characters, items and props, so they read on any floor.
+- **Animation:** 2 to 4 frames per action, at most 8 fps.
+- **No text baked into art.** Words stay live text in the game.
 
-**Palette (8 named colours).** Artwork uses only these plus at most one lighter and one darker tint of each. Ratios are WCAG 2.x contrast, computed in Python.
+## 2. Palette
 
-| Name | Hex | Role | vs Night Tea | vs Deep Brew |
+The game's one palette is `palette` in `game/assets.json`. Every committed PNG uses only these 25 colours; `tools/art/pixelize.py` enforces it for generated art and `python -m art sprites` for text sprites.
+
+The values were fitted to the [Ninja Adventure pack](https://pixel-boy.itch.io/ninja-adventure-asset-pack) in WP27: each name was snapped to the nearest colour the pack's tilesets and characters actually use (by area), unless that moved it too far from its name. `blue` and `purple` keep their original values as saturated accents the pack lacks. Against the pack's 190 colours the mean distance to the nearest palette colour fell from 14 to 9, so pack tiles survive the palette lock with little change.
+
+| Name | Hex | Typical use |
+| --- | --- | --- |
+| `black` | `#141b1b` | Outlines, deepest shadow |
+| `ink` | `#2b3631` | Dark shading, text on light |
+| `dark_brown` | `#5c2d25` | Dark wood, fur shadow |
+| `brown` | `#7b473c` | Wood, fur |
+| `brown_light` | `#a3754e` | Planks, light wood |
+| `tan` | `#c8966b` | Skin, rope, paper shadow |
+| `sand` | `#eecf9b` | Sand, paper |
+| `cream` | `#fce2ca` | Highlights, bellies, beards |
+| `red` | `#d14b34` | Red panda fur, warnings |
+| `orange` | `#e67c44` | Warm accents, lantern light |
+| `yellow` | `#f1c471` | Brass, gold, glow |
+| `green_dark` | `#345a52` | Deep foliage |
+| `green` | `#74a334` | Grass, apron |
+| `lime` | `#adbc3a` | Grass highlight |
+| `teal` | `#548789` | Sea, penguin back |
+| `blue_dark` | `#4a5270` | Night, slate, deep water |
+| `blue` | `#4b84c4` | Accents (kept: the pack has no strong blue) |
+| `sky` | `#b8dce5` | Sky, shallow water, glass |
+| `grey_dark` | `#4e484a` | Iron, machine shadow |
+| `grey` | `#8d977f` | Stone, steel |
+| `silver` | `#d2c9c9` | Polished metal |
+| `white` | `#f2eaf1` | Paper, teeth, sparkle |
+| `pink` | `#ef9597` | Cheeks, tongue, coral |
+| `purple` | `#71498a` | Anglerfish suit, magic (kept: the pack has no strong purple) |
+| `dirt` | `#ad8d6d` | Paths, dust |
+
+## 3. Characters
+
+All eight are original designs inspired by an animal, never by a project's mascot artwork. Prompts for generated art describe the animal, its clothes, colours and props, and **never name a project, a mascot or a logo**. Each needs a distinct silhouette at 16 px.
+
+Portrait expressions, matching `game/assets.json`: `neutral`, `happy`, `worried`, `surprised`, `sly`. The neutral portrait comes first; the others are edits of the approved reference, never fresh generations.
+
+| Character | Design notes | Do not |
+| --- | --- | --- |
+| **Gnu** (retired maintainer) | Tall shoulders, heavy dark mane sagging into a long cream beard, small upturned horns, gold round spectacles on a string, a worn brown cardigan with pencils and sticky notes. Prop: a ring of mismatched keys. Appears only in portraits (notes and voicemails). | Draw the line-engraved GNU head, its swirl beard or a black-and-white emblem. |
+| **Seagull** (collector of lost fortunes) | Wide cream chest, teal-grey wing tips, hooked beak with a coral spot, one foot raised, a satchel of crumpled fortune slips. | Reuse the SeaGL logo gull, its pose or colours. |
+| **Penguin** (Cookie Machine helper) | Slim and tall like a little blue penguin, short feather tuft, teal back, cream belly, gold goggles on the forehead, tool belt. Prop: an oversized spanner. | Make it black and white with an orange beak and feet, an egg-shaped belly or Tux's pose. |
+| **Gopher** (courier) | Low, long, sandy pocket gopher with cheek pouches, small dark beady eyes, digging claws, a coral courier cap. Prop: a string-tied parcel bigger than its head. | Use sky-blue fur, big round white eyes, or the Go gopher's proportions and buck-tooth smile. |
+| **Crab** (apprentice) | Small shore crab, dusky purple shell, one oversized gold claw, eyes on short stalks, a too-big cream apron. Prop: a rubber "merge" stamp. | Make it flat orange-red, give it two matching claws, or use Ferris's wide smile and dot eyes. |
+| **Elephant** (archivist) | Broad and gentle, light sandy-tan skin, huge ears with paper tags, half-moon glasses, a plum cardigan. Prop: a card-catalogue drawer with notes. | Use blue-grey or blue-violet skin, a head-in-a-circle logo, a raised-trunk emblem, Slonik's linework or the PHP elephpant's shape. |
+| **Red Panda** (teahouse keeper) | Round and fluffy, white cheek patches, ringed tail, tea towel on the shoulder, green apron. Prop: a steaming teapot. | Curl it around a globe, use flame gradients, or draw a pointed-muzzle fox like the Firefox logo. |
+| **Anglerfish** (FortuneCloud salesperson) | Round, wide-grinning deep-sea fish standing on its fins, dark teal body, tiny tie, cream teeth, a glowing gold lure on a stalk (the "FREE TRIAL" words stay live text). Prop: a clamshell briefcase that never opens. | Echo any real cloud vendor's logo, colours or shapes. |
+
+The player is the Ninja Adventure `Boy` sheet until the town slice's art lands.
+
+## 4. Asset list
+
+`game/assets.json` is the contract (PLAN.md D11): the game loads every sprite, tile and portrait by logical name and draws a labelled placeholder until the file lands at its path. Print the current list, with what has landed:
+
+```sh
+PYTHONPATH=tools uv run --python 3.12 --with pillow==13.0.0 python -m art list                 # everything
+PYTHONPATH=tools uv run --python 3.12 --with pillow==13.0.0 python -m art list --prefix portrait
+PYTHONPATH=tools uv run --python 3.12 --with pillow==13.0.0 python -m art list --missing  # still placeholders
+```
+
+| Names | Count | Frame px | Path under `game/` | Source |
 | --- | --- | --- | --- | --- |
-| Night Tea | `#291D17` | Screen background (`UiKit.BG_COLOR`) | 1.00 | 1.09 |
-| Deep Brew | `#1F1611` | HUD bar, outlines | 1.09 | 1.00 |
-| Steam Cream | `#F5E9D3` | Body text, sticker rim | 13.63 | 14.80 |
-| Lantern Gold | `#F2B833` | Accent, "fixed" glow, lures | 9.11 | 9.89 |
-| Tide Teal | `#4FB3A9` | Sea, cool accents | 6.51 | 7.07 |
-| Crab Coral | `#F0735E` | Warm accent, warnings | 5.71 | 6.20 |
-| Dusk Plum | `#B79AE0` | Sky, shadows | 6.79 | 7.38 |
-| Dune Sand | `#C9A36F` | Planks, wood, earth | 6.98 | 7.58 |
+| `tile.*` | 23 | 16×16 | `art/ninja/Backgrounds/Tilesets/...` | Ninja Adventure tilesets, at the listed `origin` |
+| `char.*` | 8 | 16×16, 4 columns (down, up, left, right), rows are frames | `art/characters/<id>_sheet.png`; player from Ninja Adventure | Hand-drawn from the approved reference |
+| `portrait.*` | 40 | 32×32 | `art/portraits/<id>_<expression>.png` | Generated reference, pixelized; expressions by edit |
+| `item.*` | 6 | 16×16 | `art/items/item_<id>.png` | Text sprites |
+| `prop.*` | 20 | 16×16 to 64×48 | `art/props/prop_<id>.png` | Text sprites or Ninja Adventure |
+| `machine.*` | 17 | 8×8 to 144×64 | `art/machines/machine_<machine>_<part>.png` | Text sprites, or generated and pixelized |
+| `closeup.*` | 18 | 16×16 to 176×40 | `art/closeups/closeup_<id>.png` | Generated and pixelized |
+| `fx.*` | 6 | 8×8 | `art/fx/fx_<id>.png` | Text sprites |
+| `ui.*` | 1 | 20×20 | `art/ui/ui_<id>.png` | Text sprite |
 
-All six light colours pass 4.5:1 as text on both dark backgrounds (lowest: Crab Coral 5.71). Dark text on a coloured button: Night Tea on Lantern Gold 9.11; Deep Brew on Tide Teal 7.07, Crab Coral 6.20, Dune Sand 7.58. Never put Steam Cream text on a light palette colour (2.4:1 or worse).
+When a file lands, fix `origin`, `frame_size` or `animations` in `game/assets.json` if the art differs from the guess. The game needs no code change.
 
-## 2. Character sheets
+**Ninja Adventure paths.** The current pack (download from itch.io, CC0) keeps characters under `Actor/Character/<Name>/`, not `Actor/Characters/` as `assets.json` guessed for the player. The tile batch corrects that path and the tile `origin` values. Commit only the sheets the game uses, under `game/art/ninja/` with the pack's own folder names.
 
-All eight are original designs inspired by an animal, not the projects' official mascot artwork. Sketch from animal photos, never mascot art. Each needs a distinct silhouette at 64 px tall.
+**Size budget.** Pixel art is small: aim for `game/art/` under 1 MB. The web export's 12 MB gzip budget in CI covers it.
 
-**Gnu (retired maintainer).** Tall shoulders, heavy shaggy mane sagging into a long beard, small upturned horns, round spectacles on a string. Night Tea body, Steam Cream beard, Lantern Gold spectacles. Prop: a ring of mismatched keys and a roll of sticky labels. Expressions: neutral (tired kind eyes), happy (beard lifted, eyes closed), apologetic (ears down, scratching the neck, brows tilted up). Do not: draw the line-engraved GNU head, its swirl beard, or a black-and-white emblem.
+## 5. The pipeline
 
-**Seagull (collector of lost fortunes).** Wide chest, hooked beak, one foot raised, a satchel stuffed with paper scraps. Steam Cream, Tide Teal wing tips, Crab Coral beak spot. Prop: a butterfly net full of crumpled fortunes. Expressions: neutral, happy. Do not: reuse the SeaGL conference logo gull, its pose or colours.
+Everything runs from the repository root on Trevor's Mac with `uv` (Python 3.12, Pillow 13.0.0). Below, `art` means `PYTHONPATH=tools uv run --python 3.12 --with pillow==13.0.0 python -m art`.
 
-**Penguin (Cookie Machine helper).** Slim and tall like a little blue penguin, with a feather tuft, goggles on the forehead and a tool belt. Tide Teal back, Steam Cream belly, Lantern Gold goggles. Prop: an oversized adjustable spanner. Expressions: neutral, happy. Do not: make it black and white with an orange beak and feet, an egg-shaped belly or Tux's pose.
+**1. Generate** through the steam-machine's media API only, one render at a time, never ComfyUI directly, changing nothing on the box. The address, key and user come from the environment; the private handoff file says where to find them:
 
-**Gopher (courier).** Low, long pocket gopher in a courier cap, with cheek pouches, small dark beady eyes and digging claws. Dune Sand fur, Steam Cream muzzle, Crab Coral cap. Prop: a string-tied parcel bigger than its head. Expressions: neutral, happy. Do not: use sky-blue fur, big round white googly eyes, or the Go gopher's proportions and buck-tooth smile.
+```sh
+export MEDIA_API_URL=...   MEDIA_API_USER=...   MEDIA_API_KEY="$(...)"   # never into a file
+art render image "<prompt>" ~/.cache/fortune-art/renders/<id>_a.png --quality best --shape square
+```
 
-**Crab (apprentice).** Small shore crab with one oversized claw, eyes on short stalks, a too-big apron. Dusk Plum shell, Lantern Gold big claw, Steam Cream apron. Prop: a rubber "merge" stamp. Expressions: neutral, happy (plus the merge frames in section 3). Do not: make it flat orange-red, give it two matching claws, or use Ferris's wide smile and plain dot eyes.
+Use `best` (Qwen-Image-2512) for references and portraits, `fast` (Z-Image-Turbo) for quick drafts, and `edit` (Qwen-Image-Edit-2511) with `--source <library item>` for new poses and expressions of an approved reference. The client reads the render graph that ComfyUI embeds in the PNG and writes `<out>.json` with the model, LoRA, seed and steps, and exits 1 if the graph loads anything but the pinned models (DESIGN.md, D21). Renders stay outside the repo (`~/.cache/fortune-art/`) and in Trevor's Media tab.
 
-**Elephant (archivist).** Broad and gentle, huge ears carrying paper tags, half-moon glasses, a cardigan. Light Dune Sand skin, Dusk Plum cardigan, Steam Cream tags. Prop: a card-catalogue drawer with notes sticking out. Expressions: neutral, happy. Do not: use blue-grey or blue-violet skin, a head-in-a-circle logo, a raised-trunk emblem, or Slonik's linework (or the PHP elephpant's shape).
+**Prompt template for a character reference:**
 
-**Red Panda (teahouse keeper).** Round and fluffy, ringed tail, white cheek patches, tea towel on the shoulder. Crab Coral fur, Steam Cream face, Night Tea tail rings. Prop: a steaming teapot. Expressions: neutral, happy. Do not: curl it around a globe, use flame gradients, or draw a pointed-muzzle fox like the Firefox logo.
+> Character design reference for a cozy retro top-down adventure game: *<design notes from section 3>*. Full body, front view, standing upright facing the viewer, centered, chunky cute proportions with a big head. 16-bit pixel art style, clean flat colours, bold dark outline, simple readable shapes. Plain solid flat magenta background, no shadow, no text, no frame.
 
-**Anglerfish (FortuneCloud salesperson).** Round, wide-grinning deep-sea fish in a tiny tie, with a glowing lure on a stalk (the "FREE TRIAL" words stay live text). Darker Tide Teal body, Lantern Gold lure, Steam Cream teeth. Prop: a clamshell briefcase that never opens. Expressions: neutral (smooth smile), smug (lure bright). Do not: echo any real cloud vendor's logo, colours or shapes.
+The flat backdrop matters: the pixelizer removes the background by flood fill from the border.
 
-## 3. Asset list
+**2. Pixelize** every generated image with `tools/art/pixelize.py`: background removal, crop, palette lock, shrink to the grid by majority colour per cell, colour limit, speck removal and a 1 px outline.
 
-PNG with alpha at 2x of the 390x844 base (a full screen is 780x1688). `canvas_items` stretch shows a texture at half its pixel size. Prefer indexed PNG-8 with alpha (lossless with 8 colours).
+```sh
+art pixelize render.png game/art/portraits/red_panda_neutral.png --size 32x32 --crop 0.05,0,0.85,0.55 --preview /tmp/p.png --scale 8
+art pixelize render.png sprite.png --size 16x16 --max-colors 2 --anchor bottom    # 2 + outline = 3
+```
 
-| Asset | Scene source | Base px | File px | Count | Path and name |
-| --- | --- | --- | --- | --- | --- |
-| Place and machine tiles | `Hotspot/Visual` | 96x96 | 192x192 | 6 | `game/art/world/tile_{shop,pier,teahouse,fortune_machine,cookie_machine,oven}.png` |
-| Avatar | Town `Avatar` | 32x48 | 64x96 | 3 | `game/art/world/avatar_{idle,walk_a,walk_b}.png` |
-| Town, shop backgrounds | `Ground`, `Path`, `Floor` | 390x950 | 780x1900 | 2 | `game/art/world/bg_{town,shop}.png` |
-| Fixture icons | `PartFixture` Broken, Fixed | 48x48 | 96x96 | 36 | `game/art/fixtures/<machine>_<part>_<state>.png` |
-| Status lights | machine view lights | 24x24 | 48x48 | 3 | `game/art/ui/status_{todo,partial,done}.png` |
-| Chips (nine-slice) | matching 104x48, sequence 150x52, word 96x48 | n/a | 96x96, 24 px margins | 4 | `game/art/ui/chip_{normal,selected,placed,decoy}.png` |
-| Slots (nine-slice) | matching slot 60 high, word blank 88x48 | n/a | 96x120, 24 px margins | 2 | `game/art/ui/slot_{empty,filled}.png` |
-| Rhythm lamps | 44x44 | 44x44 | 88x88 | 2 | `game/art/ui/lamp_{dim,lit}.png` |
-| Crab merge frames | `MergeCelebration`, Crab 120x90 | 120x90 | 240x180 | 8 | `game/art/crab/crab_merge_00.png` to `_07.png` |
-| Portraits | helpers, dialogue, finale | 128x128 | 256x256 | 17 | `game/art/characters/<animal>_<expression>.png` |
-| Title art | Start `Title` 340x130 | 340x130 | 680x260 | 1 | `game/art/screens/title.png` |
-| Start background | Start `Background` | 390x950 | 780x1900 | 1 | `game/art/screens/bg_start.png` |
-| Big-screen background | `server/static/bigscreen` | 1920x1080 | 1920x1080 | 1 | `server/static/bigscreen/img/bigscreen_bg.png` |
+`--crop` takes fractions of the subject's bounding box (head and shoulders for portraits), `--colors` limits the subject to named palette colours, `--background NAME` fills behind it, `--outline none` drops the outline.
 
-- **Fixtures:** `<machine>` is `fortune_machine`, `cookie_machine` or `oven`; `<part>` is `logic`, `wiring`, `sequence`, `word`, `rhythm` or `helper`; `<state>` is `broken` or `fixed` (3 x 6 x 2 = 36). They must differ in shape, not just colour: a cracked gear against a turning one, a dry pipe against a flowing one. Keep the bottom 16 px (2x) clear for the label.
-- **Portraits:** Gnu has `neutral`, `happy`, `apologetic`; Anglerfish `neutral`, `smug`; the other six `neutral`, `happy` (3 + 2 + 12 = 17). Bust, facing right.
-- **Crab frames:** 00 to 03 a four-step sideways scuttle loop, 04 to 06 raise and press the stamp, 07 the held pose. At most 8 fps; the existing tween slides it across.
-- **Backgrounds** are 950 base px tall because `aspect="expand"` shows extra height on tall phones. Keep everything important in the central 390x844; the rest is flat bleed.
-- **Big screen** is a landscape page outside the Godot project, so it is not in the pck. Keep the central 70 percent plain so live text passes 4.5:1.
-- **Sources:** layered files go in `art-src/` at the repo root, mirroring the names (the AGPL requires the preferred form for modification).
+**3. Clean up** by hand in Pixelorama where needed: eyes, mouth, a stray pixel. Keep to the palette.
 
-**Size budget.** 85 PNGs in `game/art/`, estimated 1.4 MB (fixtures about 6 KB, portraits about 25 KB, backgrounds about 150 KB each). Caps: icon or tile 15 KB, portrait 40 KB, background 200 KB, big-screen background 400 KB. Hard limit: `game/art/` at most 2.5 MB of PNG, adding under 3 MB to the pck (Godot imports to lossless WebP, no larger than PNG).
+**4. Review.** Trevor approves each batch from a contact sheet before anything is committed. Character references come first, and work stops there until they are approved.
 
-## 4. Accessibility
+**5. Commit** only the approved, final PNG, plus its provenance: a line in `ASSETS.md` and the render record (`<out>.json` with the pixelize command added) as `art-src/generated/<asset>.json`. Raw renders, drafts and rejected variants are never committed.
 
-- **Colour is never alone.** Broken against fixed differs in silhouette; status lights are an empty ring, a half disc and a disc with a check mark.
-- **Text contrast at least 4.5:1**, using only the pairs in section 1. Art behind live text (title, tiles, big screen) keeps that ratio under the glyphs.
-- **Tap targets at least 44x44 base px.** Art never shrinks a hit area; Area2D and Button sizes stay as they are.
-- **No flashing.** Nothing flashes more than 3 times a second, no large brightness jumps. Glows pulse over a second or more. Animations stay skippable, as the current tweens are.
+**Text sprites.** Small items, props, effects and UI are grids of characters in `art-src/sprites/*.txt`, built into PNGs by `art sprites` (format in `tools/art/sprites.py`). Commit the `.txt` and the PNG; `art sprites --check` fails if a PNG is stale.
 
-## 5. Licensing
+**Tests:** `PYTHONPATH=tools uv run --python 3.12 --with pillow==13.0.0 python -m unittest discover -s tools/art/tests -t tools` (also in CI).
 
-**Decided 3 Nov 2026: art and audio are CC-BY-SA 4.0** (`game/art/`, `game/audio/`, `art-src/`, `server/static/bigscreen/img/`); code stays AGPL-3.0-or-later. Only approved, final assets are committed. This brief is due to be rewritten for the NES pixel style (PLAN.md WP27). The root `LICENSE` stays the AGPL text, and the README License section must state the art licence explicitly, naming those folders if CC-BY-SA 4.0 is chosen. PNGs cannot carry SPDX headers, so `game/art/CREDITS.md` holds one line per asset group:
+## 6. Accessibility
 
-`<path glob> | <artist name or handle> | <year> | <AGPL-3.0-or-later or CC-BY-SA-4.0> | <link to artist or source>`
+- **Colour is never alone.** Broken and fixed parts differ in shape, not only colour: a cracked gear against a turning one, a dry pipe against a flowing one.
+- **Readable at 1×.** Every sprite must read at its native size before scaling; check the 1× contact sheet.
+- **No flashing.** Nothing flashes more than 3 times a second; glows pulse over a second or more.
+- **Tap targets** are set by the game, not the art; art never shrinks a hit area.
 
-**No third-party mascot artwork is used, traced, recoloured or kept as a reference overlay**: Tux, the Go gopher, Ferris, Slonik, the PHP elephpant, the Firefox logo, the GNU head, the SeaGL logo. Image generators must not be prompted with those names or images; keep prompts in `art-src/PROMPTS.md`.
+## 7. Licensing and provenance
 
-## 6. Delivery and integration
+Art and audio are **CC-BY-SA 4.0** (`LICENSES/CC-BY-SA-4.0.txt`); code is AGPL-3.0-or-later. `ASSETS.md` lists every committed asset with its source, licence and author, and for generated assets the model, prompt and seed, labelled AI-generated. Ninja Adventure (Pixel-boy and AAA) and Kenney are CC0 and credited anyway.
 
-**Handover.** One PR (or a zip) containing: PNGs at the exact names and sizes above; layered sources in `art-src/`; `CREDITS.md` updated; a contact sheet (not shipped) on Night Tea at 1x. Checklist:
+Only the pinned, Apache 2.0 image models may produce shipped art: Z-Image-Turbo, Qwen-Image-2512 and Qwen-Image-Edit-2511, with their Lightning LoRAs. Newer Qwen-Image releases (2.1 and later) carry a research-only licence; no upgrade without a licence check.
 
-1. Names match the table (lowercase, underscores).
-2. Pixel sizes and nine-slice margins match.
-3. Alpha PNG, palette colours and tints only.
-4. Contrast at least 4.5:1 under live text; no baked-in text.
-5. No flashing; animation at most 8 fps.
-6. Licence and attribution lines added.
-7. Size caps met.
-8. Written confirmation that no official mascot art was used or traced.
+**No third-party mascot artwork** is used, traced, recoloured, kept as a reference overlay or named in a prompt: Tux, the Go gopher, Ferris, Slonik, the PHP elephpant, the Firefox logo, the GNU head, the SeaGL logo.
 
-**Swapping a placeholder without touching scripts.** Edit only the `.tscn`:
+**Private details stay out.** No addresses, host names, keys or paths of Trevor's machines in commits, records or prompts. Records name the library item, never the server.
 
-- Replace each `ColorRect` or `Polygon2D` placeholder with a `TextureRect` (or `Sprite2D`) with the **same node name** and offsets: `mouse_filter = 2`, `expand_mode = 1`, `stretch_mode = 5`. Examples: `Hotspot/Visual`, `PartFixture/Broken/Shape`, `PartFixture/Fixed/Shape`, `Town/Ground`, `Shop/Floor`, `StartScreen/Background`. `Label` children stay.
-- Where a script types the node (`town.gd`: `var avatar: ColorRect = $Avatar`), keep the `ColorRect` at alpha 0 and add the art as a child named `Sprite`.
-- Per-place tiles are texture overrides on `Visual` in `town.tscn` and `shop.tscn`, not in `hotspot.tscn`.
-- `ext_resource` paths have no `uid=`, per `ARCHITECTURE.md`.
+## 8. Review checklist
 
-**Exceptions needing a small code PR:** the Crab and "Merged!" stage (built in `merge_celebration.gd`), status lights (`ColorRect.new()` in `machine_view.gd` and `crew_progress.gd`), and chips, slots and lamps (`StyleBoxFlat` in the puzzle scripts). A follow-up adds one `UiKit` hook for nine-slice `StyleBoxTexture`; the 44 px minimums do not change.
-
-**CI size budget.** Today `tools/dev/check-size.sh` fails when the gzip of the web export exceeds 12 MB (the design doc says uncompressed, but the engine `.wasm` alone is about 39 MB, so the script budgets gzip). Add `tools/dev/check-art-size.sh`: `game/art/**/*.png` totals at most 2.5 MB, no file over 400 KB, and each PNG's pixel size matches this table (read the PNG header with `python3 -I`). It passes on an empty folder, so it can land before the art.
+1. File at the exact path and pixel size in `game/assets.json`.
+2. Palette colours only; at most 3 per 16×16 sprite including the outline.
+3. Reads at 1×; distinct silhouette.
+4. No baked-in text; no mascot or logo resemblance (section 3 "Do not").
+5. Animation 2 to 4 frames, at most 8 fps, no flashing.
+6. `ASSETS.md` line and, for generated art, the `art-src/generated/` record with a pinned model.
+7. Approved by Trevor.
