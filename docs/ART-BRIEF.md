@@ -81,7 +81,7 @@ PNG with alpha at 2x of the 390x844 base (a full screen is 780x1688). `canvas_it
 
 ## 5. Licensing
 
-Default: all art is AGPL-3.0-or-later, like the rest of the project. Alternative if the artist prefers: CC-BY-SA 4.0 for art only (`game/art/`, `art-src/`, `server/static/bigscreen/img/`). **Trevor must choose before any art merges.** The root `LICENSE` stays the AGPL text, and the README License section must state the art licence explicitly, naming those folders if CC-BY-SA 4.0 is chosen. PNGs cannot carry SPDX headers, so `game/art/CREDITS.md` holds one line per asset group:
+**Decided 3 Nov 2026: art and audio are CC-BY-SA 4.0** (`game/art/`, `game/audio/`, `art-src/`, `server/static/bigscreen/img/`); code stays AGPL-3.0-or-later. Only approved, final assets are committed. This brief is due to be rewritten for the NES pixel style (PLAN.md WP27). The root `LICENSE` stays the AGPL text, and the README License section must state the art licence explicitly, naming those folders if CC-BY-SA 4.0 is chosen. PNGs cannot carry SPDX headers, so `game/art/CREDITS.md` holds one line per asset group:
 
 `<path glob> | <artist name or handle> | <year> | <AGPL-3.0-or-later or CC-BY-SA-4.0> | <link to artist or source>`
 

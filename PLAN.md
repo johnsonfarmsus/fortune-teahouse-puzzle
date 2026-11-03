@@ -344,6 +344,8 @@ design's rebuild prompt says.
 
 ### 9.3 How the work runs from here
 
+Superseded on 3 Nov 2026 by section 10.3: the integrator moves to a local session on Trevor's Mac.
+
 - **One player-facing session at a time.** The rebuild slice is one focused session on an
   Opus-class model, with an integrator review and then Trevor's phone test as the gate. Fleets
   of parallel Sonnet workers continue only for data, server, docs and tests.
@@ -416,3 +418,80 @@ server and tests, Haiku for mechanical edits.
 2. Start WP16, the rebuild slice, as one Opus session, and WP5c in parallel.
 3. Trevor starts the local art and audio session on his Mac with the steam-machine brief.
 4. After WP16 lands: review, screenshots, Trevor's phone test, then WP17.
+
+## 10. Revision 3: local integrator, media and hosting (3 Nov 2026)
+
+### 10.1 What changed
+
+Trevor supplied a private handoff (git-ignored; never committed) covering the steam-machine's
+media API and the Hetzner VPS. Its consequences, without the private details:
+
+- **The steam-machine is reachable only from Trevor's network,** and the VPS key lives on his
+  Mac. No cloud session can generate media or set up hosting.
+- **Media goes through one JSON API** on the steam-machine: images (`fast` Z-Image-Turbo, `best`
+  Qwen-Image), instruction edits (Qwen-Image-Edit), music (ACE-Step), speech, video. There is no
+  sound-effect mode. Never call ComfyUI directly, never change the box, one render at a time.
+- **Its images are large, softly shaded rasters,** so everything goes through `pixelize.py`
+  into the 25-colour palette in `game/assets.json`. The handoff's size targets came from the old
+  flat-sticker brief and are superseded by revision 2's 16 by 16 pixel art.
+- **Ports 80 and 443 on the VPS belong to a reverse proxy that already serves another site.**
+  The kit's own Caddy must not start there; the game is added as a site on the existing proxy.
+
+### 10.2 Decisions
+
+| ID | Decision |
+| --- | --- |
+| D15 | **Domain:** `fortune.johnsonfarms.us`, one origin for the game, the API and the big screen. A DNS-only A record to the VPS so the proxy gets its own certificate. Check first that no wildcard or proxy rule on `johnsonfarms.us` already claims `fortune`. The cookie backs now carry this address (88 characters each). |
+| D16 | **Only approved, final art and audio are committed.** Raw renders, drafts and rejected variants stay on the steam-machine. `ASSETS.md` records source, licence, author, and for generated assets the model, prompt and seed. |
+| D17 | **Audio:** no voice acting. Sound effects on every interaction from the runtime synth, CC0 packs to fill gaps, rendered batches only on request. Music: a loop per place plus a finale track, from ACE-Step through the media API; FamiStudio optional. Separate music and effects toggles in Settings, muted until tap-to-start. |
+| D18 | **Backups:** GitHub covers code and the VPS's regular backups cover the server. The kit's nightly consistent SQLite copy stays on the box so those backups capture a clean file; hourly during the event. No off-box rsync target (`BACKUP_RSYNC_TARGET` stays unset). |
+| D19 | **Licences:** code AGPL-3.0-or-later; art and audio CC-BY-SA 4.0 (`LICENSES/CC-BY-SA-4.0.txt`). |
+| D20 | **Hosting behind the existing proxy:** run only the scoreboard container on loopback; add a site block for D15 to the existing proxy (static game from `/srv/fortune/current` with the kit's headers and pre-compressed files, `/api/*` and `/bigscreen*` to the scoreboard) plus a read-only `/srv/fortune` mount and a host-gateway entry on the proxy's container. Back up the proxy config first; check the other site answers before and after. No `apt upgrade`, reboot or firewall change. Deploy user `fortune`. |
+| D21 | **Model versions:** before any generated art ships, confirm `best` and `edit` run Qwen-Image-2512 and Qwen-Image-Edit-2511, not 2.1 or later. |
+| D22 | **Local integrator from 4 Nov 2026:** the Mac session drives, reviews and merges. Cloud sessions run only for parallel batches with no player-facing code. The phone-test gate per slice is unchanged. |
+
+### 10.3 How the work runs from here
+
+- **One local session on Trevor's Mac is the integrator.** It reads this plan, `DESIGN.md`,
+  `game/ARCHITECTURE.md`, `docs/DESIGN-REVIEW.md` and the git-ignored handoff file.
+- **Player-facing slices stay one at a time,** each gated by Trevor's phone test.
+- **Media and hosting work are local by necessity.** Cloud batches are launched from the local
+  session when parallel, non-player-facing work is worth it.
+- **Model sizing (section 6) still applies** to subagents the local session starts.
+
+### 10.4 Work packages added
+
+- **WP25 Local tooling (first).** `tools/dev/get-godot.sh` and `get-gdunit4.sh` gain a macOS path
+  for Godot 4.7.2; the full suite and the web export run on the Mac; README updated.
+- **WP26 Hosting behind the existing proxy (local, with Trevor).** Rewrite `docs/DEPLOY.md`'s
+  "If 80/443 are taken" section into the full D20 path with a ready site block and the two
+  container additions; rename the deploy user to `fortune` throughout; then, with Trevor: DNS
+  record, deploy user and forced-command shell, the four GitHub secrets, `.env`, first deploy.
+  Verify Brotli with `curl -I --compressed`, `config.json` with the game, and the other site.
+- **WP27 Art pipeline (local).** Rewrite `docs/ART-BRIEF.md` for NES pixel art with the asset
+  list the game loads by filename; `tools/art/pixelize.py`; `ASSETS.md`; download the Ninja
+  Adventure and Kenney packs on the Mac; D21 check; the eight character references, then stop
+  for Trevor's review; then the slice's tiles room by room.
+- **WP28 Music and sound (local).** A loop per place and a finale track through the media API;
+  effects polish over the runtime synth; Settings toggles; an audio size budget in CI.
+
+The cookie backs were moved to the new domain in this revision, so no package is needed for that.
+
+### 10.5 Order from here
+
+1. Trevor plays the rebuild slice on a phone (the WP16 gate, issue #39).
+2. WP25, then WP26 with Trevor.
+3. WP27 in parallel with fixes from the phone test; character references go to Trevor for review.
+4. After the slice verdict: WP17 chain design, then the remaining chains one slice at a time,
+   with WP28 alongside.
+
+### 10.6 Risks added by revision 3
+
+| Risk | Likelihood | Mitigation |
+| --- | --- | --- |
+| A config mistake takes down the other site on the shared VPS | Medium | Back up proxy config and compose file first; validate before reload; check the other site before and after; no upgrades, reboots or firewall changes |
+| A model update on the steam-machine changes licence terms | Low | D21 check before shipping; record the model per asset in `ASSETS.md` |
+| Music pushes the download past the budget | Medium | Short compressed loops; audio counted in the CI size budget (WP28) |
+| `fortune.johnsonfarms.us` collides with an existing rule on the family domain | Low | Check DNS and any wildcard or proxy rule before adding the record |
+| Private details leak into the public repo | Low | Handoff file git-ignored; a repo-wide check for private addresses before each art or hosting PR |
+
