@@ -22,3 +22,9 @@ server/data/*.db
 
 # Deployment secrets (copy server/deploy/.env.example to server/deploy/.env on the server only)
 server/deploy/.env
+
+# Private handoffs and notes: never commit (private addresses, paths and key locations)
+fortune-teahouse-brain-handoff.md
+**/*-handoff.md
+private/
+*.private.md
