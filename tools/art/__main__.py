@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
-"""Command line: python -m art {pixelize,sprites,list,render} ...
+"""Command line: python -m art {pixelize,sprites,list,render,batch} ...
 
   pixelize IN OUT --size WxH [--colors a,b,c] [--max-colors N] [--outline NAME|none]
            [--background NAME] [--crop x0,y0,x1,y1] [--anchor center|bottom]
@@ -7,6 +7,8 @@
       Turn a render into palette-locked pixel art (see art/pixelize.py).
   sprites [--src art-src/sprites] [--check]
       Build every text sprite into game/; --check exits 1 if a PNG is stale.
+  batch JOBS.jsonl
+      Run a queue of renders one at a time, skipping outputs that already exist.
   list [--prefix NAME] [--missing]
       The asset list in game/assets.json as a Markdown table, with what has landed.
   render KIND PROMPT OUT [--quality fast|best] [--shape square|wide|tall] [--source NAME]
@@ -66,6 +68,9 @@ def main(argv: list[str] | None = None) -> int:
     sp.add_argument("--game", type=Path, default=ROOT / "game")
     sp.add_argument("--check", action="store_true")
 
+    bp = sub.add_parser("batch")
+    bp.add_argument("jobs", type=Path, help="JSON lines: id, kind, prompt, out, [quality, shape, source, seconds]")
+
     lp = sub.add_parser("list")
     lp.add_argument("--assets", type=Path, default=ASSETS_JSON)
     lp.add_argument("--prefix", help="only names starting with this (tile, char, portrait, prop, machine, ...)")
@@ -107,6 +112,11 @@ def main(argv: list[str] | None = None) -> int:
             print("stale text sprites (run: PYTHONPATH=tools python -m art sprites):", *stale, sep="\n  ")
             return 1
         return 0
+
+    if args.cmd == "batch":
+        summary = media.batch(media.Client(), args.jobs, log=lambda m: print(m, flush=True))
+        print(json.dumps(summary))
+        return 1 if summary["failed"] else 0
 
     if args.cmd == "list":
         data = json.loads(args.assets.read_text(encoding="utf-8"))
