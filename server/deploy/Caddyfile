@@ -1,8 +1,12 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
-# Caddy obtains and renews the TLS certificate for $DOMAIN by itself (Let's Encrypt), redirects
-# http to https, and proxies everything to the scoreboard container. The API and the big screen
-# (/bigscreen/) share this one origin. CORS headers come from the app (CORS_ORIGINS), not here.
+# One origin for everything: Caddy obtains and renews the TLS certificate for $DOMAIN by itself
+# (Let's Encrypt), redirects http to https, serves the game's static web build from
+# /srv/fortune/current (a symlink the CI deploy swaps, see docs/DEPLOY.md), and proxies /api/ and
+# /bigscreen/ to the scoreboard container. Because the game and the API share this origin the
+# browser needs no CORS for it; CORS_ORIGINS in .env is only for the GitHub Pages mirror.
 {$DOMAIN} {
+	# Dynamic responses (the API, the big screen). The game's big files are served from
+	# pre-compressed .br/.gz siblings made at deploy time (Caddy has no built-in Brotli encoder).
 	encode zstd gzip
 
 	header {
@@ -19,8 +23,42 @@
 
 	# Caddy sets X-Forwarded-For to the real client address and replaces anything a client sent,
 	# which is what the app's TRUST_PROXY=true expects (rightmost entry).
-	reverse_proxy scoreboard:8000 {
-		health_uri /api/v1/health
-		health_interval 30s
+	@app path /api/* /bigscreen /bigscreen/*
+	handle @app {
+		reverse_proxy scoreboard:8000 {
+			health_uri /api/v1/health
+			health_interval 30s
+		}
+	}
+
+	# The game. Everything else is a file from the current release.
+	handle {
+		root * /srv/fortune/current
+
+		# Optional: cross-origin isolation (SharedArrayBuffer / threaded Godot export). OFF because
+		# the export is single-threaded; turning it on also blocks cross-origin embeds that do not
+		# send CORP/CORS headers. Uncomment both lines together if you ever export with threads.
+		# header Cross-Origin-Opener-Policy "same-origin"
+		# header Cross-Origin-Embedder-Policy "require-corp"
+
+		# Hashed or versioned file names (name.<8+ hex>.ext) never change: cache for a year.
+		@immutable path_regexp \.[0-9a-f]{8,}\.[a-z0-9]+$
+		header @immutable Cache-Control "public, max-age=31536000, immutable"
+
+		# The Godot export uses fixed names (index.wasm, index.pck), so everything else is
+		# revalidated on every load. The ETag makes that a cheap 304 when nothing changed, and a
+		# merge is picked up at once. index.html and config.json are small and must be fresh.
+		@mutable not path_regexp \.[0-9a-f]{8,}\.[a-z0-9]+$
+		header @mutable Cache-Control "no-cache"
+
+		# Content types Godot needs, whatever the host's mime table says.
+		@wasm path *.wasm
+		header @wasm Content-Type "application/wasm"
+		@pck path *.pck
+		header @pck Content-Type "application/octet-stream"
+
+		file_server {
+			precompressed br gzip
+		}
 	}
 }

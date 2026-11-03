@@ -1,4 +1,4 @@
-# Deploying the scoreboard (Hetzner VM)
+# Deploying the game and scoreboard (Hetzner VM)
 
 This puts the scoreboard and big screen on one Debian or Ubuntu VM you already run, behind Caddy
 with automatic HTTPS. Everything lives in [`server/deploy/`](../server/deploy/):
@@ -6,7 +6,8 @@ with automatic HTTPS. Everything lives in [`server/deploy/`](../server/deploy/):
 | File | What it is |
 | --- | --- |
 | `compose.prod.yaml` | The scoreboard container plus Caddy (TLS), volumes, restart policies, log rotation |
-| `Caddyfile` | Caddy site config; uses `DOMAIN` from the environment |
+| `Caddyfile` | Caddy site config; uses `DOMAIN` from the environment. Serves the game, `/api/` and `/bigscreen/` on one origin |
+| `fortune-deploy-shell.sh` | Forced SSH command for the CI deploy key (rsync into `releases/`, swap `current`) |
 | `.env.example` | Every setting, documented. Copy to `.env` (git-ignored) and fill in |
 | `backup.sh`, `fortune-scoreboard-backup.{service,timer}` | Daily online backup of the SQLite database, 14 copies kept |
 | `healthcheck.sh` | External check of `/api/v1/health`, the big screen and the certificate |
@@ -132,6 +133,9 @@ different networks ever share one limit, check that the app container has no pub
 (`docker compose ... ps` must show none for `scoreboard`).
 
 ## 6. Point the game at it
+
+When the game is served from the VPS itself (section "Serving the game from the VPS") this is done
+for you by `config.json`; the options below are for the Pages mirror and other hosts.
 
 The scoreboard address is the server root, with no path: `https://scoreboard.example.org`.
 
@@ -262,6 +266,129 @@ docker compose -f server/deploy/compose.prod.yaml up -d --build
 The database is not touched by a code rollback; if the data itself is bad, restore a backup
 (section 8). To take the scoreboard offline entirely: `docker compose -f server/deploy/compose.prod.yaml down`
 (volumes, and so the database and certificates, are kept; `down -v` would delete them, so never use it).
+
+## Serving the game from the VPS
+
+The same Caddy that fronts the scoreboard also serves the game's static web build, so the game,
+the API (`/api/`) and the big screen (`/bigscreen/`) share one origin, `https://$DOMAIN`. That is
+the production address; players need no `?scoreboard=` link and the browser needs no CORS. The
+GitHub Pages deploy keeps running as a **staging mirror** (see "The Pages mirror" below).
+
+How it fits together:
+
+- Files live in `/srv/fortune/` on the VPS: `releases/<id>/` (one directory per deploy) and
+  `current`, a relative symlink to the live release. `compose.prod.yaml` mounts `/srv/fortune`
+  read-only into Caddy (change the host path with `GAME_DIR` in `.env`).
+- `Caddyfile` sends `/api/*` and `/bigscreen*` to the app and everything else to
+  `/srv/fortune/current`. `index.html` and `config.json` are `Cache-Control: no-cache`, so every
+  merge is picked up at once. The Godot export has fixed file names (`index.wasm`, `index.pck`), so
+  they are also revalidated each load (a cheap 304 via ETag); file names containing an 8+ hex hash
+  (`name.<hash>.ext`) get `max-age=31536000, immutable`. `.wasm` is `application/wasm`, `.pck` is
+  `application/octet-stream`.
+- Caddy has no built-in Brotli encoder, so CI writes `.br` and `.gz` copies of every `.wasm`,
+  `.js`, `.pck`, `.html` and `.json`, and Caddy serves them with `precompressed br gzip`. The API
+  and big screen use Caddy's `encode zstd gzip`.
+- CI also writes `config.json` (`{"scoreboard_url": "/api/v1"}`) next to `index.html`. The web
+  build fetches it at startup (never blocking; a 404 or error is ignored, which is what happens on
+  Pages) and then talks to the scoreboard on its own origin. Order: `?scoreboard=` in the address,
+  then `config.json`, then the `fortune/scoreboard_url` project setting, then offline only.
+  `fortune/scoreboard_url` itself also accepts `/api/v1` or `/` (same origin).
+- Cross-origin isolation headers (COOP/COEP) are in the Caddyfile as comments, off, because the
+  export is single-threaded.
+
+### One-time setup on the VPS
+
+Run as a sudo-capable user, after sections 1 to 4 above.
+
+```sh
+# 1. A deploy user with no password and no shell access beyond the forced command.
+sudo adduser --disabled-password --gecos "" deploy
+
+# 2. The directories. deploy writes releases/ and the symlink; Caddy (root in its container) reads.
+sudo install -d -o deploy -g deploy -m 755 /srv/fortune /srv/fortune/releases
+
+# 3. The restricted shell that the key is bound to.
+sudo install -m 755 server/deploy/fortune-deploy-shell.sh /usr/local/bin/fortune-deploy-shell
+sudo apt-get install -y rsync
+
+# 4. A key pair for CI (do this on your own machine, not on the VPS).
+ssh-keygen -t ed25519 -N "" -C "fortune-ci-deploy" -f fortune_deploy_key
+```
+
+Put the **public** key in `/home/deploy/.ssh/authorized_keys` (`sudo -u deploy mkdir -m 700
+/home/deploy/.ssh`, file mode 600), as one line, bound to the restricted shell:
+
+```
+command="/usr/local/bin/fortune-deploy-shell",no-pty,no-port-forwarding,no-agent-forwarding,no-X11-forwarding ssh-ed25519 AAAA... fortune-ci-deploy
+```
+
+`fortune-deploy-shell` accepts only two requests from that key, and rejects everything else: an
+rsync into `/srv/fortune/releases/<id>/`, and `activate <id>`, which atomically re-points
+`current` at that release and deletes all but the newest 5 releases. It cannot get a shell or write
+anywhere else.
+
+Then restart the stack so Caddy picks up the new mount and Caddyfile:
+`docker compose -f server/deploy/compose.prod.yaml up -d`. Until the first deploy runs,
+`https://$DOMAIN/` answers 404 for the game (the API and `/bigscreen/` already work).
+
+### GitHub secrets
+
+Add these four under Settings > Secrets and variables > Actions > Repository secrets. If any is
+missing the `deploy-vps` job prints a notice and skips, and the rest of CI is unaffected (forks too).
+
+| Secret | Value |
+| --- | --- |
+| `VPS_HOST` | The VPS hostname or IP, for example `scoreboard.example.org` |
+| `VPS_USER` | `deploy` |
+| `VPS_SSH_KEY` | The full **private** key file (`fortune_deploy_key`), including the BEGIN/END lines |
+| `VPS_KNOWN_HOSTS` | Output of `ssh-keyscan -t ed25519 <host>` run from a machine you trust, verified against the server's fingerprint (`ssh-keygen -lf /etc/ssh/ssh_host_ed25519_key.pub` on the VPS) |
+
+Delete `fortune_deploy_key` locally once it is stored as the secret.
+
+### How a deploy flows
+
+1. A push to `main` runs `test` and `build` (import, export, 12 MB gzip budget) and uploads the
+   `web-build` artifact.
+2. `deploy-vps` downloads that artifact, adds `config.json`, makes the `.br` and `.gz` copies, and
+   picks a release id like `20271001T120000Z-abc1234`.
+3. It runs `rsync` over SSH into `/srv/fortune/releases/<id>/`, then `activate <id>`, which swaps
+   the `current` symlink in one atomic rename. Visitors see either the old build or the new one,
+   never a mix. `deploy` (Pages) runs in parallel and is unchanged.
+
+### Roll back
+
+Releases stay on disk (the newest 5). On the VPS:
+
+```sh
+ls -1t /srv/fortune/releases                      # newest first
+cd /srv/fortune && ln -sfn releases/<previous-id> current.new && mv -T current.new current
+```
+
+Nothing is restarted; the next request is served from the older build. The next push to `main`
+moves `current` forward again, so fix or revert on `main` as well.
+
+### Verify
+
+```sh
+curl -sI --compressed https://$DOMAIN/index.wasm | grep -iE 'content-type|content-encoding|cache-control'
+# expect: content-type: application/wasm, content-encoding: br (or gzip), cache-control: no-cache
+curl -sI -H 'Accept-Encoding: gzip' https://$DOMAIN/index.pck | grep -iE 'content-type|content-encoding'
+curl -s https://$DOMAIN/config.json                # {"scoreboard_url": "/api/v1"}
+curl -s https://$DOMAIN/api/v1/health              # the app, same origin
+```
+
+Open `https://$DOMAIN/` on a phone: Menu > Scoreboard should show the scoreboard without any
+`?scoreboard=` in the address. Brotli is sent only to clients that ask for it
+(`Accept-Encoding: br`, which every current browser does); `curl --compressed` asks for whatever
+that build of curl supports (often only gzip), so add `-H 'Accept-Encoding: br'` to see
+`content-encoding: br`.
+
+### The Pages mirror
+
+Every merge still publishes to `https://johnsonfarmsus.github.io/fortune-teahouse-puzzle/`. Use it
+as staging, and as a fallback. It is a different origin from the scoreboard, so it only talks to the
+scoreboard when opened with `?scoreboard=https://$DOMAIN` and when `CORS_ORIGINS` in `.env` lists
+`https://johnsonfarmsus.github.io`. Keep that value; the VPS origin itself needs no CORS entry.
 
 ## If 80/443 are taken
 

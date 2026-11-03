@@ -22,10 +22,12 @@ var _last: Dictionary = {}  # machine -> {part: count}
 var _local: LocalProgressStore
 var _transport: HttpTransport
 var _tick: Timer
+var _query_override: bool = false  # ?scoreboard= is set, so config.json is not consulted
 
 
 func _ready() -> void:
 	scoreboard_url = ScoreboardUrl.configured()
+	_query_override = ScoreboardUrl.web_override() != ""
 	if persist_settings:
 		var saved := JsonFile.read(SETTINGS_PATH)
 		scoreboard_enabled = bool(saved.get("enabled", true))
@@ -45,6 +47,44 @@ func _ready() -> void:
 	Events.crew_changed.connect(func(_machine: String) -> void: store.refresh())
 	# Router is registered after this autoload, so it only exists once _ready is done.
 	_connect_router.call_deferred()
+	_fetch_site_config()
+
+
+## On the web, asks for config.json beside index.html (written by the VPS deploy). It never
+## blocks and any failure (404 on Pages, offline, bad JSON) is ignored.
+func _fetch_site_config() -> void:
+	if _query_override or not OS.has_feature("web"):
+		return
+	var url := ScoreboardUrl.config_url()
+	if url == "":
+		return
+	var http := HTTPRequest.new()
+	http.timeout = HttpTransport.TIMEOUT_SECONDS
+	add_child(http)
+	http.request_completed.connect(
+		func(result: int, code: int, _headers: PackedStringArray, body: PackedByteArray) -> void:
+			http.queue_free()
+			if result == HTTPRequest.RESULT_SUCCESS and code == 200:
+				apply_site_config(body.get_string_from_utf8())
+	)
+	if http.request(url) != OK:
+		http.queue_free()
+
+
+## Uses the scoreboard_url in a config.json body unless ?scoreboard= was given. Returns true
+## when the scoreboard address changed.
+func apply_site_config(text: String) -> bool:
+	if _query_override:
+		return false
+	var resolved := ScoreboardUrl.resolve_chain(
+		"", ScoreboardUrl.from_config_json(text),
+		str(ProjectSettings.get_setting(ScoreboardUrl.SETTING, "")), ScoreboardUrl.page_origin())
+	if resolved == "" or resolved == scoreboard_url:
+		return false
+	scoreboard_url = resolved
+	_build_store()
+	Events.scoreboard_status_changed.emit()
+	return true
 
 
 func set_store(new_store: ProgressStore) -> void:

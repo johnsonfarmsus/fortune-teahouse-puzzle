@@ -76,3 +76,49 @@ func test_the_query_accepts_https_and_only_local_http() -> void:
 	assert_str(ScoreboardUrl.from_query("?scoreboard=http://evil.org/localhost")).is_empty()
 	# The project setting is the maintainers' own choice, so it may be plain http.
 	assert_str(ScoreboardUrl.resolve("http://board.lan:8000", "")).is_equal("http://board.lan:8000")
+
+
+func test_relative_values_join_the_page_origin() -> void:
+	var o := "https://play.example.org"
+	assert_str(ScoreboardUrl.normalise_with_origin("/api/v1", o)).is_equal(o)
+	assert_str(ScoreboardUrl.normalise_with_origin("/", o)).is_equal(o)
+	assert_str(ScoreboardUrl.normalise_with_origin("/api/v1/", o)).is_equal(o)
+	assert_str(ScoreboardUrl.normalise_with_origin("/board/api/v1", o)).is_equal(o + "/board")
+	assert_str(ScoreboardUrl.normalise_with_origin("https://a.org/", o)).is_equal("https://a.org")
+
+
+func test_relative_values_are_offline_without_an_origin_or_when_protocol_relative() -> void:
+	assert_str(ScoreboardUrl.normalise_with_origin("/api/v1", "")).is_empty()
+	assert_str(ScoreboardUrl.normalise_with_origin("//evil.org/api/v1", "https://play.example.org")).is_empty()
+	assert_str(ScoreboardUrl.normalise_with_origin("", "https://play.example.org")).is_empty()
+	assert_str(ScoreboardUrl.normalise_with_origin("api/v1", "https://play.example.org")).is_empty()
+
+
+func test_config_json_is_read_defensively() -> void:
+	assert_str(ScoreboardUrl.from_config_json('{"scoreboard_url": "/api/v1"}')).is_equal("/api/v1")
+	assert_str(ScoreboardUrl.from_config_json("<html>404</html>")).is_empty()
+	assert_str(ScoreboardUrl.from_config_json("[]")).is_empty()
+	assert_str(ScoreboardUrl.from_config_json('{"scoreboard_url": 5}')).is_empty()
+	assert_str(ScoreboardUrl.from_config_json("{}")).is_empty()
+
+
+func test_resolution_order_query_then_config_then_setting_then_offline() -> void:
+	var o := "https://play.example.org"
+	assert_str(ScoreboardUrl.resolve_chain("https://q.org", "/api/v1", "https://s.org", o)).is_equal("https://q.org")
+	assert_str(ScoreboardUrl.resolve_chain("", "/api/v1", "https://s.org", o)).is_equal(o)
+	assert_str(ScoreboardUrl.resolve_chain("nonsense", "/api/v1", "https://s.org", o)).is_equal(o)
+	assert_str(ScoreboardUrl.resolve_chain("", "", "https://s.org", o)).is_equal("https://s.org")
+	assert_str(ScoreboardUrl.resolve_chain("", "garbage", "/api/v1", o)).is_equal(o)
+	assert_str(ScoreboardUrl.resolve_chain("", "", "", o)).is_empty()
+	assert_str(ScoreboardUrl.resolve_chain("", "/api/v1", "", "")).is_empty()
+
+
+func test_site_config_applies_unless_the_query_overrides() -> void:
+	# Off the web there is no origin, so a relative value stays offline.
+	if OS.has_feature("web"):
+		return
+	var progress: Node = auto_free(load("res://autoload/progress.gd").new())
+	assert_bool(progress.apply_site_config('{"scoreboard_url": "/api/v1"}')).is_false()
+	progress._query_override = true
+	assert_bool(progress.apply_site_config('{"scoreboard_url": "https://x.org"}')).is_false()
+	assert_str(progress.scoreboard_url).is_empty()

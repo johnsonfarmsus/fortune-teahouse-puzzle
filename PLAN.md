@@ -35,7 +35,7 @@ Defaults are given so work can start today. Reply to change any of them.
 | D5 | Scoreboard stack: Python FastAPI plus SQLite in one Docker container, behind the existing reverse proxy on the Hetzner server. | Yes |
 | D6 | Test framework: gdUnit4 (official GitHub action, headless by default). | Yes |
 | D7 | Pi string: ten digits "3.141592653" as the finale start code (no sixth lucky number). | Yes |
-| D8 | Deploy target for the game: GitHub Pages at the repo's default URL now; custom domain later. | Yes |
+| D8 | Deploy target for the game: the Hetzner VPS is the production origin (Caddy serves the game, `/api/` and `/bigscreen/` on one origin; CI deploys on merge to `main`). GitHub Pages stays as a staging mirror. | Yes |
 
 ## 2. Phases and dates
 
