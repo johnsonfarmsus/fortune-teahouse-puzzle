@@ -15,14 +15,22 @@ To repeat the end-to-end finale run, start a scoreboard with the finale settings
 
 ## Get Godot locally
 
-Godot 4.7.2-stable is pinned. On Linux x86_64:
+Godot 4.7.2-stable is pinned. On Linux x86_64 or macOS (Apple silicon or Intel):
 
 ```sh
 GODOT=$(tools/dev/get-godot.sh)
 $GODOT --version
 ```
 
-The script downloads the editor binary (it runs headless) and the matching export templates into `~/.cache/fortune-godot` and installs the templates to `~/.local/share/godot/export_templates/4.7.2.stable/`. Set `FORTUNE_GODOT_CACHE` to change the cache directory. On other platforms, install Godot 4.7.2 and its export templates yourself.
+The script downloads the editor binary (it runs headless) and the matching export templates into `~/.cache/fortune-godot` and installs the templates where Godot looks for them: `~/.local/share/godot/export_templates/4.7.2.stable/` on Linux, `~/Library/Application Support/Godot/export_templates/4.7.2.stable/` on macOS. On macOS `$GODOT` is the binary inside `Godot.app` (`~/.cache/fortune-godot/Godot_v4.7.2-stable_macos/Godot.app/Contents/MacOS/Godot`), so the commands below work unchanged. Set `FORTUNE_GODOT_CACHE` to change the cache directory. On other platforms, install Godot 4.7.2 and its export templates yourself.
+
+The server and solver tests need Python 3.12 (as in CI). With [uv](https://docs.astral.sh/uv/), from the repository root:
+
+```sh
+(cd server && uv run --python 3.12 --with-requirements requirements-dev.txt python -m pytest -q)
+PYTHONPATH=tools uv run --python 3.12 --with pyyaml==6.0.2 --with jsonschema==4.23.0 python -m unittest discover -s tools/solver/tests -t tools
+PYTHONPATH=tools uv run --python 3.12 python -m solver check puzzles/
+```
 
 ## Run the tests
 
