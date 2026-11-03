@@ -1,0 +1,25 @@
+{
+  "asset": "portrait.gnu.neutral",
+  "file": "game/art/portraits/gnu_neutral.png",
+  "licence": "CC-BY-SA-4.0",
+  "ai_generated": true,
+  "approved_by": "Trevor Johnson",
+  "approved_on": "2026-11-02",
+  "render": {
+    "library_item": "2026-11-02_210110_image.png",
+    "prompt": "Character design reference for a cozy retro top-down adventure game: an elderly, kindly gnu (a wildebeest) who is a retired inventor, with tall shoulders, a heavy shaggy dark mane sagging into a long cream-coloured beard, small upturned horns, gold round spectacles on a string, and a worn brown cardigan with pockets stuffed with pencils and yellow sticky notes, holding a ring of mismatched keys; tired, kind eyes and an apologetic smile. Full body, front view, standing upright facing the viewer, centered, chunky cute proportions with a big head. 16-bit pixel art style, clean flat colours, bold dark outline, simple readable shapes. Plain solid flat magenta background, no shadow, no text, no frame.",
+    "mode": "image",
+    "quality": "best",
+    "shape": "square",
+    "models": [
+      "Qwen-Image-2512"
+    ],
+    "loras": [
+      "Qwen-Image-2512-Lightning 8-step"
+    ],
+    "seed": 1682048113,
+    "steps": 8,
+    "cfg": 1.0
+  },
+  "pixelize": "python -m art pixelize <render> game/art/portraits/gnu_neutral.png --size 32x32 --max-colors 8 --crop 0.18,0.03,0.82,0.42"
+}

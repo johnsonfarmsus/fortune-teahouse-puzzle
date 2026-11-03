@@ -30,9 +30,13 @@ func test_asset_list_is_well_formed() -> void:
 			assert_str(str(d["file"])).starts_with("art/ninja/")
 
 
-func test_no_art_has_landed_so_everything_is_a_placeholder_that_draws() -> void:
+func test_every_asset_draws_at_its_size_from_its_file_or_a_placeholder() -> void:
+	# The neutral portraits have landed (WP27); the rest are still placeholders.
+	assert_bool(assets.is_placeholder("portrait.red_panda.neutral")).is_false()
+	assert_bool(assets.is_placeholder("portrait.red_panda.happy")).is_true()
 	for asset_name in assets.names():
-		assert_bool(assets.is_placeholder(asset_name)).is_true()
+		var landed := ResourceLoader.exists(assets.path_for(asset_name))
+		assert_bool(assets.is_placeholder(asset_name)).override_failure_message(asset_name).is_equal(not landed)
 		var tex := assets.texture(asset_name)
 		assert_object(tex).is_not_null()
 		assert_object(Vector2i(tex.get_size())).override_failure_message(asset_name).is_equal(assets.frame_size(asset_name))
@@ -106,3 +110,22 @@ func test_a_file_that_exists_replaces_the_placeholder() -> void:
 	assert_object((frame as AtlasTexture).region).is_equal(Rect2(64, 64, 64, 64))
 	assert_bool(loader.is_placeholder("missing")).is_true()
 	assert_bool(loader.texture("missing") is ImageTexture).is_true()
+
+
+func test_a_portrait_falls_back_to_neutral_until_its_own_art_lands() -> void:
+	var loader := AssetLoader.new("", {
+		"tile_size": 16, "palette": {"red": "#ff0000"},
+		"assets": {
+			"portrait.fox.neutral": {"file": "icon.svg", "frame_size": [32, 32], "frames": 1, "kind": "portrait", "color": "red"},
+			"portrait.fox.happy": {"file": "art/none/fox_happy.png", "frame_size": [32, 32], "frames": 1, "kind": "portrait", "color": "red"},
+			"portrait.owl.neutral": {"file": "art/none/owl_neutral.png", "frame_size": [32, 32], "frames": 1, "kind": "portrait", "color": "red"},
+			"portrait.owl.happy": {"file": "art/none/owl_happy.png", "frame_size": [32, 32], "frames": 1, "kind": "portrait", "color": "red"},
+		},
+	})
+	# Neutral art has landed and happy has not: show the real neutral portrait.
+	assert_str(PortraitDialogue.portrait_key(loader, "Fox", "happy")).is_equal("portrait.fox.neutral")
+	# An unlisted expression falls back to neutral too.
+	assert_str(PortraitDialogue.portrait_key(loader, "Fox", "sly")).is_equal("portrait.fox.neutral")
+	# All placeholders: keep the expression's own placeholder (it draws the mouth).
+	assert_str(PortraitDialogue.portrait_key(loader, "Owl", "happy")).is_equal("portrait.owl.happy")
+	assert_str(PortraitDialogue.portrait_key(loader, "Owl", "")).is_equal("portrait.owl.neutral")

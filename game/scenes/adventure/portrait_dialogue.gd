@@ -180,6 +180,17 @@ static func portrait_name(speaker: String, expression: String) -> String:
 	return "portrait.%s.%s" % [speaker.to_lower().replace(" ", "_"), expression if expression != "" else "neutral"]
 
 
+## The portrait to show: the expression's own, or the neutral one when the
+## expression is not listed, or is still a placeholder while neutral's art has
+## landed (art arrives one portrait at a time).
+static func portrait_key(loader: AssetLoader, speaker: String, expression: String) -> String:
+	var key := portrait_name(speaker, expression)
+	var neutral := portrait_name(speaker, "neutral")
+	if not loader.has(key) or (loader.is_placeholder(key) and loader.file_exists(neutral)):
+		return neutral
+	return key
+
+
 func _show(index: int) -> void:
 	_index = index
 	var page := _pages[index]
@@ -189,12 +200,9 @@ func _show(index: int) -> void:
 	_speaker.visible = speaker != "Narrator" or kind != ""
 	if speaker == "Narrator":
 		_speaker.text = kind.capitalize() if kind != "" else ""
-	var key := portrait_name(speaker, str(page["expression"]))
 	_portrait.visible = speaker != "Narrator" and assets != null
 	if _portrait.visible:
-		if not assets.has(key):
-			key = portrait_name(speaker, "neutral")
-		_portrait.texture = assets.texture(key)
+		_portrait.texture = assets.texture(portrait_key(assets, speaker, str(page["expression"])))
 	_body.add_theme_font_size_override("font_size", 17)
 	_body.text = str(page["text"])
 	_body.visible_characters = 0
