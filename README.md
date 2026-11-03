@@ -11,6 +11,8 @@ To repeat the end-to-end finale run, start a scoreboard with the finale settings
 - [docs/DESIGN-REVIEW.md](docs/DESIGN-REVIEW.md) is the design review.
 - [docs/SMOKE-TEST.md](docs/SMOKE-TEST.md) is the checklist for trying the build on a real phone.
 
+**Where it runs:** production is the Hetzner VPS, where Caddy serves the game, the scoreboard API (`/api/`) and the big screen (`/bigscreen/`) from one origin, deployed by CI on every merge to `main` ([docs/DEPLOY.md](docs/DEPLOY.md)). GitHub Pages is kept as a staging mirror.
+
 ## Get Godot locally
 
 Godot 4.7.2-stable is pinned. On Linux x86_64:
@@ -83,7 +85,8 @@ CI fails if the exported build exceeds 12 MB **gzipped**, which is what a phone 
 
 1. **test**: gdUnit4 tests via `godot-gdunit-labs/gdUnit4-action` (it installs Godot and the addon).
 2. **build**: `chickensoft-games/setup-godot` with export templates, `--import` twice, export of the "Web" preset, then a size budget check. Each Godot log is grepped for `ERROR` and the job fails on a match. The web build is uploaded as the `web-build` artifact.
-3. **deploy** (push to `main` only, after test and build pass): publishes the build to GitHub Pages with `actions/deploy-pages`. A `.nojekyll` file is added to the export. The deploy job asks `configure-pages` to enable Pages; if the repository setting refuses that, set Settings > Pages > Source to "GitHub Actions" once.
+3. **deploy-vps** (push to `main` only, after test and build pass): publishes the build to the VPS over rsync and SSH, which serves the game, API and big screen from one origin; skipped with a notice unless the `VPS_*` secrets exist (see `docs/DEPLOY.md`).
+4. **deploy** (push to `main` only, after test and build pass): publishes the build to GitHub Pages as a staging mirror with `actions/deploy-pages`. A `.nojekyll` file is added to the export. The deploy job asks `configure-pages` to enable Pages; if the repository setting refuses that, set Settings > Pages > Source to "GitHub Actions" once.
 
 ## Repository layout
 

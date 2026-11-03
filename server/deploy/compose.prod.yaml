@@ -1,5 +1,6 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
-# Production stack for the Fortune Teahouse scoreboard: the app plus Caddy (automatic TLS).
+# Production stack for Fortune Teahouse: the scoreboard app plus Caddy (automatic TLS), which also
+# serves the game's static web build from the same origin.
 #
 # Run from the repository root:
 #   cp server/deploy/.env.example server/deploy/.env   # then edit it
@@ -65,6 +66,9 @@ services:
       DOMAIN: ${DOMAIN:?Set DOMAIN in server/deploy/.env (for example scoreboard.example.org)}
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      # The game's web build: releases/<id>/ plus a `current` symlink that CI swaps (read-only
+      # here). Create it once on the host, see docs/DEPLOY.md "Serving the game from the VPS".
+      - ${GAME_DIR:-/srv/fortune}:/srv/fortune:ro
       - caddy-data:/data       # certificates and ACME account: keep this volume
       - caddy-config:/config
     security_opt:

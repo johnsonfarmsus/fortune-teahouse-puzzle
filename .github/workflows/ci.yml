@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 #
 # CI for the Godot web game: headless import, gdUnit4 tests, web export with a
-# size budget, and (on main only) deploy to GitHub Pages.
+# size budget, and (on main only) deploy to the VPS (production) and GitHub Pages (staging).
 name: CI
 
 on:
@@ -140,3 +140,68 @@ jobs:
       - name: Deploy
         id: deployment
         uses: actions/deploy-pages@v4
+
+  # Publishes the same build to the VPS (production origin: game + API + big screen, served by
+  # Caddy). Uploads to releases/<id>/ over rsync+SSH, then swaps the `current` symlink, so a
+  # visitor never sees a half-copied build. Skips with a notice when the VPS_* secrets are not
+  # set (forks, or before the VPS is ready). Setup: docs/DEPLOY.md "Serving the game from the VPS".
+  deploy-vps:
+    name: Deploy to VPS
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: [test, build]
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    concurrency:
+      group: vps-deploy
+      cancel-in-progress: false
+    env:
+      VPS_HOST: ${{ secrets.VPS_HOST }}
+      VPS_USER: ${{ secrets.VPS_USER }}
+      VPS_SSH_KEY: ${{ secrets.VPS_SSH_KEY }}
+      VPS_KNOWN_HOSTS: ${{ secrets.VPS_KNOWN_HOSTS }}
+    steps:
+      - name: Check for VPS secrets
+        id: check
+        run: |
+          if [ -n "$VPS_HOST" ] && [ -n "$VPS_USER" ] && [ -n "$VPS_SSH_KEY" ] && [ -n "$VPS_KNOWN_HOSTS" ]; then
+            echo "enabled=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::VPS deploy skipped: set the VPS_HOST, VPS_USER, VPS_SSH_KEY and VPS_KNOWN_HOSTS repository secrets to enable it (docs/DEPLOY.md)."
+          fi
+
+      - name: Download web build
+        if: steps.check.outputs.enabled == 'true'
+        uses: actions/download-artifact@v4
+        with:
+          name: web-build
+          path: site
+
+      # Same-origin scoreboard: the game reads config.json at startup (ScoreboardUrl / Progress).
+      # Pre-compressed .br and .gz copies are served by Caddy's `precompressed br gzip`.
+      - name: Prepare release (config.json, Brotli, gzip)
+        if: steps.check.outputs.enabled == 'true'
+        run: |
+          set -euo pipefail
+          sudo apt-get install -y --no-install-recommends brotli >/dev/null
+          printf '{"scoreboard_url": "/api/v1"}\n' > site/config.json
+          rm -f site/.nojekyll
+          find site -type f \( -name '*.wasm' -o -name '*.js' -o -name '*.pck' -o -name '*.html' -o -name '*.json' \) | while read -r f; do
+            gzip -9 -k -f "$f"
+            brotli -q 11 -f -k "$f"
+          done
+          echo "RELEASE_ID=$(date -u +%Y%m%dT%H%M%SZ)-${GITHUB_SHA::7}" >> "$GITHUB_ENV"
+
+      - name: Upload release and activate
+        if: steps.check.outputs.enabled == 'true'
+        run: |
+          set -euo pipefail
+          install -d -m 700 ~/.ssh
+          printf '%s\n' "$VPS_SSH_KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          printf '%s\n' "$VPS_KNOWN_HOSTS" > ~/.ssh/known_hosts
+          SSH="ssh -i $HOME/.ssh/deploy_key -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes -o UserKnownHostsFile=$HOME/.ssh/known_hosts"
+          # The server side only accepts rsync into /srv/fortune/releases/<id>/ and "activate <id>".
+          rsync -rlt --delete -e "$SSH" site/ "$VPS_USER@$VPS_HOST:/srv/fortune/releases/$RELEASE_ID/"
+          $SSH "$VPS_USER@$VPS_HOST" "activate $RELEASE_ID"
+          echo "Deployed release \`$RELEASE_ID\` to the VPS." >> "$GITHUB_STEP_SUMMARY"
