@@ -1,0 +1,47 @@
+# SPDX-License-Identifier: AGPL-3.0-or-later
+# Art tools: unit tests for the pixelizer, text sprites and media client
+# (no network), and a check that every text sprite's PNG is up to date.
+name: art-tools
+
+on:
+  pull_request:
+    paths:
+      - "tools/art/**"
+      - "art-src/**"
+      - "game/assets.json"
+      - "game/art/**"
+      - ".github/workflows/art-tools.yml"
+  push:
+    branches: [main]
+    paths:
+      - "tools/art/**"
+      - "art-src/**"
+      - "game/assets.json"
+      - "game/art/**"
+      - ".github/workflows/art-tools.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  art-tools:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      PYTHONPATH: tools
+      PYTHONDONTWRITEBYTECODE: "1"
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Pillow
+        run: python -m pip install --disable-pip-version-check pillow==13.0.0
+
+      - name: Unit tests
+        run: python -m unittest discover -s tools/art/tests -t tools -v
+
+      - name: Text sprites are up to date
+        run: python -m art sprites --check

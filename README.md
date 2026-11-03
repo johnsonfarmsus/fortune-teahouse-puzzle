@@ -104,6 +104,8 @@ CI fails if the exported build exceeds 12 MB **gzipped**, which is what a phone 
 | `puzzles/` | Every clue as YAML; `tools/solver/export_json.py` turns it into `game/data/puzzles/*.json` |
 | `tools/dev/` | Developer scripts: `get-godot.sh`, `get-gdunit4.sh`, `check-size.sh`, `finale_integration.gd` (see "Finale integration run") |
 | `tools/solver/` | Python solver and clue generator |
+| `tools/art/` | Art pipeline: pixelizer, text-sprite build, asset list, media API client (`python -m art`; see [docs/ART-BRIEF.md](docs/ART-BRIEF.md)) |
+| `art-src/` | Text sprites and provenance records for approved generated art |
 | `server/` | Scoreboard service and big-screen page |
 | `docs/` | Design review and other documents |
 | `.github/workflows/` | CI, build and deploy |
