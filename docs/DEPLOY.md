@@ -21,7 +21,7 @@ alias C='docker compose -f server/deploy/compose.prod.yaml'   # optional, per sh
 
 ## 0. Decide first
 
-- **The domain**, for example `scoreboard.example.org` (a subdomain you control; `fortune.ataary.com`
+- **The domain**, for example `scoreboard.example.org` (a subdomain you control; `fortune.johnsonfarms.us`
   is still a placeholder for the game itself, not this server).
 - **Where backups go.** They land in `/var/backups/fortune-scoreboard` on the VM. That does not
   survive losing the VM, so set `BACKUP_RSYNC_TARGET` to another machine (or a Hetzner Storage

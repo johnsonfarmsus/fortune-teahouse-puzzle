@@ -102,4 +102,4 @@ CI fails if the exported build exceeds 12 MB **gzipped**, which is what a phone 
 
 ## License
 
-GNU Affero General Public License, version 3 or later (`AGPL-3.0-or-later`). Every source file carries an `SPDX-License-Identifier: AGPL-3.0-or-later` header. Because the AGPL covers network use, the game's about screen and the big-screen page must link to this source repository: https://github.com/johnsonfarmsus/fortune-teahouse-puzzle
+Code: GNU Affero General Public License, version 3 or later (`AGPL-3.0-or-later`). Art and audio in `game/art/`, `game/audio/` and `server/static/bigscreen/img/`: Creative Commons Attribution-ShareAlike 4.0 (`CC-BY-SA-4.0`, text in `LICENSES/CC-BY-SA-4.0.txt`, credits in `ASSETS.md`). Every source file carries an `SPDX-License-Identifier: AGPL-3.0-or-later` header. Because the AGPL covers network use, the game's about screen and the big-screen page must link to this source repository: https://github.com/johnsonfarmsus/fortune-teahouse-puzzle

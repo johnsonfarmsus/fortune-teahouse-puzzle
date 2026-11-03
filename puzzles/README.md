@@ -47,7 +47,7 @@ A machine file has:
 
 `backs.yaml` has two `packs` (`id`, exact `text`, `lucky_numbers`, `char_count`) and the
 `start_code` `3141592653`: Pack A's numbers then Pack B's spell the first ten digits of
-pi (decision D7). The address `fortune.ataary.com` is a placeholder.
+pi (decision D7). The address is the production domain, `fortune.johnsonfarms.us`.
 
 ### YAML subset
 
