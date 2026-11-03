@@ -1,0 +1,12 @@
+# A puff of steam.
+out: art/fx/fx_steam.png
+colors: . transparent, w white, g sky
+---
+........
+...ggw..
+...ggww.
+.wwwwwww
+.wgwwww.
+.wwwww..
+.wwww...
+........

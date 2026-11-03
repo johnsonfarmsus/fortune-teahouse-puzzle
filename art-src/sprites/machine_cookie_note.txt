@@ -1,0 +1,20 @@
+# The gnu's rhyme note, faded and then readable.
+out: art/machines/machine_cookie_note.png
+colors: . transparent, k black, t tan, c cream, r red, m grey_dark, l grey
+---
+......kmmk............krrk......
+..kkkkmmmmkkkk....kkkkrrrrkkkk..
+.kllllmmmmllllk..kccccrrrrcccck.
+.klllllmmlllllk..kcccccrrccccck.
+.kllllllllllllk..kcccccccccccck.
+.kllmmmmmmmmllk..kccllllllllcck.
+.kllllllllllllk..kcccccccccccck.
+.kllllllllllllk..kcccccccccccck.
+.kllmmmmmmmmllk..kccllllllllcck.
+.kllllllllllllk..kcccccccccccck.
+.kllllllllllllk..kcccccccccccck.
+.kllmmmmmlllllk..kcclllllccccck.
+.kllllllllllllk..kcccccccccccck.
+.klllllllllllmk..kccccccccccctk.
+.kllllllllllmk...kcccccccccctk..
+..kkkkkkkkkkk.....kkkkkkkkkkk...

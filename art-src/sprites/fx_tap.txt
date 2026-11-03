@@ -1,0 +1,12 @@
+# A tap ripple that widens over three frames.
+out: art/fx/fx_tap.png
+colors: . transparent, w white
+---
+..................wwww..
+...........ww....ww..ww.
+...ww.....w..w..ww....ww
+..wwww...w....w.w......w
+..wwww...w....w.w......w
+...ww.....w..w..ww....ww
+...........ww....ww..ww.
+..................wwww..

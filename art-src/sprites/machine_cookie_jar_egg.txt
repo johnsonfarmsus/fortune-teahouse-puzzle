@@ -1,0 +1,16 @@
+# A small jar of eggs on the batter shelf.
+out: art/machines/machine_cookie_jar_egg.png
+colors: . transparent, k black, b brown, L brown_light, c cream, w white, o orange, g sky
+---
+..kkkk..
+.kLbbbk.
+.kbbbbk.
+kggggggk
+kwgggggk
+kwoooogk
+kwoooogk
+kgocoogk
+kgcooogk
+kgoocogk
+kgoooogk
+.kkkkkk.

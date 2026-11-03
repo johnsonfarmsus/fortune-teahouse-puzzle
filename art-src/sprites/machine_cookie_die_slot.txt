@@ -1,0 +1,10 @@
+# The empty slot the cutter die bolts into.
+out: art/machines/machine_cookie_die_slot.png
+colors: . transparent, k black, m grey_dark, v silver
+---
+kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk
+kvmmmmmmmmmmmmmmmmmmmmmmmmmmmmvk
+kmmkkkkkkkkkkkkkkkkkkkkkkkkkkmmk
+kmmkkkkkkkkkkkkkkkkkkkkkkkkkkmmk
+kvmmmmmmmmmmmmmmmmmmmmmmmmmmmmvk
+kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk

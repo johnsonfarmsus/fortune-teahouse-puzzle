@@ -18,6 +18,7 @@ Every art and audio file committed to this repository, where it came from, its l
 
 | Path | Source | Licence | Author | AI-generated | Record |
 | --- | --- | --- | --- | --- | --- |
+| `game/art/machines/*.png`, `game/art/closeups/closeup_{bolt,dent,dial,shelf}.png`, `game/art/fx/*.png`, `game/art/ui/*.png` (22 files) | Text sprites drawn for this game, built from `art-src/sprites/*.txt` by `python -m art sprites` | CC-BY-SA-4.0 | Fortune Teahouse contributors | No | `art-src/sprites/` |
 | `game/art/portraits/gnu_neutral.png` | Gnu neutral portrait: generated reference (Qwen-Image-2512 + Qwen-Image-2512-Lightning 8-step, seed 1682048113), pixelized to 32×32 | CC-BY-SA-4.0 | Fortune Teahouse contributors | Yes | `art-src/generated/portrait.gnu.neutral.json` |
 | `game/art/portraits/seagull_neutral.png` | Seagull neutral portrait: generated reference (Qwen-Image-2512 + Qwen-Image-2512-Lightning 8-step, seed 1682120206), pixelized to 32×32 | CC-BY-SA-4.0 | Fortune Teahouse contributors | Yes | `art-src/generated/portrait.seagull.neutral.json` |
 | `game/art/portraits/penguin_neutral.png` | Penguin neutral portrait: generated reference (Qwen-Image-2512 + Qwen-Image-2512-Lightning 8-step, seed 1682161086), pixelized to 32×32 | CC-BY-SA-4.0 | Fortune Teahouse contributors | Yes | `art-src/generated/portrait.penguin.neutral.json` |
