@@ -1,0 +1,142 @@
+{
+ "description": "Tiles that are transparent around their subject, baked onto the tile they stand on, because a room draws one tile per cell. Built by: PYTHONPATH=tools python -m art tiles. Sources are Ninja Adventure (CC0) cells under game/art/ninja/.",
+ "out": "art/tiles/composites.png",
+ "tiles": [
+  {
+   "asset": "tile.tree",
+   "over": {
+    "file": "art/ninja/Backgrounds/Tilesets/TilesetNature.png",
+    "origin": [
+     0,
+     160
+    ]
+   },
+   "under": {
+    "file": "art/ninja/Backgrounds/Tilesets/TilesetFloor.png",
+    "origin": [
+     16,
+     192
+    ]
+   }
+  },
+  {
+   "asset": "tile.flowers",
+   "over": {
+    "file": "art/ninja/Backgrounds/Tilesets/TilesetNature.png",
+    "origin": [
+     16,
+     176
+    ]
+   },
+   "under": {
+    "file": "art/ninja/Backgrounds/Tilesets/TilesetFloor.png",
+    "origin": [
+     16,
+     192
+    ]
+   }
+  },
+  {
+   "asset": "tile.post",
+   "over": {
+    "file": "art/ninja/Backgrounds/Tilesets/TilesetElement.png",
+    "origin": [
+     16,
+     0
+    ]
+   },
+   "under": {
+    "file": "art/ninja/Backgrounds/Tilesets/TilesetWater.png",
+    "origin": [
+     16,
+     16
+    ]
+   }
+  },
+  {
+   "asset": "tile.crate",
+   "over": {
+    "file": "art/ninja/Backgrounds/Tilesets/TilesetElement.png",
+    "origin": [
+     96,
+     0
+    ]
+   },
+   "under": {
+    "file": "art/ninja/Backgrounds/Tilesets/Interior/TilesetInteriorFloor.png",
+    "origin": [
+     272,
+     32
+    ]
+   }
+  },
+  {
+   "asset": "tile.junk",
+   "over": {
+    "file": "art/ninja/Backgrounds/Tilesets/TilesetVillageAbandoned.png",
+    "origin": [
+     80,
+     64
+    ]
+   },
+   "under": {
+    "file": "art/ninja/Backgrounds/Tilesets/TilesetFloor.png",
+    "origin": [
+     192,
+     240
+    ]
+   }
+  },
+  {
+   "asset": "tile.fence",
+   "over": {
+    "file": "art/ninja/Backgrounds/Tilesets/TilesetHouse.png",
+    "origin": [
+     176,
+     80
+    ]
+   },
+   "under": {
+    "file": "art/ninja/Backgrounds/Tilesets/TilesetFloor.png",
+    "origin": [
+     16,
+     192
+    ]
+   }
+  },
+  {
+   "asset": "tile.table",
+   "over": {
+    "file": "art/ninja/Backgrounds/Tilesets/TilesetElement.png",
+    "origin": [
+     128,
+     0
+    ]
+   },
+   "under": {
+    "file": "art/ninja/Backgrounds/Tilesets/Interior/TilesetInteriorFloor.png",
+    "origin": [
+     272,
+     32
+    ]
+   }
+  },
+  {
+   "asset": "tile.counter",
+   "over": {
+    "file": "art/ninja/Backgrounds/Tilesets/TilesetElement.png",
+    "origin": [
+     48,
+     160
+    ]
+   },
+   "under": {
+    "file": "art/ninja/Backgrounds/Tilesets/Interior/TilesetInteriorFloor.png",
+    "origin": [
+     272,
+     32
+    ]
+   }
+  }
+ ]
+}

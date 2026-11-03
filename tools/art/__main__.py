@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
-"""Command line: python -m art {pixelize,sprites,list,render,batch} ...
+"""Command line: python -m art {pixelize,sprites,tiles,list,render,batch} ...
 
   pixelize IN OUT --size WxH [--colors a,b,c] [--max-colors N] [--outline NAME|none]
            [--background NAME] [--crop x0,y0,x1,y1] [--anchor center|bottom]
@@ -7,6 +7,8 @@
       Turn a render into palette-locked pixel art (see art/pixelize.py).
   sprites [--src art-src/sprites] [--check]
       Build every text sprite into game/; --check exits 1 if a PNG is stale.
+  tiles [--check]
+      Bake transparent tiles onto their ground (art-src/tiles/composites.json).
   batch JOBS.jsonl
       Run a queue of renders one at a time, skipping outputs that already exist.
   list [--prefix NAME] [--missing]
@@ -68,6 +70,11 @@ def main(argv: list[str] | None = None) -> int:
     sp.add_argument("--game", type=Path, default=ROOT / "game")
     sp.add_argument("--check", action="store_true")
 
+    tp = sub.add_parser("tiles")
+    tp.add_argument("--spec", type=Path, default=ROOT / "art-src" / "tiles" / "composites.json")
+    tp.add_argument("--game", type=Path, default=ROOT / "game")
+    tp.add_argument("--check", action="store_true")
+
     bp = sub.add_parser("batch")
     bp.add_argument("jobs", type=Path, help="JSON lines: id, kind, prompt, out, [quality, shape, source, seconds]")
 
@@ -110,6 +117,13 @@ def main(argv: list[str] | None = None) -> int:
         stale = sprites.build(args.src, args.game, load_palette(), check=args.check)
         if args.check and stale:
             print("stale text sprites (run: PYTHONPATH=tools python -m art sprites):", *stale, sep="\n  ")
+            return 1
+        return 0
+
+    if args.cmd == "tiles":
+        stale = sprites.build_composites(args.spec, args.game, check=args.check)
+        if args.check and stale:
+            print("stale composite tiles (run: PYTHONPATH=tools python -m art tiles):", *stale, sep="\n  ")
             return 1
         return 0
 

@@ -220,7 +220,8 @@ def batch(client: Client, jobs_file: Path, log=print, retries_502: int = 3, wait
     """Run a JSON-lines queue of renders, one at a time, skipping outputs that exist.
 
     Each line: {"id", "kind": image|edit|music, "prompt", "out", and optionally
-    "quality", "shape", "source" (library item name), "seconds"}. On a 502 it
+    "quality", "shape", "source" (library item name), "source_record" (the
+    .json record of an earlier output, to edit that render), "seconds"}. On a 502 it
     waits and retries a few times, then stops the whole batch."""
     done = failed = skipped = 0
     for n, line in enumerate(Path(jobs_file).read_text(encoding="utf-8").splitlines(), 1):
@@ -236,8 +237,16 @@ def batch(client: Client, jobs_file: Path, log=print, retries_502: int = 3, wait
             opts["quality"] = job.get("quality", "best")
         if job["kind"] == "image":
             opts["shape"] = job.get("shape", "square")
-        if job.get("source"):
-            opts["source"] = {"library": job["source"]}
+        source = job.get("source")
+        if job.get("source_record"):  # chain: edit what an earlier job in this queue rendered
+            record_path = Path(job["source_record"]).expanduser()
+            if not record_path.exists():
+                failed += 1
+                log(f"FAIL {job['id']}: its source {record_path.name} was not rendered")
+                continue
+            source = json.loads(record_path.read_text(encoding="utf-8"))["library_item"]
+        if source:
+            opts["source"] = {"library": source}
         if job["kind"] == "music":
             opts["seconds"] = int(job.get("seconds", 60))
         for attempt in range(retries_502 + 1):

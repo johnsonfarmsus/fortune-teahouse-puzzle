@@ -110,3 +110,43 @@ def build(src_dir: Path, game_dir: Path, palette: dict[str, RGB], check: bool = 
         dest.parent.mkdir(parents=True, exist_ok=True)
         img.save(dest)
     return stale
+
+
+def build_composites(spec_path: Path, game_dir: Path, check: bool = False) -> list[str]:
+    """Bake each transparent tile onto the tile it stands on, one 16 px cell per
+    tile in a row, and point its asset at the sheet. With ``check``, return the
+    stale outputs instead of writing."""
+    import json
+
+    spec = json.loads(Path(spec_path).read_text(encoding="utf-8"))
+    sheets: dict[str, Image.Image] = {}
+
+    def cell(src: dict) -> Image.Image:
+        f = src["file"]
+        if f not in sheets:
+            sheets[f] = Image.open(Path(game_dir) / f).convert("RGBA")
+        x, y = src["origin"]
+        return sheets[f].crop((x, y, x + 16, y + 16))
+
+    tiles = spec["tiles"]
+    out = Image.new("RGBA", (16 * len(tiles), 16), (0, 0, 0, 0))
+    for i, t in enumerate(tiles):
+        tile = cell(t["under"]).copy()
+        tile.alpha_composite(cell(t["over"]))
+        out.paste(tile, (16 * i, 0))
+    dest = Path(game_dir) / spec["out"]
+    assets_path = Path(game_dir) / "assets.json"
+    assets = json.loads(assets_path.read_text(encoding="utf-8"))
+    wanted = {t["asset"]: (spec["out"], [16 * i, 0]) for i, t in enumerate(tiles)}
+    stale_assets = [a for a, (f, o) in wanted.items()
+                    if assets["assets"][a].get("file") != f or assets["assets"][a].get("origin") != o]
+    if check:
+        stale = [] if dest.exists() and same_pixels(out, Image.open(dest)) else [spec["out"]]
+        return stale + [f"assets.json {a}" for a in stale_assets]
+    dest.parent.mkdir(parents=True, exist_ok=True)
+    out.save(dest)
+    for a, (f, o) in wanted.items():
+        assets["assets"][a]["file"] = f
+        assets["assets"][a]["origin"] = o
+    assets_path.write_text(json.dumps(assets, indent=1, ensure_ascii=False) + "\n", encoding="utf-8")
+    return []

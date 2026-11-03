@@ -45,3 +45,6 @@ jobs:
 
       - name: Text sprites are up to date
         run: python -m art sprites --check
+
+      - name: Composite tiles are up to date
+        run: python -m art tiles --check
