@@ -1,0 +1,16 @@
+# A small jar of yellow butter on the batter shelf.
+out: art/machines/machine_cookie_jar_butter.png
+colors: . transparent, k black, b brown, L brown_light, w white, y yellow, o orange, g sky
+---
+..kkkk..
+.kLbbbk.
+.kbbbbk.
+kggggggk
+kwgggggk
+kwyyyygk
+kwyyyygk
+kgyoyygk
+kgoyyygk
+kgyyoygk
+kgyyyygk
+.kkkkkk.

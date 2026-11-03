@@ -1,0 +1,12 @@
+# Two frames of the conveyor belt, treads moving right.
+out: art/machines/machine_cookie_belt.png
+colors: . transparent, k black, i ink, m grey_dark, l grey, v silver
+---
+kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk
+llmmllmmllmmllmmmmllmmllmmllmmll
+mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm
+ivimivimivimivimmivimivimivimivi
+iiimiiimiiimiiimmiiimiiimiiimiii
+mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm
+llmmllmmllmmllmmmmllmmllmmllmmll
+kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk

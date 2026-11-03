@@ -1,0 +1,12 @@
+# A baked, folded fortune cookie with its slip peeking out.
+out: art/machines/machine_cookie_cookie.png
+colors: . transparent, k black, b brown, w white, y yellow, o orange
+---
+...kk...
+..kook..
+.kooook.
+kooooook
+koyyyyok
+koowwook
+kooobook
+.kkookk.

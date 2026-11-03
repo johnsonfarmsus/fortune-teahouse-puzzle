@@ -1,0 +1,12 @@
+# A bubble.
+out: art/fx/fx_bubble.png
+colors: . transparent, w white, g sky, u blue
+---
+........
+..uuuu..
+.uwwggu.
+.uggggu.
+.uggggu.
+.uggggu.
+..uuuu..
+........

@@ -1,0 +1,12 @@
+# A raw dough round on the belt.
+out: art/machines/machine_cookie_round.png
+colors: . transparent, k black, t tan, s sand, c cream
+---
+..kkkk..
+.kssssk.
+ksccsssk
+kscssssk
+ksssstsk
+ksssttsk
+.kssssk.
+..kkkk..

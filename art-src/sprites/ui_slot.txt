@@ -1,0 +1,24 @@
+# An empty inventory slot.
+out: art/ui/ui_slot.png
+colors: . transparent, k black, i ink, m grey_dark
+---
+....................
+..mmmmmmmmmmmmmmmm..
+.mkkkkkkkkkkkkkkkkm.
+.mkiiiiiiiiiiiiiiim.
+.mkiiiiiiiiiiiiiiim.
+.mkiiiiiiiiiiiiiiim.
+.mkiiiiiiiiiiiiiiim.
+.mkiiiiiiiiiiiiiiim.
+.mkiiiiiiiiiiiiiiim.
+.mkiiiiiiiiiiiiiiim.
+.mkiiiiiiiiiiiiiiim.
+.mkiiiiiiiiiiiiiiim.
+.mkiiiiiiiiiiiiiiim.
+.mkiiiiiiiiiiiiiiim.
+.mkiiiiiiiiiiiiiiim.
+.mkiiiiiiiiiiiiiiim.
+.mkiiiiiiiiiiiiiiim.
+.mkiiiiiiiiiiiiiiim.
+..mmmmmmmmmmmmmmmm..
+....................
