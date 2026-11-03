@@ -96,3 +96,15 @@ class PixelizeTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class HolesTest(unittest.TestCase):
+    def test_the_middle_of_a_ring_is_cleared(self):
+        img = Image.new("RGB", (400, 400), (160, 40, 100))
+        d = ImageDraw.Draw(img)
+        d.ellipse((60, 60, 340, 340), fill=(230, 180, 60))
+        d.ellipse((140, 140, 260, 260), fill=(160, 40, 100))  # the hole shows the backdrop
+        out = pixelize(img, Options(size=(16, 16), palette=PAL, outline=None))
+        self.assertEqual(out.getpixel((8, 8))[3], 0)
+        kept = pixelize(img, Options(size=(16, 16), palette=PAL, outline=None, holes=False))
+        self.assertGreater(kept.getpixel((8, 8))[3], 0)

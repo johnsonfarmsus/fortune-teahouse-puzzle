@@ -42,6 +42,7 @@ class Options:
     alpha_threshold: int = 128
     keep_alpha: bool = False  # trust the source alpha; skip background removal
     speck_share: float = 0.15  # drop islands under this share of the largest; 0 keeps all
+    holes: bool = True  # also clear enclosed backdrop (ring middles)
 
 
 def _border_colour(img: Image.Image) -> RGB:
@@ -57,8 +58,11 @@ def _border_colour(img: Image.Image) -> RGB:
     return (sum(c[0] for c in members) // n, sum(c[1] for c in members) // n, sum(c[2] for c in members) // n)
 
 
-def remove_background(img: Image.Image, tolerance: float) -> Image.Image:
-    """Make the backdrop connected to the border transparent."""
+def remove_background(img: Image.Image, tolerance: float, holes: bool = True) -> Image.Image:
+    """Make the backdrop connected to the border transparent. With ``holes``, also
+    clear enclosed patches of backdrop (the middle of a ring, the gap under a
+    handle) that are at least a few pixels across and closer to the backdrop
+    colour than ``tolerance``."""
     img = img.convert("RGBA")
     w, h = img.size
     px = img.load()
@@ -90,7 +94,39 @@ def remove_background(img: Image.Image, tolerance: float) -> Image.Image:
             queue.append((x, y - 1))
         if y < h - 1:
             queue.append((x, y + 1))
+    if holes:
+        _clear_holes(px, w, h, bg, tol2)
     return img
+
+
+def _clear_holes(px, w: int, h: int, bg: RGB, tol2: float, min_size: int = 24) -> None:
+    """Clear enclosed regions of backdrop colour big enough not to be detail."""
+    seen = bytearray(w * h)
+    for start in range(w * h):
+        if seen[start]:
+            continue
+        sx, sy = start % w, start // w
+        r, g, b, a = px[sx, sy]
+        if not a or distance2((r, g, b), bg) > tol2:
+            seen[start] = 1
+            continue
+        region, stack = [], [start]
+        seen[start] = 1
+        while stack:
+            i = stack.pop()
+            region.append(i)
+            x, y = i % w, i // w
+            for nx, ny in ((x - 1, y), (x + 1, y), (x, y - 1), (x, y + 1)):
+                if 0 <= nx < w and 0 <= ny < h:
+                    j = ny * w + nx
+                    if not seen[j]:
+                        rr, gg, bb, aa = px[nx, ny]
+                        if aa and distance2((rr, gg, bb), bg) <= tol2:
+                            seen[j] = 1
+                            stack.append(j)
+        if len(region) >= min_size:
+            for i in region:
+                px[i % w, i // w] = (0, 0, 0, 0)
 
 
 def _subject_box(img: Image.Image, threshold: int) -> tuple[int, int, int, int]:
@@ -153,7 +189,7 @@ def pixelize(src: Image.Image, opts: Options, names: dict[str, RGB] | None = Non
         f = limit / longest
         img = img.resize((max(1, round(img.width * f)), max(1, round(img.height * f))), Image.LANCZOS)
     if not opts.keep_alpha:
-        img = remove_background(img, opts.bg_tolerance)
+        img = remove_background(img, opts.bg_tolerance, opts.holes)
 
     x0, y0, x1, y1 = _subject_box(img, opts.alpha_threshold)
     cx0, cy0, cx1, cy1 = opts.crop
