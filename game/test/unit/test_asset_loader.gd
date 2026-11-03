@@ -27,7 +27,9 @@ func test_asset_list_is_well_formed() -> void:
 			assert_bool(assets.palette.has(str(d["color"]))).override_failure_message(asset_name).is_true()
 		if asset_name.begins_with("tile."):
 			assert_object(size).is_equal(Vector2i(16, 16))
-			assert_str(str(d["file"])).starts_with("art/ninja/")
+			# Pack tiles, or composites baked from them (art-src/tiles/composites.json).
+			var file := str(d["file"])
+			assert_bool(file.begins_with("art/ninja/") or file.begins_with("art/tiles/")).override_failure_message(asset_name).is_true()
 
 
 func test_every_asset_draws_at_its_size_from_its_file_or_a_placeholder() -> void:

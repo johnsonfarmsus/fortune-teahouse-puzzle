@@ -204,7 +204,70 @@ def render(client: Client, kind: str, prompt: str, out: Path, **opts: Any) -> di
     out.parent.mkdir(parents=True, exist_ok=True)
     data = client.file(item)
     out.write_bytes(data)
-    record = {"library_item": item["name"], **provenance(client.meta(item), graph_from_png(data))}
-    record["problems"] = check_pinned(record)
+    if item.get("kind") == "images":
+        record = {"library_item": item["name"], **provenance(client.meta(item), graph_from_png(data))}
+        record["problems"] = check_pinned(record)
+    else:
+        # Audio carries no graph; record what the library stored.
+        meta = client.meta(item)
+        record = {"library_item": item["name"], "prompt": meta.get("prompt"), "mode": meta.get("mode"),
+                  "seconds": meta.get("seconds"), "problems": []}
     out.with_suffix(out.suffix + ".json").write_text(json.dumps(record, indent=2) + "\n", encoding="utf-8")
     return record
+
+
+def batch(client: Client, jobs_file: Path, log=print, retries_502: int = 3, wait_502: float = 300) -> dict[str, int]:
+    """Run a JSON-lines queue of renders, one at a time, skipping outputs that exist.
+
+    Each line: {"id", "kind": image|edit|music, "prompt", "out", and optionally
+    "quality", "shape", "source" (library item name), "source_record" (the
+    .json record of an earlier output, to edit that render), "seconds"}. On a 502 it
+    waits and retries a few times, then stops the whole batch."""
+    done = failed = skipped = 0
+    for n, line in enumerate(Path(jobs_file).read_text(encoding="utf-8").splitlines(), 1):
+        if not line.strip() or line.lstrip().startswith("#"):
+            continue
+        job = json.loads(line)
+        out = Path(job["out"]).expanduser()
+        if out.exists() and out.stat().st_size > 0:
+            skipped += 1
+            continue
+        opts: dict[str, Any] = {}
+        if job["kind"] in ("image", "edit"):
+            opts["quality"] = job.get("quality", "best")
+        if job["kind"] == "image":
+            opts["shape"] = job.get("shape", "square")
+        source = job.get("source")
+        if job.get("source_record"):  # chain: edit what an earlier job in this queue rendered
+            record_path = Path(job["source_record"]).expanduser()
+            if not record_path.exists():
+                failed += 1
+                log(f"FAIL {job['id']}: its source {record_path.name} was not rendered")
+                continue
+            source = json.loads(record_path.read_text(encoding="utf-8"))["library_item"]
+        if source:
+            opts["source"] = {"library": source}
+        if job["kind"] == "music":
+            opts["seconds"] = int(job.get("seconds", 60))
+        for attempt in range(retries_502 + 1):
+            try:
+                rec = render(client, job["kind"], job["prompt"], out, **opts)
+                done += 1
+                log(f"ok {job['id']}" + (f"  PROBLEMS {rec['problems']}" if rec["problems"] else ""))
+                break
+            except MediaError as e:
+                if "502" in str(e) and attempt < retries_502:
+                    log(f"502 on {job['id']}; waiting {wait_502:.0f}s")
+                    time.sleep(wait_502)
+                    continue
+                if "502" in str(e):
+                    log(f"STOP: backend still down after {retries_502} retries")
+                    return {"done": done, "failed": failed + 1, "skipped": skipped}
+                failed += 1
+                log(f"FAIL {job['id']}: {e}")
+                break
+            except (OSError, ValueError) as e:  # network blips, bad JSON from the server
+                failed += 1
+                log(f"FAIL {job['id']}: {e}")
+                break
+    return {"done": done, "failed": failed, "skipped": skipped}

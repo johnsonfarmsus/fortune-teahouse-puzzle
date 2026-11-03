@@ -18,6 +18,9 @@ Every art and audio file committed to this repository, where it came from, its l
 
 | Path | Source | Licence | Author | AI-generated | Record |
 | --- | --- | --- | --- | --- | --- |
+| `game/art/ninja/Backgrounds/Tilesets/*.png`, `Interior/*.png` (8 sheets) | Ninja Adventure asset pack, unmodified; the game uses one 16×16 cell per tile at the `origin` in `game/assets.json` | CC0 1.0 | Pixel-boy and AAA | No | `game/art/ninja/LICENSE.txt` |
+| `game/art/tiles/composites.png` | Ninja Adventure cells baked onto the ground they stand on (bush, flowers, fence on grass; post on water; crate, table, counter on floor; junk on dirt), built from `art-src/tiles/composites.json` by `python -m art tiles` | CC0 1.0 (derived) | Pixel-boy and AAA | No | `art-src/tiles/composites.json` |
+| `game/art/ninja/Actor/Character/Boy/SpriteSheet.png` | Ninja Adventure asset pack, unmodified (the player) | CC0 1.0 | Pixel-boy and AAA | No | `game/art/ninja/LICENSE.txt` |
 | `game/art/portraits/gnu_neutral.png` | Gnu neutral portrait: generated reference (Qwen-Image-2512 + Qwen-Image-2512-Lightning 8-step, seed 1682048113), pixelized to 32×32 | CC-BY-SA-4.0 | Fortune Teahouse contributors | Yes | `art-src/generated/portrait.gnu.neutral.json` |
 | `game/art/portraits/seagull_neutral.png` | Seagull neutral portrait: generated reference (Qwen-Image-2512 + Qwen-Image-2512-Lightning 8-step, seed 1682120206), pixelized to 32×32 | CC-BY-SA-4.0 | Fortune Teahouse contributors | Yes | `art-src/generated/portrait.seagull.neutral.json` |
 | `game/art/portraits/penguin_neutral.png` | Penguin neutral portrait: generated reference (Qwen-Image-2512 + Qwen-Image-2512-Lightning 8-step, seed 1682161086), pixelized to 32×32 | CC-BY-SA-4.0 | Fortune Teahouse contributors | Yes | `art-src/generated/portrait.penguin.neutral.json` |

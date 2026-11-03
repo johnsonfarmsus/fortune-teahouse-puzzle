@@ -1,6 +1,6 @@
 {
  "schema_version": 1,
- "description": "Logical asset names to files (PLAN.md D11). AssetLoader loads every sprite, tile and portrait through this list; a file that has not landed yet shows a placeholder drawn in code (a block in the palette colour named by color, a 1 px outline and the glyph). Tiles are expected from the Ninja Adventure pack (CC0) under art/ninja/; origin is the tile's top-left pixel in that sheet and is a best guess until the art session lands the files and corrects it. Characters, portraits, props, machines, close-ups and effects are this game's own art, expected under art/. frame_size is [w, h] in pixels; frames are read left to right from origin, columns per row; animations name frame indices. frame_colors and frame_glyphs only shape placeholders. The palette is the game's one palette (Art and sound in DESIGN.md).",
+ "description": "Logical asset names to files (PLAN.md D11). AssetLoader loads every sprite, tile and portrait through this list; a file that has not landed yet shows a placeholder drawn in code (a block in the palette colour named by color, a 1 px outline and the glyph). Tiles are expected from the Ninja Adventure pack (CC0) under art/ninja/; origin is the tile's top-left pixel in that sheet. Characters, portraits, props, machines, close-ups and effects are this game's own art, expected under art/. frame_size is [w, h] in pixels; frames are read left to right from origin, columns per row; animations name frame indices. frame_colors and frame_glyphs only shape placeholders. The palette is the game's one palette (Art and sound in DESIGN.md).",
  "tile_size": 16,
  "palette": {
   "black": "#141b1b",
@@ -31,10 +31,10 @@
  },
  "assets": {
   "tile.floor_wood": {
-   "file": "art/ninja/Backgrounds/Tilesets/TilesetInteriorFloor.png",
+   "file": "art/ninja/Backgrounds/Tilesets/Interior/TilesetInteriorFloor.png",
    "origin": [
-    0,
-    0
+    272,
+    32
    ],
    "frame_size": [
     16,
@@ -46,10 +46,10 @@
    "glyph": "-"
   },
   "tile.rug": {
-   "file": "art/ninja/Backgrounds/Tilesets/TilesetInteriorFloor.png",
+   "file": "art/ninja/Backgrounds/Tilesets/Interior/TilesetInteriorFloor.png",
    "origin": [
     16,
-    64
+    112
    ],
    "frame_size": [
     16,
@@ -61,10 +61,10 @@
    "glyph": "+"
   },
   "tile.wall_wood": {
-   "file": "art/ninja/Backgrounds/Tilesets/TilesetInterior.png",
+   "file": "art/ninja/Backgrounds/Tilesets/Interior/TilesetWallSimple.png",
    "origin": [
-    0,
-    0
+    48,
+    96
    ],
    "frame_size": [
     16,
@@ -76,10 +76,10 @@
    "glyph": "|"
   },
   "tile.window": {
-   "file": "art/ninja/Backgrounds/Tilesets/TilesetInterior.png",
+   "file": "art/ninja/Backgrounds/Tilesets/Interior/TilesetWallSimple.png",
    "origin": [
-    32,
-    0
+    16,
+    112
    ],
    "frame_size": [
     16,
@@ -91,10 +91,10 @@
    "glyph": "#"
   },
   "tile.door": {
-   "file": "art/ninja/Backgrounds/Tilesets/TilesetInterior.png",
+   "file": "art/ninja/Backgrounds/Tilesets/TilesetHouse.png",
    "origin": [
     64,
-    0
+    32
    ],
    "frame_size": [
     16,
@@ -106,10 +106,10 @@
    "glyph": ""
   },
   "tile.counter": {
-   "file": "art/ninja/Backgrounds/Tilesets/TilesetInterior.png",
+   "file": "art/tiles/composites.png",
    "origin": [
-    0,
-    48
+    112,
+    0
    ],
    "frame_size": [
     16,
@@ -121,10 +121,10 @@
    "glyph": "="
   },
   "tile.table": {
-   "file": "art/ninja/Backgrounds/Tilesets/TilesetInterior.png",
+   "file": "art/tiles/composites.png",
    "origin": [
-    48,
-    48
+    96,
+    0
    ],
    "frame_size": [
     16,
@@ -136,10 +136,10 @@
    "glyph": "o"
   },
   "tile.machine_floor": {
-   "file": "art/ninja/Backgrounds/Tilesets/TilesetInteriorFloor.png",
+   "file": "art/ninja/Backgrounds/Tilesets/Interior/TilesetInteriorFloor.png",
    "origin": [
-    64,
-    0
+    272,
+    128
    ],
    "frame_size": [
     16,
@@ -153,8 +153,8 @@
   "tile.grass": {
    "file": "art/ninja/Backgrounds/Tilesets/TilesetFloor.png",
    "origin": [
-    0,
-    0
+    16,
+    192
    ],
    "frame_size": [
     16,
@@ -168,8 +168,8 @@
   "tile.path": {
    "file": "art/ninja/Backgrounds/Tilesets/TilesetFloor.png",
    "origin": [
-    96,
-    0
+    16,
+    128
    ],
    "frame_size": [
     16,
@@ -183,8 +183,8 @@
   "tile.roof": {
    "file": "art/ninja/Backgrounds/Tilesets/TilesetHouse.png",
    "origin": [
-    0,
-    0
+    32,
+    16
    ],
    "frame_size": [
     16,
@@ -198,8 +198,8 @@
   "tile.house_wall": {
    "file": "art/ninja/Backgrounds/Tilesets/TilesetHouse.png",
    "origin": [
-    0,
-    48
+    16,
+    32
    ],
    "frame_size": [
     16,
@@ -226,7 +226,7 @@
    "glyph": "#"
   },
   "tile.tree": {
-   "file": "art/ninja/Backgrounds/Tilesets/TilesetNature.png",
+   "file": "art/tiles/composites.png",
    "origin": [
     0,
     0
@@ -243,24 +243,23 @@
   "tile.water": {
    "file": "art/ninja/Backgrounds/Tilesets/TilesetWater.png",
    "origin": [
-    0,
-    0
+    16,
+    16
    ],
    "frame_size": [
     16,
     16
    ],
-   "frames": 4,
+   "frames": 1,
    "kind": "tile",
    "color": "blue",
-   "glyph": "~",
-   "columns": 4
+   "glyph": "~"
   },
   "tile.sand": {
    "file": "art/ninja/Backgrounds/Tilesets/TilesetFloor.png",
    "origin": [
-    0,
-    96
+    16,
+    16
    ],
    "frame_size": [
     16,
@@ -272,10 +271,10 @@
    "glyph": "."
   },
   "tile.planks": {
-   "file": "art/ninja/Backgrounds/Tilesets/TilesetFloor.png",
+   "file": "art/ninja/Backgrounds/Tilesets/TilesetWater.png",
    "origin": [
-    176,
-    0
+    16,
+    208
    ],
    "frame_size": [
     16,
@@ -287,9 +286,9 @@
    "glyph": "-"
   },
   "tile.post": {
-   "file": "art/ninja/Backgrounds/Tilesets/TilesetElement.png",
+   "file": "art/tiles/composites.png",
    "origin": [
-    0,
+    32,
     0
    ],
    "frame_size": [
@@ -302,9 +301,9 @@
    "glyph": "o"
   },
   "tile.fence": {
-   "file": "art/ninja/Backgrounds/Tilesets/TilesetElement.png",
+   "file": "art/tiles/composites.png",
    "origin": [
-    64,
+    80,
     0
    ],
    "frame_size": [
@@ -319,8 +318,8 @@
   "tile.dirt": {
    "file": "art/ninja/Backgrounds/Tilesets/TilesetFloor.png",
    "origin": [
-    0,
-    160
+    192,
+    240
    ],
    "frame_size": [
     16,
@@ -332,9 +331,9 @@
    "glyph": "."
   },
   "tile.junk": {
-   "file": "art/ninja/Backgrounds/Tilesets/TilesetVillageAbandoned.png",
+   "file": "art/tiles/composites.png",
    "origin": [
-    0,
+    64,
     0
    ],
    "frame_size": [
@@ -347,10 +346,10 @@
    "glyph": "%"
   },
   "tile.crate": {
-   "file": "art/ninja/Backgrounds/Tilesets/TilesetElement.png",
+   "file": "art/tiles/composites.png",
    "origin": [
-    96,
-    16
+    48,
+    0
    ],
    "frame_size": [
     16,
@@ -362,10 +361,10 @@
    "glyph": "x"
   },
   "tile.flowers": {
-   "file": "art/ninja/Backgrounds/Tilesets/TilesetNature.png",
+   "file": "art/tiles/composites.png",
    "origin": [
-    64,
-    64
+    16,
+    0
    ],
    "frame_size": [
     16,
@@ -378,7 +377,7 @@
    "ink": "pink"
   },
   "char.player": {
-   "file": "art/ninja/Actor/Characters/Boy/SpriteSheet.png",
+   "file": "art/ninja/Actor/Character/Boy/SpriteSheet.png",
    "frame_size": [
     16,
     16
